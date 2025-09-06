@@ -9,3 +9,8 @@ Full stack Application for COSC 4353 using PERN stack
 - Volunteer Matching (A module that matches volunteers to events/tasks based on their profiles and the event requirements)
 - Notification System (Send notifications to volunteers for event assignments, updates, and reminders)
 - Volunteer History (Track volunteer participation history and performance)
+
+# Steps to download and run this project
+- cd frontend
+- npm install
+- npm run dev // runs localhost

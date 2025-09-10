@@ -14,3 +14,9 @@ Full stack Application for COSC 4353 using PERN stack
 - cd frontend
 - npm install
 - npm run dev // runs localhost
+
+# Developers
+- Cole Plagens
+- Jason Pedder
+- Samuel Alvarez
+- Ramsey Chandoklow

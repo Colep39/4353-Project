@@ -46,13 +46,11 @@ function VolunteerMatching() {
 
   return (
     <>
-      <UserBanner user={sampleUser}>
-        <div className="m-20">Navbar here</div>
         <CardGrid events={sampleVolunteerMatchingEvents} title="Event Matching" buttonLabel="Match Volunteers" titleAction={
-          <button 
-            className="ml-5 bg-gray-200 border border-black rounded px-2 py-1 text-sm font-medium hover:bg-gray-300" onClick={() => alert("Create Event Clicked")}> Create Event
-          </button>}/>
-      </UserBanner>
+        <button 
+          className="ml-5 bg-gray-200 border border-black rounded px-2 py-1 text-sm font-medium hover:bg-gray-300 cursor-pointer" onClick={() => alert("Create Event Clicked")}> Create Event
+        </button>}/>
+      
     </>
   );
 }

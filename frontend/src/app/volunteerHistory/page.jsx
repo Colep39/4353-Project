@@ -45,10 +45,8 @@ function VolunteerHistory() {
 
   return (
     <>
-      <UserBanner user={sampleUser}>
-        <div className="m-20">Navbar here</div>
-        <CardGrid events={sampleVolunteerHistory} userName={sampleUser.fullName} showButton={false}/>
-      </UserBanner>
+      <CardGrid events={sampleVolunteerHistory} userName={sampleUser.fullName} showButton={false}/>
+      
     </>
   );
 }

@@ -47,10 +47,10 @@ function EventsPage() {
 
   return (
     <>
-      <UserBanner user={sampleUser}>
-        <div className="m-20">Navbar here</div>
-        <CardGrid events={sampleEvents} />
-      </UserBanner>
+        <div className="bg-green-200 min-h-screen">
+          <CardGrid events={sampleEvents} />
+        </div>
+       
     </>
   );
 }

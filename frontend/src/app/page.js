@@ -1,11 +1,12 @@
-import EventsPage from "./pages/events.jsx";
+{/* import EventsPage from "./events/page.jsx";  */}
 {/*import VolunteerMatching from "./pages/volunteerMatching.jsx";*/}
 {/*import VolunteerHistory from "./pages/volunteerHistory.jsx";*/}
 
 export default function Home() {
   return (
     <>
-    <EventsPage></EventsPage>
+    <h1 className="m-20 text-center">Welcome to the homepage</h1>
+    {/*<EventsPage></EventsPage>*/}
     {/*<VolunteerMatching></VolunteerMatching>*/}
     {/*<VolunteerHistory></VolunteerHistory>*/}
     

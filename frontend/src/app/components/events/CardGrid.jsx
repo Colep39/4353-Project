@@ -6,7 +6,7 @@ function CardGrid({ events, title, showButton = true, buttonLabel = "Join Event"
 
   return (
     <div className="px-8">
-      <div className="flex items-center justify-between text-black py-2 mt-10 pr-2">
+      <div className="flex items-center justify-between text-black py-2 mt-30 pr-2">
         <h1 className="font-sans text-2xl font-semibold">{title || (userName ? `${userName}'s History` : "Current Events")}
             {titleAction && <span>{titleAction}</span>}
         </h1>
@@ -31,11 +31,11 @@ function CardGrid({ events, title, showButton = true, buttonLabel = "Join Event"
             </div>
             <div className="w-[90%] p-4 flex flex-col justify-between">
               <h2 className="text-xl font-semibold">{event.title}</h2>
-              <div className="text-sm text-gray-500 mb-2">{event.date}</div>
+              <div className="text-sm text-gray-500 mb-2">{event.date} Urgency: {event.urgency}</div>
               <p className="text-gray-700">{event.description}</p>
               {showButton ? (
                 <div className="mt-2">
-                    <button className="bg-green-200 border border-black rounded px-4 py-1 text-sm font-medium hover:bg-green-100 cursor-pointer">
+                    <button className="bg-gray-200 border border-black rounded px-4 py-1 text-sm font-medium hover:bg-gray-300 cursor-pointer">
                     {buttonLabel}
                     </button>
                 </div>

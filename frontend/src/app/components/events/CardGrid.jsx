@@ -35,7 +35,7 @@ function CardGrid({ events, title, showButton = true, buttonLabel = "Join Event"
               <p className="text-gray-700">{event.description}</p>
               {showButton ? (
                 <div className="mt-2">
-                    <button className="bg-gray-200 border border-black rounded px-4 py-1 text-sm font-medium hover:bg-gray-300">
+                    <button className="bg-green-200 border border-black rounded px-4 py-1 text-sm font-medium hover:bg-green-100 cursor-pointer">
                     {buttonLabel}
                     </button>
                 </div>

@@ -58,11 +58,12 @@ function VolunteerMatching() {
 
   return (
     <>
-      <CardGrid events={events} title="Event Matching" buttonLabel="Match Volunteers" titleAction={
-          <button className="ml-5 bg-gray-200 border border-black rounded px-2 py-1 text-sm font-medium hover:bg-gray-300 cursor-pointer"onClick={() => setIsModalOpen(true)}>
-              Create Event
-          </button>}
-      />
+      <div className="max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20">
+        <CardGrid events={events} title="Event Matching" buttonLabel="Match Volunteers" titleAction={
+            <button className="ml-5 bg-gray-200 border border-black rounded px-2 py-1 text-sm font-medium hover:bg-gray-300 cursor-pointer"onClick={() => setIsModalOpen(true)}>
+                Create Event
+            </button>}/>
+      </div>
 
       {isModalOpen && (
         <div className="fixed inset-0 backdrop-blur-xs flex justify-center items-center z-50">

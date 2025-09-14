@@ -48,7 +48,9 @@ function VolunteerHistory() {
 
   return (
     <>
-      <CardGrid events={sampleVolunteerHistory} userName={sampleUser.fullName} showButton={false}/>   
+      <div className="max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20">
+        <CardGrid events={sampleVolunteerHistory} userName={sampleUser.fullName} showButton={false}/>   
+      </div>
     </>
   );
 }

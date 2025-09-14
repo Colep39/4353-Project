@@ -44,9 +44,9 @@ function EventsPage() {
 
   return (
     <>
-        <div className="bg-green-200 min-h-screen">
-          <CardGrid events={sampleEvents} />
-        </div>
+      <div className="max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20">
+        <CardGrid events={sampleEvents} />
+      </div>
     </>
   );
 }

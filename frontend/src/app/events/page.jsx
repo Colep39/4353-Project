@@ -45,7 +45,7 @@ function EventsPage() {
   return (
     <>
       <div className="max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20">
-        <CardGrid events={sampleEvents} />
+        <CardGrid events={sampleEvents}/>
       </div>
     </>
   );

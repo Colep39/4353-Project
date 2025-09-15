@@ -1,12 +1,13 @@
 import { useState } from 'react';
 
-function CardGrid({ events, title, showButton = true, buttonLabel = "Join Event", titleAction = null, userName }) {
+function CardGrid({ events, title, showButton = true, buttonLabel = "Join Event", titleAction = null, userName, tooltip = false, onEventClick }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('Date Created (Most Recent)');
+  const tooltipText = tooltip ? "Click to edit event" : null;
 
   return (
     <div className="h-full flex flex-col px-8">
-      <div className="shrink-0 py-4 pr-2">
+      <div className="shrink-0 py-4 pr-2 ml-2 mr-4">
         <div className="flex items-center justify-between text-black">
           <h1 className="font-sans text-2xl font-semibold">{title || (userName ? `${userName}'s History` : "Current Events")}
             {titleAction && <span className="ml-2">{titleAction}</span>}
@@ -28,7 +29,8 @@ function CardGrid({ events, title, showButton = true, buttonLabel = "Join Event"
       </div>
       <div className="flex-1 overflow-y-auto pr-2 space-y-6">
         {events.map((event) => (
-          <div key={event.id} className="flex bg-white rounded-lg shadow-md overflow-hidden">
+        <div key={event.id} className={`mt-2 ml-2 flex bg-white rounded-lg shadow-md overflow-hidden ${tooltip ? "hover:outline hover:outline-black cursor-pointer" : ""}`}
+                  {...(tooltipText ? { title: tooltipText } : {})} {...(tooltip ? { onClick: () => onEventClick(event) } : {})}>
             <div className="w-[10%] m-2 h-[150px]">
               <img src={event.image} alt={event.title} className="object-cover h-full w-full"/>
             </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { format } from "date-fns";
 
-function CardGrid({ events, title, showButton = true, buttonLabel = "Join Event", titleAction = null, userName, tooltip = false, onEventClick }) {
+function CardGrid({ events, title, showButton = true, buttonLabel = "Join Event", titleAction = null, userName, tooltip = false, onEventClick, onMatchVolunteers, onToggleJoin, joinedEventIds = [], }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('Date Created (Most Recent)');
   const tooltipText = tooltip ? "Click to edit event" : null;
@@ -38,13 +39,26 @@ function CardGrid({ events, title, showButton = true, buttonLabel = "Join Event"
             <div className="w-[90%] p-4 flex flex-col justify-between">
               <h2 className="text-xl font-semibold">{event.title}</h2>
               <div className="text-sm text-gray-500 mb-2">
-                {event.date} Urgency: {event.urgency}
+              <span className="mr-2">
+                {event.date.start ? event.date.end && event.date.start.getTime() !== event.date.end.getTime()
+                    ? `${format(event.date.start, "MMM dd, yyyy")} - ${format(event.date.end, "MMM dd, yyyy")}`
+                    : format(event.date.start, "MMM dd, yyyy") : "No date"}
+              </span>
+              Urgency: {event.urgency}
               </div>
               <p className="text-gray-700">{event.description}</p>
               {showButton ? (
                 <div className="mt-2">
-                  <button className="bg-gray-200 border border-black rounded px-4 py-1 text-sm font-medium hover:bg-gray-300 cursor-pointer">
-                    {buttonLabel}
+                  <button className="bg-gray-200 border border-black rounded px-4 py-1 text-sm font-medium hover:bg-gray-300 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onToggleJoin) {
+                        onToggleJoin(event.id);
+                      } else if (onMatchVolunteers) {
+                        onMatchVolunteers(event);
+                      }
+                    }}>
+                    {onToggleJoin ? joinedEventIds.includes(event.id) ? "Leave Event" : "Join Event" : buttonLabel}
                   </button>
                 </div>
               ) : (

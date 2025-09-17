@@ -1,15 +1,15 @@
 "use client";
-import { Formik, Field, Form } from 'formik';
+import { ErrorMessage, Formik, Field, Form } from 'formik';
 
 const validateFields = (values) => {
     const errors = {};
 
     if (!values.username) {
-        errors.username = "Required";
+        errors.username = "Username is required";
     };
 
     if (!values.password) {
-        errors.password = "Required";
+        errors.password = "Password is required";
     };
 
     return errors;
@@ -44,6 +44,11 @@ export default function RegisterPage() {
                             name="username"
                             placeholder="Username"
                         />
+                        <ErrorMessage
+                            name="username"
+                            component="div"
+                            className="text-red-500 text-sm"
+                        />
                     </div>
 
                     <div className="flex flex-col gap-1">
@@ -56,6 +61,11 @@ export default function RegisterPage() {
                             name="password"
                             placeholder="Password"
                             type="password"
+                        />
+                        <ErrorMessage
+                            name="password"
+                            component="div"
+                            className="text-red-500 text-sm"
                         />
                     </div>
 

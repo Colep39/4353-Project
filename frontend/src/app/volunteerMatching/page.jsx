@@ -77,7 +77,11 @@ const recommendedVolunteers = [
 function VolunteerMatching() {
   const [events, setEvents] = useState(sampleVolunteerMatchingEvents);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newEvent, setNewEvent] = useState({title: '', date: '', urgency: '', description: '', image: '',});
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [newEvent, setNewEvent] = useState({title: '', date: { start: null, end: null }, urgency: '', description: '', image: '',});
+  const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
+  const [matchedEvent, setMatchedEvent] = useState(null);
+  const [selectedVolunteers, setSelectedVolunteers] = useState([]);
 
   const handleCreateEvent = () => {
     const nextId = events.length + 1;
@@ -92,10 +96,20 @@ function VolunteerMatching() {
     setIsModalOpen(false);
   };
 
+  const handleEditEvent = (event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+const handleMatchVolunteers = (event) => {
+  setMatchedEvent(event);
+  setIsMatchModalOpen(true);
+};
+
   return (
     <>
       <div className="max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20">
-        <CardGrid events={events} title="Event Matching" buttonLabel="Match Volunteers" titleAction={
+        <CardGrid events={events} title="Event Matching" buttonLabel="Match Volunteers" tooltip={true} onEventClick={handleEditEvent} onMatchVolunteers={handleMatchVolunteers} titleAction={
             <button className="ml-5 bg-gray-200 border border-black rounded px-2 py-1 text-sm font-medium hover:bg-gray-300 cursor-pointer"onClick={() => setIsModalOpen(true)}>
                 Create Event
             </button>}/>
@@ -104,25 +118,54 @@ function VolunteerMatching() {
       {isModalOpen && (
         <div className="fixed inset-0 backdrop-blur-xs flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-md relative border border-black">
-            <button onClick={() => setIsModalOpen(false)} className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-black">
+            <button onClick={() => {setIsModalOpen(false); setSelectedEvent(null); setNewEvent({ title: '', date: { start: null, end: null }, urgency: '', description: '', image: '' });}} 
+                    className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-black">
               &times;
             </button>
-            <h2 className="text-lg font-semibold mb-4">Create New Event</h2>
+
+            <h2 className="text-lg font-semibold mb-4">{selectedEvent ? "Edit Event" : "Create New Event"}</h2>
 
             <div className="flex flex-col space-y-3">
               <div className="flex items-center">
-                <label htmlFor="eventName" className="w-32">Event Name</label>
-                <input type="text" id="eventName" className="border px-3 py-2 rounded w-full" value={newEvent.title} onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}/>
+                <label htmlFor="eventName" className="w-32">Event Name</label><span className="text-red-500 mr-2">*</span>
+                <input type="text" id="eventName" className="border px-3 py-2 rounded w-full" value={selectedEvent ? selectedEvent.title : newEvent.title}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (selectedEvent) {
+                      setSelectedEvent({ ...selectedEvent, title: value });
+                    } else {
+                      setNewEvent({ ...newEvent, title: value });
+                    }
+                  }}
+                />
               </div>
 
               <div className="flex items-center">
-                <label htmlFor="eventDate" className="w-32">Event Date</label>
-                <input type="text" id="eventDate" placeholder="MM/DD/YY" className="border px-3 py-2 rounded w-full" value={newEvent.date} onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}/>
+                <label htmlFor="eventDate" className="w-25">Event Date</label><span className="text-red-500 mr-2">*</span>
+                <DatePicker selectsRange startDate={selectedEvent ? selectedEvent.date?.start : newEvent.date?.start} endDate={selectedEvent ? selectedEvent.date?.end : newEvent.date?.end}
+                    onChange={(update) => {
+                      const [start, end] = update;
+                      if (selectedEvent) {
+                        setSelectedEvent({ ...selectedEvent, date: { start, end },});
+                      } else {
+                        setNewEvent({...newEvent, date: { start, end },});
+                      }
+                    }}
+                    isClearable className="border px-15 py-2 rounded w-full" placeholderText="Click to choose date(s)"/>
               </div>
 
               <div className="flex items-center">
-                <label htmlFor="eventUrgency" className="w-32">Urgency</label>
-                <select id="eventUrgency" className="border px-3 py-2 rounded w-full" value={newEvent.urgency} onChange={(e) => setNewEvent({ ...newEvent, urgency: e.target.value })}>
+                <label htmlFor="eventUrgency" className="w-32">Urgency</label><span className="text-red-500 mr-2">*</span>
+                <select id="eventUrgency" className="border px-3 py-2 rounded w-full" value={selectedEvent ? selectedEvent.urgency : newEvent.urgency}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (selectedEvent) {
+                      setSelectedEvent({ ...selectedEvent, urgency: value });
+                    } else {
+                      setNewEvent({ ...newEvent, urgency: value });
+                    }
+                  }}
+                >
                   <option>4</option>
                   <option>3</option>
                   <option>2</option>
@@ -131,18 +174,59 @@ function VolunteerMatching() {
               </div>
 
               <div className="flex items-center">
-                <label htmlFor="eventDescription" className="w-32">Description</label>
-                <textarea id="eventDescription" className="border px-3 py-2 rounded w-full" value={newEvent.description} onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}/>
+                <label htmlFor="eventDescription" className="w-32">Description</label><span className="text-red-500 mr-2">*</span>
+                <textarea id="eventDescription" className="border px-3 py-2 rounded w-full" value={selectedEvent ? selectedEvent.description : newEvent.description}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (selectedEvent) {
+                      setSelectedEvent({ ...selectedEvent, description: value });
+                    } else {
+                      setNewEvent({ ...newEvent, description: value });
+                    }
+                  }}
+                />
               </div>
 
               <div className="flex items-center">
-                <label htmlFor="eventImage" className="w-32">Event Image</label>
-                <input type="text" id="eventImage" placeholder="Image URL" className="border px-3 py-2 rounded w-full" value={newEvent.image} onChange={(e) => setNewEvent({ ...newEvent, image: e.target.value })}/>
+                <label htmlFor="eventImage" className="w-32">Event Image</label><span className="text-red-500 mr-2">*</span>
+                <input type="text" id="eventImage" placeholder="Image URL or path" className="border px-3 py-2 rounded w-full" value={selectedEvent ? selectedEvent.image : newEvent.image}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (selectedEvent) {
+                      setSelectedEvent({ ...selectedEvent, image: value });
+                    } else {
+                      setNewEvent({ ...newEvent, image: value });
+                    }
+                  }}
+                />
               </div>
 
-              <button onClick={handleCreateEvent} className="bg-blue-600 text-white py-2 rounded hover:bg-blue-500 self-end px-4">
-                Add Event
-              </button>
+              <div className="flex justify-between items-center mt-4">
+                {selectedEvent ? (
+                  <button onClick={() => {setEvents(events.filter(ev => ev.id !== selectedEvent.id)); setIsModalOpen(false);
+                      setSelectedEvent(null); setNewEvent({ title: '', date: { start: null, end: null }, urgency: '', description: '', image: '' });
+                    }} className="bg-red-600 text-white py-2 rounded hover:bg-red-500 px-4">
+                    Cancel Event
+                  </button>
+                ) : (
+                  <div className="w-24"></div>
+                )}
+
+                <div className="flex space-x-2">
+                  <button onClick={() => {
+                      if (selectedEvent) {
+                        setEvents(events.map(ev => ev.id === selectedEvent.id ? selectedEvent : ev));
+                        setSelectedEvent(null);
+                      } else {
+                        handleCreateEvent();
+                      }
+                      setIsModalOpen(false);
+                      setNewEvent({ title: '', date: '', urgency: '', description: '', image: '' });
+                    }} className="bg-blue-600 text-white py-2 rounded hover:bg-blue-500 px-4">
+                    {selectedEvent ? "Save" : "Add Event"}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

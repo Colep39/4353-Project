@@ -3,7 +3,7 @@ import { useState } from "react";
 import CardGrid from '../components/events/CardGrid';
 
 const sampleEvents = [
-  /*{
+  {
     id: 1,
     title: "Traffic Director",
     date: {
@@ -46,7 +46,7 @@ const sampleEvents = [
     urgency: "2",
     description: "Looking for vendors to setup tents in the green between PGH and the library, must sell allowed goods such as food, clothing, or jewelry. Must be friendly towards students and report all revenue and provide the campus 25% of total profits",
     image: "/images/events/popup-shop.jpg",
-  },*/
+  },
 ];
 
 

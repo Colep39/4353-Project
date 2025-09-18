@@ -56,8 +56,16 @@ function CardGrid({ events = [], title, showButton = true, buttonLabel = "Join E
     <div className="h-full flex flex-col px-8">
       {events.length === 0 ? (
       <div className="flex-1 flex flex-col items-center justify-center text-gray-600">
-        <h1 className="font-sans text-2xl font-semibold">{title || (userName ? `${userName}'s History` : "No events available right now")}</h1>
-        <p className="text-sm text-gray-500">{title || (userName ? `${userName}'s History` : "You'll get a notification when new events are recommended for you.")}</p>
+        <h1 className="font-sans text-2xl font-semibold">
+          {title ? "No upcoming events" : (userName ? `${userName}’s journey is just beginning` : "No events available right now")}
+        </h1>
+        <p className="text-sm text-gray-500 mb-5">
+          {title ? "Click \"Create Event\" to start planning one!" : (userName ? "Your next adventure is waiting — join an event to see it here!" : "You'll get a notification when new events are recommended for you.")}
+        </p>
+        {titleAction && <span className="ml-2">{titleAction}</span>}
+        <div className="mt-10">
+          <img src="/images/events/event-fallback.jpg" alt="event-fallback"></img>
+        </div>
       </div>
     ) : (
       <>

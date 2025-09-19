@@ -7,7 +7,7 @@ export default function Navbar(){
     const pathname = usePathname(); // so we can highlight the current page
 
     const links = [
-        { name: 'Home', href: '/' },
+        
         { name: 'Events', href: '/events' },
         { name: 'Volunteer Matching', href:'/volunteerMatching'},
         { name: 'Volunteer History', href:'/volunteerHistory'},
@@ -23,18 +23,27 @@ export default function Navbar(){
     }
 
 return (
-    <nav className="bg-gray-900 text-white p-4 shadow-md">
+    <nav className="bg-black text-white p-4 shadow-md">
       <div className="w-full grid grid-cols-[auto_1fr_auto] items-center px-4 sm:px-8">
 
         <div className="flex items-center space-x-3">
-          <Image src="/images/avatars/cougar-connect-logo.jpg" alt="Cougar Connect Logo" width={48} height={48} className="rounded-full shrink-0"/>
-          <span className="text-lg font-bold whitespace-nowrap">The Cougar Connect</span>
+          <Link href='/' className="flex items-center space-x-3">
+            <Image src="/images/connect_logo.jpg" alt="Cougar Connect Logo" width={48} height={48} className="rounded-full shrink-0"/>
+            <span className="text-lg font-bold whitespace-nowrap">The Cougar Connect</span>
+          </Link>
         </div>
 
         <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-4">
           {links.map((link) => (
             <li key={link.href}>
-              <Link href={link.href} className={`hover:text-green-400 transition ${pathname === link.href ? "text-green-400 font-semibold" : ""}`}>
+              <Link href={link.href} 
+                className={`
+                relative 
+                after:absolute after:left-0 after:bottom-[-4px] after:h-[2px] after:w-0 after:bg-green-200 after:transition-all after:duration-300 
+                hover:after:w-full
+                transition-colors duration-300
+                ${pathname === link.href ? "text-green-200 font-semibold after:w-full" : ""}
+              `}>
                 {link.name}
               </Link>
             </li>

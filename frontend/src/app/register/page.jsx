@@ -15,7 +15,7 @@ const validateFields = (values) => {
     }
 
     if (!values.password) {
-        errors.password = "Password is required";
+        errors.password = "Required";
     };
 
     return errors;
@@ -23,11 +23,14 @@ const validateFields = (values) => {
 
 export default function RegisterPage() {
     return (
-        <div className="p-6 max-w-md mx-auto min-h-screen">
+        <div
+            className="flex items-start justify-center min-h-screen bg-cover bg-center p-6 pt-40"
+            style={{ backgroundImage: "url('/images/login-bg.png')" }}
+        >
             <Formik
                 initialValues={{
                     userType: "",
-                    username: "",
+                    email: "",
                     password: ""
                 }}
 
@@ -38,7 +41,7 @@ export default function RegisterPage() {
 
                 validate={validateFields}
             >
-                <Form className="bg-white border p-4 rounded flex flex-col gap-4">
+                <Form className="bg-white border p-6 rounded flex flex-col gap-4 w-full max-w-md">
                     <p className="text-lg font-semibold text-center">Welcome! Please register below.</p>
 
                     <p className="font-medium">Select User Type</p>

@@ -8,12 +8,14 @@ const validateFields = (values) => {
         errors.userType = "Please select a User Type";
     }
 
-    if (!values.username) {
-        errors.username = "Username is required";
-    };
+    if (!values.email) {
+        errors.email = 'Required';
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+        errors.email = 'Invalid email address';
+    }
 
     if (!values.password) {
-        errors.password = "Password is required";
+        errors.password = "Required";
     };
 
     return errors;
@@ -21,11 +23,14 @@ const validateFields = (values) => {
 
 export default function RegisterPage() {
     return (
-        <div className="p-6 max-w-md mx-auto min-h-screen">
+        <div
+            className="flex items-start justify-center min-h-screen bg-cover bg-center p-6 pt-40"
+            style={{ backgroundImage: "url('/images/login-bg.png')" }}
+        >
             <Formik
                 initialValues={{
                     userType: "",
-                    username: "",
+                    email: "",
                     password: ""
                 }}
 
@@ -36,7 +41,7 @@ export default function RegisterPage() {
 
                 validate={validateFields}
             >
-                <Form className="bg-white border p-4 rounded flex flex-col gap-4">
+                <Form className="bg-white border p-6 rounded flex flex-col gap-4 w-full max-w-md">
                     <p className="text-lg font-semibold text-center">Welcome! Please register below.</p>
 
                     <p className="font-medium">Select User Type</p>
@@ -66,16 +71,16 @@ export default function RegisterPage() {
 
                     <div className="flex flex-col gap-1">
                         <label className="text-sm font-medium">
-                            Username
+                            Email Address
                         </label>
                         <Field
                             className="border px-3 py-2 rounded"
-                            id="username"
-                            name="username"
-                            placeholder="Username"
+                            id="email"
+                            name="email"
+                            placeholder="Email Address"
                         />
                         <ErrorMessage
-                            name="username"
+                            name="email"
                             component="div"
                             className="text-red-500 text-sm"
                         />

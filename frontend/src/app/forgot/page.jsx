@@ -1,6 +1,6 @@
 "use client";
 import { ErrorMessage, Formik, Field, Form } from 'formik';
-import Link from 'next/link';
+import { AsyncCallbackSet } from 'next/dist/server/lib/async-callback-set';
 
 const validateFields = (values) => {
     const errors = {};
@@ -10,10 +10,6 @@ const validateFields = (values) => {
     } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
         errors.email = 'Invalid email address';
     }
-
-    if (!values.password) {
-        errors.password = "Required";
-    };
 
     return errors;
 }
@@ -26,19 +22,19 @@ export default function RegisterPage() {
         >
             <Formik
                 initialValues={{
-                    email: "",
-                    password: ""
+                    email: ""
                 }}
 
                 onSubmit={(values) => {
-                    alert(`Submitted:\n${JSON.stringify(values, null, 2)}`);
+                    alert(`Thank you. If this email is linked to an account, you will recieve an email to reset your password.`)
+                    //alert(`Submitted:\n${JSON.stringify(values, null, 2)}`);
                     // insert api call to save
                 }}
 
                 validate={validateFields}
             >
                 <Form className="bg-white border p-6 rounded flex flex-col gap-4 w-full max-w-md">
-                    <p className="text-lg font-semibold text-center">Welcome back! Please log in.</p>
+                    <p className="text-lg font-semibold text-center">Please enter the email address assosciated with your account.</p>
 
                     <div className="flex flex-col gap-1">
                         <label className="text-sm font-medium">
@@ -57,33 +53,12 @@ export default function RegisterPage() {
                         />
                     </div>
 
-                    <div className="flex flex-col gap-1">
-                        <label className="text-sm font-medium">
-                            Password
-                        </label>
-                        <Field
-                            className="border px-3 py-2 rounded"
-                            id="password"
-                            name="password"
-                            placeholder="Password"
-                            type="password"
-                        />
-                        <ErrorMessage
-                            name="password"
-                            component="div"
-                            className="text-red-500 text-sm"
-                        />
-                    </div>
-
                     <button
                         type="submit"
                         className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
                     >
-                        Log In
+                        Submit
                     </button>
-
-                    <p>Forgot password? <Link className="text-blue-500 underline" href="/forgot">Click here</Link></p>
-                    <p>Need to register? <Link className="text-blue-500 underline" href="/register">Click here</Link></p>
                 </Form>
             </Formik>
         </div>

@@ -1,21 +1,54 @@
-# 4353-Project
-Full stack Application for COSC 4353 using PERN stack
+# 4353-Project  
+**Full-Stack Volunteer Management Application**  
 
-# Requirements List:
-- Login (Allow volunteers and administrators to register if not already registered)
-- User Registration (Initially only username and password, followed by email verification)
-- User Profile Management (After registration, users should log in to complete their profile, including location, skills, preferences, and availability)
-- Event Management (Administrators can create and manage events, specifying required skills, location, and urgency)
-- Volunteer Matching (A module that matches volunteers to events/tasks based on their profiles and the event requirements)
-- Notification System (Send notifications to volunteers for event assignments, updates, and reminders)
-- Volunteer History (Track volunteer participation history and performance)
+A full-stack web application built for **COSC 4353** using the **PERN stack** (PostgreSQL, Express, React/Next.js, Node.js).  
+The application allows administrators to manage events and volunteers to register, match to events, and track participation.  
 
-# Steps to download and run this project
-- cd frontend
-- npm install
-- npm run dev // runs localhost
+---
 
-# Developers
+## Features  
+- **User Authentication**  
+  - Volunteers and administrators can register/login  
+  - Email verification for new users  
+
+- **User Profile Management**  
+  - Manage personal info, skills, preferences, and availability  
+
+- **Event Management**  
+  - Admins create/manage events with required skills, location, and urgency  
+
+- **Volunteer Matching System**  
+  - Automatically matches volunteers to events based on profiles and event requirements  
+
+- **Notification System**  
+  - Sends event assignments, updates, and reminders  
+
+- **Volunteer History**  
+  - Tracks participation and performance  
+
+---
+
+## Tech Stack  
+- **Frontend**: Next.js (React)  
+- **Backend**: Express.js (Node.js)  
+- **Database**: PostgreSQL  
+- **Other Tools**: Axios, JWT Authentication, TailwindCSS (if used)  
+
+---
+
+## Getting Started  
+
+### 1. Clone the repository  
+```bash
+git clone https://github.com/your-repo/4353-Project.git
+cd 4353-Project
+cd frontend
+npm install
+npm run dev   # runs on http://localhost:3000
+```
+---
+
+## Developers
 - Cole Plagens
 - Jason Pedder
 - Samuel Alvarez

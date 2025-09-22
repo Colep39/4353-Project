@@ -32,7 +32,7 @@ The application allows administrators to manage events and volunteers to registe
 - **Frontend**: Next.js (React)  
 - **Backend**: Express.js (Node.js)  
 - **Database**: PostgreSQL  
-- **Other Tools**: Axios, JWT Authentication, TailwindCSS (if used)  
+- **Other Tools**: JWT Authentication, TailwindCSS
 
 ---
 

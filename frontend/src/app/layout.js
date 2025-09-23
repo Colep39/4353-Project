@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "4353 Project",
+  title: "Cougar Connect",
   description: "COSC 4353 Volunteering Project",
   icons: { icon: '/images/favicon.png'},
 };

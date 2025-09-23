@@ -9,7 +9,7 @@ export default function Navbar(){
     const links = [
         
         { name: 'Events', href: '/events' },
-        { name: 'Volunteer Matching', href:'/volunteerMatching'},
+        { name: 'Event Management', href:'/eventManagement'},
         { name: 'Volunteer History', href:'/volunteerHistory'},
         { name: 'Profile', href:'/profile' },
         { name: 'Login', href:'/login' },

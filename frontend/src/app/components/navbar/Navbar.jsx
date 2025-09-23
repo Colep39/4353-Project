@@ -14,6 +14,7 @@ export default function Navbar(){
         { name: 'Profile', href:'/profile' },
         { name: 'Login', href:'/login' },
         { name: 'Register', href:'/register' },
+        { name: 'About Us', href:'/aboutUs'}
     ];
 
     const user = {

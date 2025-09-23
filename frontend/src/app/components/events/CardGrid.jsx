@@ -15,6 +15,13 @@ function CardGrid({ events = [], title, showButton = true, buttonLabel = "Join E
       );
     }
 
+    const urgencyOrder = {
+      Critical: 4,
+      High: 3,
+      Medium: 2,
+      Low: 1,
+    };
+
     result.sort((a, b) => {
         let primary;
 
@@ -27,23 +34,31 @@ function CardGrid({ events = [], title, showButton = true, buttonLabel = "Join E
             primary = new Date(b.date.start) - new Date(a.date.start); 
             break;
 
-          case "Urgency (Highest)":
-            primary = b.urgency - a.urgency;
+          case "Urgency (Highest)": {
+            const aUrgency = urgencyOrder[a.urgency] || 0;
+            const bUrgency = urgencyOrder[b.urgency] || 0;
+            primary = bUrgency - aUrgency;
             break;
+          }
 
-          case "Urgency (Lowest)":
-            primary = a.urgency - b.urgency;
+          case "Urgency (Lowest)": {
+            const aUrgency = urgencyOrder[a.urgency] || 0;
+            const bUrgency = urgencyOrder[b.urgency] || 0;
+            primary = aUrgency - bUrgency;
             break;
+          }
 
           default:
             primary = 0;
         }
 
         if (primary === 0) {
-          const urgencyDiff = b.urgency - a.urgency;
+          const aUrgency = urgencyOrder[a.urgency] || 0;
+          const bUrgency = urgencyOrder[b.urgency] || 0;
+          const urgencyDiff = bUrgency - aUrgency;
           if (urgencyDiff !== 0) return urgencyDiff;
 
-          return a.title.localeCompare(b.title);
+          return (a.title || "").localeCompare(b.title || "");
         }
 
         return primary;

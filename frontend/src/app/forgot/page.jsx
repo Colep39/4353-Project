@@ -17,7 +17,7 @@ const validateFields = (values) => {
 export default function RegisterPage() {
     return (
         <div
-            className="flex items-start justify-center min-h-screen bg-cover bg-center p-6 pt-40"
+            className="relative h-[calc(100vh-64px)] w-screen overflow-hidden bg-cover bg-center bg-no-repeat flex items-start justify-center p-6 pt-40"
             style={{ backgroundImage: "url('/images/login-bg.png')" }}
         >
             <Formik

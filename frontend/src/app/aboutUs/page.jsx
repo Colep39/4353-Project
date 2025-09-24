@@ -10,7 +10,7 @@ const memberInfo = [
   },
   {
     id:2,
-    description: "Jason is a Senior year Computer Science Student at the University of Houston. While he focuses on Full-Stack Development, he is also studying programming paradigms.",
+    description: "Jason is a Senior year Computer Science Student at the University of Houston. Professionally he intends the pursue a career in full stack development with aspirations to become a software engineer. Outside of academics he enjoys riding dirtbikes, hiking, and traveling.",
     image: "/images/aboutUs/jason-photo.webp",
   },
   {

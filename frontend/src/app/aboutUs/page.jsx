@@ -15,7 +15,7 @@ const memberInfo = [
   },
   {
     id:3,
-    description: "Ramsey is a Senior year Computer Science Student at the University of Houston. While he focuses on Full-Stack Development, he is also studying programming paradigms.",
+    description: "Ramsey is a Junior year Computer Science Student at the University of Houston. He enjoys hiking, gaming, and working on projects in his downtime. He's also open to chat anytime!",
     image: "/images/aboutUs/ramsey-photo.png",
   },
   {

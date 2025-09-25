@@ -5,7 +5,7 @@ import PersonCard from '../components/aboutUs/PersonCard';
 const memberInfo = [
   {
     id:1,
-    description: "Cole is a Senior Computer Science Student focusing in Full-Stack Development and Data Science. His favorite programming language is Python and tutors for COSC 3360 in his free time. ",
+    description: "Cole is a Senior Computer Science Student focusing in Full-Stack Development and Data Science. His favorite programming language is Python and in his free time enjoys basketball and peak fiction. ",
     image: "/images/aboutUs/cole-photo.webp",
   },
   {

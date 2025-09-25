@@ -1,5 +1,5 @@
 # 4353-The Cougar Connect
-**Full-Stack Volunteer Management Application**  
+**Full-Stack Volunteer Management Application**   
 
 A full-stack web application built for **COSC 4353** using the **PERN stack** (PostgreSQL, Express, React/Next.js, Node.js).  
 The application allows administrators to manage events and volunteers to register, match to events, and track participation.  
@@ -25,6 +25,18 @@ The application allows administrators to manage events and volunteers to registe
 
 - **Volunteer History**  
   - Tracks participation and performance  
+
+---
+
+## User Roles
+- **Administrator**
+  - Can create volunteering events and match volunteers
+  - Can view and update profile
+
+-**Volunteer**
+  - Can sign up for volunteering events
+  - Can view volunteering history
+  - Can view and update profile 
 
 ---
 

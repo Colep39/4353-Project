@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const user = {
   firstName: "Cole",
-  lastName: "Mole",
+  lastName: "Hawke",
   address1: "1234 Elm St",
   address2: "",
   city: "Antarctica City",

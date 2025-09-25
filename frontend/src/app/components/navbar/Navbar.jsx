@@ -22,7 +22,7 @@ export default function Navbar(){
 
     const user = {
         id: 1,
-        fullName: "Cole Mole",
+        fullName: "Cole Hawke",
         avatar: "/images/avatars/cole.jpg",
     }
 

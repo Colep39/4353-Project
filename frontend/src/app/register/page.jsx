@@ -68,8 +68,8 @@ export default function RegisterPage() {
                   id="password" name="password" placeholder="Password" type="password"/>
                 <ErrorMessage name="password" component="div" className="text-red-300 text-sm"/>
               </div>
-              <button type="submit" className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition">Register</button>
-              <Link className="text-blue-800 hover:text-blue-900 underline text-sm text-left" href="/login">Already have an account? Log in</Link>
+              <button type="submit" className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition cursor-pointer">Register</button>
+              <p className="text-sm text-left">Already have an account? <Link className="text-blue-800 hover:text-blue-900 underline"  href="/login">Log in</Link></p>
             </Form>
           </Formik>
         </div>

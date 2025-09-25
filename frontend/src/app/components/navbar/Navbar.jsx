@@ -98,7 +98,7 @@ return (
                 {notifications.length > 0 ? (
                   <ul className="divide-y divide-gray-200">
                     {notifications.map((note, idx) => (
-                      <li key={idx} className="p-3 hover:bg-gray-100">
+                      <li key={idx} className="p-3 hover:bg-gray-100 cursor-pointer">
                         {note}
                       </li>
                     ))}

@@ -1,10 +1,12 @@
-
+import VolunteerProfile from '../components/profile/VolunteerProfile';
+import AdminProfile from '../components/profile/AdminProfile';
 
 export default function ProfilePage(){
     return(
         <>
             <div>
-                <h1 className="text-3xl font-bold text-center mt-10">Profile Page</h1>
+                <VolunteerProfile />
+                {/*<AdminProfile /> */}
             </div>
         </>
     );

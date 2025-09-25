@@ -49,7 +49,7 @@ export default function RegisterPage() {
                   id="password" name="password" placeholder="Password" type="password"/>
                 <ErrorMessage name="password" component="div" className="text-red-300 text-sm"/>
               </div>
-              <button type="submit" className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition">Log In</button>
+              <button type="submit" className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition cursor-pointer">Log In</button>
               <Link className="text-blue-800 hover:text-blue-900 underline text-sm text-left" href="/forgot">Forgot Password?</Link>
               <Link className="text-blue-800 hover:text-blue-900 underline text-sm text-left" href="/register">Sign Up</Link>
             </Form>

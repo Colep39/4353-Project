@@ -3,89 +3,59 @@ import { ErrorMessage, Formik, Field, Form } from 'formik';
 import Link from 'next/link';
 
 const validateFields = (values) => {
-    const errors = {};
-
-    if (!values.email) {
-        errors.email = 'Required';
-    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-        errors.email = 'Invalid email address';
-    }
-
-    if (!values.password) {
-        errors.password = "Required";
-    };
-
-    return errors;
+  const errors = {};
+  if (!values.email) {
+    errors.email = 'Required';
+  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+    errors.email = 'Invalid email address';
+  }
+  if (!values.password) {
+    errors.password = "Required";
+  }
+  return errors;
 }
 
 export default function RegisterPage() {
-    return (
-        <div
-            className="flex items-start justify-center min-h-screen bg-cover bg-center p-6 pt-40"
-            style={{ backgroundImage: "url('/images/login-bg.png')" }}
-        >
-            <Formik
-                initialValues={{
-                    email: "",
-                    password: ""
-                }}
-
-                onSubmit={(values) => {
-                    alert(`Submitted:\n${JSON.stringify(values, null, 2)}`);
-                    // insert api call to save
-                }}
-
-                validate={validateFields}
-            >
-                <Form className="bg-white border p-6 rounded flex flex-col gap-4 w-full max-w-md">
-                    <p className="text-lg font-semibold text-center">Welcome back! Please log in.</p>
-
-                    <div className="flex flex-col gap-1">
-                        <label className="text-sm font-medium">
-                            Email Address
-                        </label>
-                        <Field
-                            className="border px-3 py-2 rounded"
-                            id="email"
-                            name="email"
-                            placeholder="Email Address"
-                        />
-                        <ErrorMessage
-                            name="email"
-                            component="div"
-                            className="text-red-500 text-sm"
-                        />
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                        <label className="text-sm font-medium">
-                            Password
-                        </label>
-                        <Field
-                            className="border px-3 py-2 rounded"
-                            id="password"
-                            name="password"
-                            placeholder="Password"
-                            type="password"
-                        />
-                        <ErrorMessage
-                            name="password"
-                            component="div"
-                            className="text-red-500 text-sm"
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
-                    >
-                        Log In
-                    </button>
-
-                    <p>Forgot password? <Link className="text-blue-500 underline" href="/forgot">Click here</Link></p>
-                    <p>Need to register? <Link className="text-blue-500 underline" href="/register">Click here</Link></p>
-                </Form>
-            </Formik>
+  return (
+    <div
+      className="relative h-[calc(100vh-64px)] w-screen overflow-hidden bg-cover bg-center bg-no-repeat flex items-center justify-center"
+      style={{ backgroundImage: "url('/images/login-bg.jpg')" }}
+    >
+      <div className="backdrop-blur-xs bg-white/30 border border-white/40 rounded-2xl shadow-xl w-full max-w-4xl flex flex-col md:flex-row items-stretch overflow-hidden">
+        <div className="flex-1 flex flex-col justify-center px-8 py-12 text-white-300">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 drop-shadow">Unlock Your Potential</h1>
+          <p className="text-lg max-w-md drop-shadow">
+            Join a community of driven individuals. Stay inspired, stay motivated, and achieve your goals.  
+            Your journey starts here. Log in the view current events, or sign up to be a part of the team!
+          </p>
         </div>
-    );
-};
+        <div className="flex-1 flex items-center justify-center px-10 py-12 bg-white/10">
+          <Formik initialValues={{ email: "", password: "" }}
+            onSubmit={(values) => {
+              alert(`Submitted:\n${JSON.stringify(values, null, 2)}`);
+            }}
+            validate={validateFields}>
+            <Form className="flex flex-col gap-4 w-full max-w-sm">
+              <p className="text-lg font-semibold text-center text-white-300 drop-shadow">Welcome back! Please log in.</p>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-white-300">Email Address</label>
+                <Field className="border border-white/50 bg-white/70 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  id="email" name="email" placeholder="Email Address"/>
+                <ErrorMessage name="email" component="div" className="text-red-300 text-sm"/>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-white-300">Password</label>
+                <Field className="border border-white/50 bg-white/70 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  id="password" name="password" placeholder="Password" type="password"/>
+                <ErrorMessage name="password" component="div" className="text-red-300 text-sm"/>
+              </div>
+              <button type="submit" className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition">Log In</button>
+              <Link className="text-blue-800 hover:text-blue-900 underline text-sm text-left" href="/forgot">Forgot Password?</Link>
+              <Link className="text-blue-800 hover:text-blue-900 underline text-sm text-left" href="/register">Sign Up</Link>
+            </Form>
+          </Formik>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -5,7 +5,7 @@ import PersonCard from '../components/aboutUs/PersonCard';
 const memberInfo = [
   {
     id:1,
-    description: "Cole is a Senior year Computer Science Student at the University of Houston. While he focuses on Full-Stack Development, he is also studying programming paradigms.",
+    description: "Cole is a Senior Computer Science Student focusing in Full-Stack Development and Data Science. His favorite programming language is Python and tutors for COSC 3360 in his free time. ",
     image: "/images/aboutUs/cole-photo.webp",
   },
   {

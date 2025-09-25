@@ -33,7 +33,7 @@ The application allows administrators to manage events and volunteers to registe
   - Can create volunteering events and match volunteers
   - Can view and update profile
 
--**Volunteer**
+- **Volunteer**
   - Can sign up for volunteering events
   - Can view volunteering history
   - Can view and update profile 

@@ -40,7 +40,7 @@ The application allows administrators to manage events and volunteers to registe
 
 ### 1. Clone the repository  
 ```bash
-git clone https://github.com/your-repo/4353-Project.git
+git clone https://github.com/Colep39/4353-Project.git
 ```
 
 ### 2. Navigate and run the project

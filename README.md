@@ -51,7 +51,12 @@ npm install
 npm run dev   # runs on http://localhost:3000
 ```
 ---
+## List of dependencies used
+- npm install express cors dotenv pg pg-hstore bcryptjs jsonwebtoken 
+- npm install --save-dev nodemon
 
+
+---
 ## Developers
 - Cole Plagens
 - Jason Pedder

@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
+const manageEventRoutes = require('./routes/manageEventRoutes');
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 // routes
 app.use('/api/users', userRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/eventManagement', manageEventRoutes);
 
 app.get('/', (req, res) => {
     res.send("API is up and going....");

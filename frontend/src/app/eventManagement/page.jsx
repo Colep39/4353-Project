@@ -1,82 +1,13 @@
 "use client";
-import { useState } from "react"; 
+import { useState, useEffect } from "react"; 
 import CardGrid from '../components/events/CardGrid';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { addDays, startOfDay, isValid } from "date-fns";
 
-const sampleEvents = [
-  {
-    id: 1,
-    title: "Traffic Director",
-    date: {
-      start: new Date(2025, 9, 29),
-      end: new Date(2025, 9, 29),
-    },
-    urgency: "Critical",
-    description: "Help needed to direct traffic for the home game against Sam Houston State University. Needed from 5pm to 9pm for directing traffic in and out.",
-    image: "/images/events/traffic-director.jpg",
-  },
-  {
-    id: 2,
-    title: "Cleaning SEC",
-    date: {
-      start: new Date(2025, 10, 11),
-      end: new Date(2025, 10, 11),
-    },
-    urgency: "High",
-    description: "Help needed purging the stench of stem majors from the SEC building",
-    image: "/images/events/soul-cleanup.jpg",
-  },
-  {
-    id: 3,
-    title: "Rincon's Birthday Party",
-    date: {
-      start: new Date(2025, 10, 21),
-      end: new Date(2025, 10, 21),
-    },
-    urgency: "Medium",
-    description: "Help needed setting up a surprise birthday party for the goat Rincon",
-    image: "/images/events/carlos-rincon.jpg",
-  },
-  {
-    id: 4,
-    title: "Meal Testing",
-    date: {
-      start: new Date(2025, 10, 31),
-      end: new Date(2025, 10, 31),
-    },
-    urgency: "Low",
-    description: "Looking for volunteers to risk their lives eating the cafeteria food and giving honest reviews on the quality of the food being made here on campus.",
-    image: "/images/events/cafe-food.jpg",
-  },
-];
-
-const recommendedVolunteers = [
-  {
-    firstName: "Alice Malice",
-    email: "alicemalice@example.com",
-    location: "Houston",
-  },
-  {
-    firstName: "Bob Job",
-    email: "bobjob@example.com",
-    location: "Dallas",
-  },
-  {
-    firstName: "Charlie Harley",
-    email: "charlieharley@example.com",
-    location: "Austin",
-  },
-  {
-    firstName: "Denise Quenise",
-    email: "denisequenise@example.com",
-    location: "San Antonio",
-  },
-];
-
-function eventManagement() {
-  const [events, setEvents] = useState(sampleEvents);
+function EventManagement() {
+  const [events, setEvents] = useState([]);
+  const [recommendedVolunteers, setRecommendedVolunteers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [newEvent, setNewEvent] = useState({title: '', date: { start: null, end: null }, urgency: '', description: '', image: '',});
@@ -87,21 +18,30 @@ function eventManagement() {
 
   const minSelectableDate = addDays(new Date(), 3);
 
+  useEffect(() => {
+    fetch("http://localhost:5000/api/eventManagement").then((res) => res.json()).then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
+    fetch("http://localhost:5000/api/eventManagement/recommendedVolunteers").then((res) => res.json()).then((data) => setRecommendedVolunteers(data)).catch((err) => console.error("Error fetching events:", err));
+  }, []);
+
   const resetModalState = () => {
     setSelectedEvent(null);
     setNewEvent({ title: '', date: { start: null, end: null }, urgency: '', description: '', image: '' });
     setValidationErrors({});
   };
 
-  const handleCreateEvent = (eventToAdd) => {
-    const nextId = events.length > 0 ? Math.max(...events.map(e => e.id)) + 1 : 1;
-    setEvents([
-      ...events,
-      {
-        id: nextId,
-        ...eventToAdd,
-      },
-    ]);
+  const handleCreateEvent = async (eventToAdd) => {
+    try {
+      const res = await fetch("http://localhost:5000/api/eventManagement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(eventToAdd),
+      });
+      if (!res.ok) throw new Error("Failed to create event");
+      const created = await res.json();
+      setEvents([...events, created]);
+    } catch (err) {
+      console.error("Error creating event:", err);
+    }
   };
 
   const handleEditEvent = (event) => {
@@ -167,14 +107,21 @@ const handleSave = () => {
   }
 
   if (selectedEvent) {
-    setEvents(events.map(ev => ev.id === selectedEvent.id ? selectedEvent : ev));
-    resetModalState();
-    setIsModalOpen(false);
+  fetch(`http://localhost:5000/api/eventManagement/${selectedEvent.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(selectedEvent),
+  }).then((res) => {
+      if (!res.ok) throw new Error("Failed to update event");
+      return res.json();
+    }).then((updated) => {
+      setEvents(events.map(ev => ev.id === updated.id ? updated : ev));
+    }).catch((err) => console.error("Error updating event:", err)).finally(() => {resetModalState(); setIsModalOpen(false);});
   } else {
-    handleCreateEvent(newEvent);
-    resetModalState();
-    setIsModalOpen(false);
-  }
+      handleCreateEvent(newEvent);
+      resetModalState();
+      setIsModalOpen(false);
+    }
 };
 
 return (
@@ -296,11 +243,16 @@ return (
 
               <div className="flex justify-between items-center mt-4">
                 {selectedEvent ? (
-                  <button onClick={() => {
-                    setEvents(events.filter(ev => ev.id !== selectedEvent.id));
-                    setIsModalOpen(false);
-                    resetModalState();
-                  }} className="bg-red-600 text-white py-2 rounded hover:bg-red-500 px-4">
+                  <button onClick={async () => {
+                            try {const res = await fetch(`http://localhost:5000/api/eventManagement/${selectedEvent.id}`, {method: "DELETE",});
+                              if (!res.ok) throw new Error("Failed to delete event");
+                              setEvents(events.filter(ev => ev.id !== selectedEvent.id));
+                            } catch (err) {
+                              console.error("Error deleting event:", err);
+                            } finally {
+                              setIsModalOpen(false);
+                              resetModalState();
+                            }}} className="bg-red-600 text-white py-2 rounded hover:bg-red-500 px-4">
                     Cancel Event
                   </button>
                 ) : (
@@ -381,4 +333,4 @@ return (
   );
 }
 
-export default eventManagement; 
+export default EventManagement; 

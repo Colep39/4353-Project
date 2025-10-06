@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 
 const userRoutes = require('./routes/userRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 // routes
 app.use('/api/users', userRoutes);
+app.use('/api/events', eventRoutes);
 
 app.get('/', (req, res) => {
     res.send("API is up and going....");

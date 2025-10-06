@@ -30,7 +30,7 @@ const sampleEvents = [
   },
   {
     id: 3,
-    title: "Rincons Birthday Party",
+    title: "Rincon's Birthday Party",
     date: {
       start: new Date(2025, 10, 21),
       end: new Date(2025, 10, 21),
@@ -180,7 +180,7 @@ const handleSave = () => {
 return (
     <>
       <div className="max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20">
-        <CardGrid events={events} title="Event Matching" buttonLabel="Match Volunteers" tooltip={true} onEventClick={handleEditEvent} onMatchVolunteers={handleMatchVolunteers} titleAction={
+        <CardGrid events={events} title="Upcoming Events" buttonLabel="Match Volunteers" tooltip={true} onEventClick={handleEditEvent} onMatchVolunteers={handleMatchVolunteers} titleAction={
             <button className="ml-5 bg-gray-200 border border-black rounded px-2 py-1 text-sm font-medium hover:bg-gray-300 cursor-pointer" onClick={() => { resetModalState(); setIsModalOpen(true); }}>
               Create Event
             </button>}/>

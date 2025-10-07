@@ -3,14 +3,19 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Bell } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Navbar(){
     const pathname = usePathname(); // so we can highlight the current page
     const [showNotifications, setShowNotifications] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+
+
+    useEffect(() => {
+      fetch("http://localhost:5000/api/notifications").then((res) => res.json()).then((data) => setNotifications(data)).catch((err) => console.error("Error fetching notifications:"), err)
+    }, []);
 
     const links = [
-        
         { name: 'Events', href: '/events' },
         { name: 'Event Management', href:'/eventManagement'},
         { name: 'Volunteer History', href:'/volunteerHistory'},
@@ -26,13 +31,7 @@ export default function Navbar(){
         avatar: "/images/avatars/cole.jpg",
     }
 
-     // Example notifications
-    const notifications = [
-      "Event 'Operating Systems Exam 1' starts tomorrow!",
-      "Your profile has been updated successfully.",
-      "You have a new volunteer request.",
-      "Your password was changed successfully.",
-    ];
+
 
 return (
     <nav className="bg-black text-white p-4 shadow-md">

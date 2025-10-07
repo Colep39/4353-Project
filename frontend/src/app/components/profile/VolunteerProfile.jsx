@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { useState, useEffect } from 'react';
 
 const user = {
   firstName: "Cole",
@@ -17,6 +18,12 @@ const user = {
 };
 
 export default function VolunteerProfile() {
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/users/1").then((res) => res.json()).then((data) => setUserData(data)).catch((err) => console.error("Error fetching user data:", err));
+  }, []);
+
   return (
     <>
       <div className="bg-white p-8 rounded-2xl shadow-lg max-w-4xl mx-auto mt-10">

@@ -3,11 +3,12 @@ import { useState, useEffect } from "react";
 import CardGrid from '../components/events/CardGrid';
 
 function EventsPage() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [events, setEvents] = useState([]);
   const [joinedEventIds, setJoinedEventIds] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/events").then((res) => res.json()).then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
+    fetch(`${API_URL}/api/events`).then((res) => res.json()).then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
   }, []);
 
   const handleToggleJoin = (eventId) => {

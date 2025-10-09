@@ -6,7 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { addDays, startOfDay, isValid } from "date-fns";
 
 function EventManagement() {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [events, setEvents] = useState([]);
   const [recommendedVolunteers, setRecommendedVolunteers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);

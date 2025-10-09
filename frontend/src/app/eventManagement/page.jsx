@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { addDays, startOfDay, isValid } from "date-fns";
 
 function EventManagement() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [events, setEvents] = useState([]);
   const [recommendedVolunteers, setRecommendedVolunteers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,8 +20,8 @@ function EventManagement() {
   const minSelectableDate = addDays(new Date(), 3);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/eventManagement").then((res) => res.json()).then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
-    fetch("http://localhost:5000/api/eventManagement/recommendedVolunteers").then((res) => res.json()).then((data) => setRecommendedVolunteers(data)).catch((err) => console.error("Error fetching events:", err));
+    fetch(`${API_URL}/api/eventManagement`).then((res) => res.json()).then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
+    fetch(`${API_URL}/api/eventManagement/recommendedVolunteers`).then((res) => res.json()).then((data) => setRecommendedVolunteers(data)).catch((err) => console.error("Error fetching events:", err));
   }, []);
 
   const resetModalState = () => {
@@ -31,7 +32,7 @@ function EventManagement() {
 
   const handleCreateEvent = async (eventToAdd) => {
     try {
-      const res = await fetch("http://localhost:5000/api/eventManagement", {
+      const res = await fetch(`${API_URL}/api/eventManagement`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(eventToAdd),
@@ -107,7 +108,7 @@ const handleSave = () => {
   }
 
   if (selectedEvent) {
-  fetch(`http://localhost:5000/api/eventManagement/${selectedEvent.id}`, {
+  fetch(`${API_URL}/api/eventManagement/${selectedEvent.id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(selectedEvent),
@@ -244,7 +245,7 @@ return (
               <div className="flex justify-between items-center mt-4">
                 {selectedEvent ? (
                   <button onClick={async () => {
-                            try {const res = await fetch(`http://localhost:5000/api/eventManagement/${selectedEvent.id}`, {method: "DELETE",});
+                            try {const res = await fetch(`${API_URL}/api/eventManagement/${selectedEvent.id}`, {method: "DELETE",});
                               if (!res.ok) throw new Error("Failed to delete event");
                               setEvents(events.filter(ev => ev.id !== selectedEvent.id));
                             } catch (err) {

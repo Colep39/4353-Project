@@ -6,6 +6,7 @@ const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const manageEventRoutes = require('./routes/manageEventRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const historyRoutes = require('./routes/historyRoutes')
 
 const app = express();
 
@@ -18,7 +19,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/eventManagement', manageEventRoutes);
 app.use('/api/notifications', notificationRoutes);
-
+app.use('/api/volunteerHistory', historyRoutes);
 
 app.get('/', (req, res) => {
     res.send("API is up and going....");

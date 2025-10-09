@@ -7,7 +7,7 @@ function EventsPage() {
   const [joinedEventIds, setJoinedEventIds] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/events").then((res) => res.json()).then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
+    fetch("https://volunteer-server-rxev.onrender.com/api/events").then((res) => res.json()).then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
   }, []);
 
   const handleToggleJoin = (eventId) => {

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import CardGrid from '../components/events/CardGrid';
 
 function EventsPage() {
+  const API_URL = import.meta.env.VITE_API_URL;
   const [events, setEvents] = useState([]);
   const [joinedEventIds, setJoinedEventIds] = useState([]);
 

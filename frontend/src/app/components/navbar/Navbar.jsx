@@ -10,10 +10,11 @@ export default function Navbar(){
     const [showNotifications, setShowNotifications] = useState(false);
     const [notifications, setNotifications] = useState([]);
 
-
+    {/*}
     useEffect(() => {
       fetch("http://localhost:5000/api/notifications").then((res) => res.json()).then((data) => setNotifications(data)).catch((err) => console.error("Error fetching notifications:"), err)
     }, []);
+    */}
 
     const links = [
         { name: 'Events', href: '/events' },

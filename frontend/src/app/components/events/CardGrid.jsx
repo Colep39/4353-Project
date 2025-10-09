@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { format } from "date-fns";
+import Loading from '../loading/Loading';
 
 function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Event", titleAction = null, userName, tooltip = false, onEventClick, onMatchVolunteers, onToggleJoin, joinedEventIds = []}) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -64,18 +65,7 @@ function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Ev
   return (
     <div className="h-full flex flex-col px-8">
       {normalizedEvents.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-gray-600">
-          <h1 className="font-sans text-2xl font-semibold">
-            {title ? "No upcoming events" : (userName ? `${userName}’s journey is just beginning` : "No events available right now")}
-          </h1>
-          <p className="text-sm text-gray-500 mb-5">
-            {title ? "Click \"Create Event\" to start planning one!" : (userName ? "Your next adventure is waiting — join an event to see it here!" : "You'll get a notification when new events are recommended for you.")}
-          </p>
-          {titleAction && <span className="ml-2">{titleAction}</span>}
-          <div className="mt-10">
-            <img src="/images/events/event-fallback.jpg" alt="event-fallback"></img>
-          </div>
-        </div>
+        <Loading />
       ) : (
         <>
           <div className="shrink-0 py-4 pr-2 ml-2 mr-4">

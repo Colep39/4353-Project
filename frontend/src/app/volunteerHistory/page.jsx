@@ -14,7 +14,7 @@ function VolunteerHistory() {
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
-        fetch(`${API_URL}/api/events/volunteerHistory`).then((res) => res.json()).then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
+        fetch(`${API_URL}/api/volunteerHistory`).then((res) => res.json()).then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
     }, []);
 
 

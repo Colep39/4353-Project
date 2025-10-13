@@ -32,23 +32,26 @@ export default function Navbar(){
     }
 
 return (
-    <nav className="bg-white text-black p-4 shadow-md">
+    <nav className="bg-black text-white p-4 shadow-md">
       <div className="w-full grid grid-cols-[auto_1fr_auto] items-center px-4 sm:px-8">
         {/* Logo + Title */}
         <div className="flex items-center space-x-3">
           <Link href="/" className="flex items-center space-x-3">
-            <Image
-              src="/images/connect_logo.jpg"
-              alt="Cougar Connect Logo"
-              width={56}
-              height={56}
-              className="rounded-lg shadow-md object-contain w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16"
-            />
-            <span className="text-lg sm:text-xl md:text-2xl font-bold whitespace-nowrap">
+            <div className="rounded-2xl overflow-hidden shadow-md w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16">
+              <Image
+                src="/images/connect_logo2.png"
+                alt="Cougar Connect Logo"
+                width={56}
+                height={56}
+                className="object-contain w-full h-full"
+              />
+            </div>
+            <span className="text-lg sm:text-xl md:text-2xl font-bold whitespace-nowrap text-white">
               The Cougar Connect
             </span>
           </Link>
         </div>
+
 
 
         {/* Links */}
@@ -59,12 +62,12 @@ return (
                 href={link.href}
                 className={`
                   relative 
-                  after:absolute after:left-0 after:bottom-[-4px] after:h-[2px] after:w-0 after:bg-green-600 after:transition-all after:duration-300 
+                  after:absolute after:left-0 after:bottom-[-4px] after:h-[2px] after:w-0 after:bg-green-200 after:transition-all after:duration-300 
                   hover:after:w-full
                   transition-colors duration-300
                   ${
                     pathname === link.href
-                      ? "text-green-600 font-semibold after:w-full"
+                      ? "text-green-200 font-semibold after:w-full"
                       : ""
                   }
                 `}
@@ -83,7 +86,7 @@ return (
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative flex items-center justify-center"
             >
-              <Bell className="w-6 h-6 hover:text-green-600 transition cursor-pointer" />
+              <Bell className="w-6 h-6 hover:text-green-200 transition cursor-pointer" />
               {notifications.length > 0 && (
                 <span className="absolute top-[-4px] right-[-4px] bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
                   {notifications.length}

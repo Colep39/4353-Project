@@ -138,7 +138,7 @@ return (
         <div className="fixed inset-0 backdrop-blur-xs flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg relative border border-black">
             <button onClick={() => { setIsModalOpen(false); resetModalState(); }}
-              className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-black">
+              className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-black cursor-pointer">
               &times;
             </button>
 
@@ -261,7 +261,7 @@ return (
                 )}
 
                 <div className="flex space-x-2">
-                  <button onClick={handleSave} className="bg-blue-600 text-white py-2 rounded hover:bg-blue-500 px-4">
+                  <button onClick={handleSave} className="bg-blue-600 text-white py-2 rounded hover:bg-blue-500 px-4 cursor-pointer">
                     {selectedEvent ? "Save" : "Add Event"}
                   </button>
                 </div>

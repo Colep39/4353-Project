@@ -9,12 +9,11 @@ export default function Navbar(){
     const pathname = usePathname(); // so we can highlight the current page
     const [showNotifications, setShowNotifications] = useState(false);
     const [notifications, setNotifications] = useState([]);
-
-    {/*}
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    
     useEffect(() => {
-      fetch("http://localhost:5000/api/notifications").then((res) => res.json()).then((data) => setNotifications(data)).catch((err) => console.error("Error fetching notifications:"), err)
+      fetch(`${API_URL}/api/notifications/1`).then((res) => res.json()).then((data) => setNotifications(data)).catch((err) => console.error("Error fetching notifications:", err))
     }, []);
-    */}
 
     const links = [
         { name: 'Events', href: '/events' },
@@ -32,10 +31,8 @@ export default function Navbar(){
         avatar: "/images/avatars/cole.jpg",
     }
 
-
-
 return (
-    <nav className="bg-black text-white p-4 shadow-md">
+    <nav className="bg-white text-black p-4 shadow-md">
       <div className="w-full grid grid-cols-[auto_1fr_auto] items-center px-4 sm:px-8">
         {/* Logo + Title */}
         <div className="flex items-center space-x-3">
@@ -43,15 +40,16 @@ return (
             <Image
               src="/images/connect_logo.jpg"
               alt="Cougar Connect Logo"
-              width={48}
-              height={48}
-              className="rounded-full shrink-0"
+              width={56}
+              height={56}
+              className="rounded-lg shadow-md object-contain w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16"
             />
-            <span className="text-lg font-bold whitespace-nowrap">
+            <span className="text-lg sm:text-xl md:text-2xl font-bold whitespace-nowrap">
               The Cougar Connect
             </span>
           </Link>
         </div>
+
 
         {/* Links */}
         <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-4">
@@ -61,12 +59,12 @@ return (
                 href={link.href}
                 className={`
                   relative 
-                  after:absolute after:left-0 after:bottom-[-4px] after:h-[2px] after:w-0 after:bg-green-200 after:transition-all after:duration-300 
+                  after:absolute after:left-0 after:bottom-[-4px] after:h-[2px] after:w-0 after:bg-green-600 after:transition-all after:duration-300 
                   hover:after:w-full
                   transition-colors duration-300
                   ${
                     pathname === link.href
-                      ? "text-green-200 font-semibold after:w-full"
+                      ? "text-green-600 font-semibold after:w-full"
                       : ""
                   }
                 `}
@@ -85,7 +83,7 @@ return (
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative flex items-center justify-center"
             >
-              <Bell className="w-6 h-6 hover:text-green-200 transition cursor-pointer" />
+              <Bell className="w-6 h-6 hover:text-green-600 transition cursor-pointer" />
               {notifications.length > 0 && (
                 <span className="absolute top-[-4px] right-[-4px] bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
                   {notifications.length}

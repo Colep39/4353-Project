@@ -20,7 +20,7 @@ app.use(express.json());
 // routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/events', eventRoutes);
+app.use('/api/events', eventRoutes); 
 app.use('/api/eventManagement', manageEventRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/volunteerHistory', historyRoutes);

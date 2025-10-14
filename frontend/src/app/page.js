@@ -133,7 +133,7 @@ export default function Home() {
                     alt={review.name}
                     width={300}
                     height={300}
-                    className="rounded-full shadow-lg object-cover"
+                    className="rounded-full shadow-lg object-cover h-auto w-auto"
                   />
                 </div>
 

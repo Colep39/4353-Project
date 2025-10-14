@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Cougar Connect",
   description: "COSC 4353 Volunteering Project",
-  icons: { icon: '/images/connect_logo.jpg'},
+  icons: { icon: '/images/connect_logo2.png'},
 };
 
 export default function RootLayout({ children }) {

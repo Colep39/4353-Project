@@ -50,10 +50,11 @@ function EventManagement() {
   };
 
   const handleCreateEvent = async (eventToAdd) => {
+    const token = localStorage.getItem("token");
     try {
       const res = await fetch(`${API_URL}/api/eventManagement`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(eventToAdd),
       });
       if (!res.ok) throw new Error("Failed to create event");
@@ -118,6 +119,7 @@ const validateEvent = (candidate) => {
 };
 
 const handleSave = () => {
+  const token = localStorage.getItem("token");
   const candidate = selectedEvent ? selectedEvent : newEvent;
   const errors = validateEvent(candidate);
 
@@ -129,7 +131,7 @@ const handleSave = () => {
   if (selectedEvent) {
   fetch(`${API_URL}/api/eventManagement/${selectedEvent.id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify(selectedEvent),
   }).then((res) => {
       if (!res.ok) throw new Error("Failed to update event");
@@ -264,7 +266,8 @@ return (
               <div className="flex justify-between items-center mt-4">
                 {selectedEvent ? (
                   <button onClick={async () => {
-                            try {const res = await fetch(`${API_URL}/api/eventManagement/${selectedEvent.id}`, {method: "DELETE",});
+                            const token = localStorage.getItem("token");
+                            try {const res = await fetch(`${API_URL}/api/eventManagement/${selectedEvent.id}`, {method: "DELETE", headers: { Authorization: `Bearer ${token}`}});
                               if (!res.ok) throw new Error("Failed to delete event");
                               setEvents(events.filter(ev => ev.id !== selectedEvent.id));
                             } catch (err) {

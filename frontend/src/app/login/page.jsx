@@ -20,7 +20,7 @@ export default function RegisterPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    if (token){
+    if (token) {
       alert("You are already logged in")
       window.location.href = "/profile";
       return;
@@ -36,7 +36,7 @@ export default function RegisterPage() {
         <div className="flex-1 flex flex-col justify-center px-8 py-12 text-white-300">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 drop-shadow">Unlock Your Potential</h1>
           <p className="text-lg max-w-md drop-shadow">
-            Join a community of driven individuals. Stay inspired, stay motivated, and achieve your goals.  
+            Join a community of driven individuals. Stay inspired, stay motivated, and achieve your goals.
             Your journey starts here. Log in the view current events, or sign up to be a part of the team!
           </p>
         </div>
@@ -48,14 +48,14 @@ export default function RegisterPage() {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
-                    password: values.password,
-                    email: values.email
+                    email: values.email,
+                    password: values.password
                   })
                 });
 
                 const data = await res.json();
 
-                if (!res.ok){
+                if (!res.ok) {
                   alert(`Error: ${data.error || "Request failed"}`);
                   return;
                 }
@@ -77,14 +77,14 @@ export default function RegisterPage() {
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-white-300">Email Address</label>
                 <Field className="border border-white/50 bg-white/70 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  id="email" name="email" placeholder="Email Address"/>
-                <ErrorMessage name="email" component="div" className="text-red-300 text-sm"/>
+                  id="email" name="email" placeholder="Email Address" />
+                <ErrorMessage name="email" component="div" className="text-red-300 text-sm" />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-white-300">Password</label>
                 <Field className="border border-white/50 bg-white/70 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  id="password" name="password" placeholder="Password" type="password"/>
-                <ErrorMessage name="password" component="div" className="text-red-300 text-sm"/>
+                  id="password" name="password" placeholder="Password" type="password" />
+                <ErrorMessage name="password" component="div" className="text-red-300 text-sm" />
               </div>
               <button type="submit" className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition cursor-pointer">Log In</button>
               <Link className="text-blue-800 hover:text-blue-900 underline text-sm text-left" href="/forgot">Forgot Password?</Link>

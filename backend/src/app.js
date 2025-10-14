@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 
+const authRoutes = require('./routes/authRoutes')
 const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const manageEventRoutes = require('./routes/manageEventRoutes');
@@ -11,10 +12,13 @@ const historyRoutes = require('./routes/historyRoutes')
 const app = express();
 
 // middleware
-app.use(cors());
+app.use(cors({
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // routes
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/events', eventRoutes); 
 app.use('/api/eventManagement', manageEventRoutes);

@@ -1,5 +1,6 @@
 "use client";
 import { ErrorMessage, Formik, Field, Form } from 'formik';
+import { useEffect } from 'react';
 import Link from 'next/link';
 
 const validateFields = (values) => {
@@ -23,6 +24,16 @@ const validateFields = (values) => {
 };
 
 export default function RegisterPage() {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token){
+      alert("You are already logged in")
+      window.location.href = "/profile";
+      return;
+    }
+  }, []);
+
   return (
     <div className="relative h-[calc(100vh-64px)] w-screen overflow-hidden bg-cover bg-center bg-no-repeat flex items-center justify-center"
          style={{ backgroundImage: "url('/images/login-bg.jpg')" }}>
@@ -35,9 +46,35 @@ export default function RegisterPage() {
         </div>
         <div className="flex-1 flex items-center justify-center px-10 py-12 bg-white/10">
           <Formik initialValues={{ userType: "", email: "", password: "" }}
-            onSubmit={(values) => {
-              alert(`Submitted:\n${JSON.stringify(values, null, 2)}`);
-              // insert api call to save
+            onSubmit={async (values, { setSubmitting }) => {
+              try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    email: values.email,
+                    password: values.password,
+                    userType: values.userType
+                  })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok){
+                  alert(`Error: ${data.error || "Request failed"}`);
+                  return;
+                }
+
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("role", data.role);
+
+                alert(`Login successful as ${data.role}`);
+                window.location.href = "/profile";
+              } catch (e) {
+                alert("Server error");
+              } finally {
+                setSubmitting(false);
+              }
             }}
             validate={validateFields}>
             <Form className="flex flex-col gap-4 w-full max-w-sm">

@@ -20,8 +20,27 @@ function EventManagement() {
   const minSelectableDate = addDays(new Date(), 3);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/eventManagement`).then((res) => res.json()).then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
-    fetch(`${API_URL}/api/eventManagement/recommendedVolunteers`).then((res) => res.json()).then((data) => setRecommendedVolunteers(data)).catch((err) => console.error("Error fetching events:", err));
+    const role = localStorage.getItem("role");
+    const token = localStorage.getItem("token");
+
+    if (!token || role !== "admin"){
+      alert("You do not have access this page! Please login as a volunteer.")
+      window.location.href = "/login";
+      return; // i dont think it will reach this but whatever
+    }
+
+    fetch(`${API_URL}/api/eventManagement`, {
+      headers: { Authorization: `Bearer ${token}`}
+    })
+    .then((res) => res.json())
+    .then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
+
+    fetch(`${API_URL}/api/eventManagement/recommendedVolunteers`, {
+      headers: { Authorization: `Bearer ${token}`}
+    })
+    .then((res) => res.json())
+    .then((data) => setRecommendedVolunteers(data))
+    .catch((err) => console.error("Error fetching events:", err));
   }, []);
 
   const resetModalState = () => {

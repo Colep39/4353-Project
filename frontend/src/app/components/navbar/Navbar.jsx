@@ -5,10 +5,25 @@ import { usePathname } from 'next/navigation';
 import { Bell } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
+const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    window.location.href = "/"
+}
+
 export default function Navbar(){
     const pathname = usePathname(); // so we can highlight the current page
     const [showNotifications, setShowNotifications] = useState(false);
     const [notifications, setNotifications] = useState([]);
+    const [role, setRole] = useState(null);
+    const [isLogged, setIsLogged] = useState(false);
+
+    useEffect(() => {
+        const storedRole = localStorage.getItem("role");
+        const token = localStorage.getItem("token");
+        setRole(storedRole);
+        setIsLogged(!!token);
+    }, []);
 
     {/*}
     useEffect(() => {
@@ -17,6 +32,7 @@ export default function Navbar(){
     */}
 
     const links = [
+        { name: 'Home', href: '/'},
         { name: 'Events', href: '/events' },
         { name: 'Event Management', href:'/eventManagement'},
         { name: 'Volunteer History', href:'/volunteerHistory'},
@@ -26,13 +42,28 @@ export default function Navbar(){
         { name: 'About Us', href:'/aboutUs'}
     ];
 
+    // this is messy but its too late at night to fix
+    const visibleLinks = links.filter((link) =>{
+      if (role === "volunteer" && link.href === '/eventManagement'){
+        return false;
+      }
+      if (role === "admin" && (link.href === '/volunteerHistory' || link.href === '/events')){
+        return false;
+      }
+      if (isLogged && (link.href === '/login' || link.href === '/register')){
+        return false;
+      }
+      if (!isLogged && (link.href === '/volunteerHistory' || link.href === '/eventManagement' || link.href === '/events' || link.href === '/profile')){
+        return false;
+      }
+      return true;
+    })
+
     const user = {
         id: 1,
         fullName: "Cole Hawke",
         avatar: "/images/avatars/cole.jpg",
     }
-
-
 
 return (
     <nav className="bg-black text-white p-4 shadow-md">
@@ -55,7 +86,7 @@ return (
 
         {/* Links */}
         <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-4">
-          {links.map((link) => (
+          {visibleLinks.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
@@ -75,6 +106,23 @@ return (
               </Link>
             </li>
           ))}
+          {isLogged && (<li key={"logout"}>
+            <button
+              onClick={logout}
+              className={`
+                relative 
+                after:absolute after:left-0 after:bottom-[-4px] after:h-[2px] 
+                after:w-0 after:bg-green-200 after:transition-all after:duration-300 
+                hover:after:w-full
+                transition-colors duration-300
+                text-green-200 font-medium
+                hover:text-green-100
+                cursor-pointer
+              `}
+            >
+              Logout
+            </button>
+          </li>)}
         </ul>
 
         {/* Right side (welcome + avatar + bell) */}

@@ -8,7 +8,21 @@ function EventsPage() {
   const [joinedEventIds, setJoinedEventIds] = useState([]);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/events`).then((res) => res.json()).then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
+    const role = localStorage.getItem("role");
+    const token = localStorage.getItem("token");
+
+    if (!token || role !== "volunteer"){
+      alert("You do not have access this page! Please login as a volunteer.")
+      window.location.href = "/login";
+      return; // i dont think it will reach this but whatever
+    }
+
+    fetch(`${API_URL}/api/events`, {
+      headers: { Authorization: `Bearer ${token}`}
+    })
+      .then((res) => res.json())
+      .then((data) => setEvents(data))
+      .catch((err) => console.error("Error fetching events:", err));
   }, []);
 
   const handleToggleJoin = (eventId) => {

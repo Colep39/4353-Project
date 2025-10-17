@@ -14,8 +14,7 @@ function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Ev
       date: {
         start: event.date.start instanceof Date ? event.date.start : new Date(event.date.start),
         end: event.date.end instanceof Date ? event.date.end : new Date(event.date.end),
-      }
-    })), [events]);
+      }})), [events]);
 
   const filteredAndSortedEvents = useMemo(() => {
   let result = [...normalizedEvents];

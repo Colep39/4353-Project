@@ -11,7 +11,7 @@ function EventManagement() {
   const [recommendedVolunteers, setRecommendedVolunteers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [newEvent, setNewEvent] = useState({title: '', date: { start: null, end: null }, urgency: '', description: '', image: '',});
+  const [newEvent, setNewEvent] = useState({title: '', date: { start: null, end: null }, urgency: 1, description: '', image: '',});
   const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
   const [matchedEvent, setMatchedEvent] = useState(null);
   const [selectedVolunteers, setSelectedVolunteers] = useState([]);
@@ -20,32 +20,50 @@ function EventManagement() {
   const minSelectableDate = addDays(new Date(), 3);
 
   useEffect(() => {
-    const role = localStorage.getItem("role");
-    const token = localStorage.getItem("token");
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
 
-    if (!token || role !== "admin"){
-      alert("You do not have access this page! Please login as a volunteer.")
-      window.location.href = "/login";
-      return; // i dont think it will reach this but whatever
-    }
+      if (!token || role !== "admin") {
+        alert("You do not have access to this page! Please login as an admin.");
+        window.location.href = "/login";
+        return;
+      }
 
-    fetch(`${API_URL}/api/eventManagement`, {
-      headers: { Authorization: `Bearer ${token}`}
-    })
-    .then((res) => res.json())
-    .then((data) => setEvents(data)).catch((err) => console.error("Error fetching events:", err));
+      try {
+        const resEvents = await fetch(`${API_URL}/api/eventManagement`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!resEvents.ok) {
+          const errData = await resEvents.json();
+          throw new Error(errData.message || "Failed to fetch events");
+        }
+        const eventsData = await resEvents.json();
+        setEvents(Array.isArray(eventsData) ? eventsData : []);
 
-    fetch(`${API_URL}/api/eventManagement/recommendedVolunteers`, {
-      headers: { Authorization: `Bearer ${token}`}
-    })
-    .then((res) => res.json())
-    .then((data) => setRecommendedVolunteers(data))
-    .catch((err) => console.error("Error fetching events:", err));
+        const resVolunteers = await fetch(`${API_URL}/api/eventManagement/recommendedVolunteers`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!resVolunteers.ok) {
+          const errData = await resVolunteers.json();
+          throw new Error(errData.message || "Failed to fetch recommended volunteers");
+        }
+        const volunteersData = await resVolunteers.json();
+        setRecommendedVolunteers(Array.isArray(volunteersData) ? volunteersData : []);
+
+      } catch (err) {
+        console.error("Error fetching data:", err.message);
+        setEvents([]);
+        setRecommendedVolunteers([]);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const resetModalState = () => {
     setSelectedEvent(null);
-    setNewEvent({ title: '', date: { start: null, end: null }, urgency: '', description: '', image: '' });
+    setNewEvent({ title: '', date: { start: null, end: null }, urgency: 1, description: '', image: '' });
     setValidationErrors({});
   };
 
@@ -76,15 +94,13 @@ const handleMatchVolunteers = (event) => {
   setIsMatchModalOpen(true);
 };
 
-const nameRegex = /^[A-Za-z0-9 @&$\#()\[\]\-_.,'!+?%]+$/;
-
 const validateEvent = (candidate) => {
   const errors = {};
 
-  if (!candidate.title || String(candidate.title).trim() === '') {
-    errors.title = "Event name is required.";
-  } else if (!nameRegex.test(candidate.title)) {
-    errors.title = "Event name contains invalid characters. Allowed: letters, numbers, spaces and common symbols (@ & $ # ( ) - _ . , ' ! + ? %).";
+  if (!candidate.title || candidate.title.trim().length < 3 || candidate.title.trim().length > 100) {
+    errors.title = "Title must be 3–100 characters.";
+  } else if (!/^[a-zA-Z0-9\s'.,!?-]+$/.test(candidate.title.trim())) {
+    errors.title = "Title contains invalid characters.";
   }
 
   const start = candidate.date?.start;
@@ -103,7 +119,7 @@ const validateEvent = (candidate) => {
     errors.date = errors.date ? errors.date + ` End date must be ${minSelectableDate.toLocaleDateString()} or later.` : `End date must be ${minSelectableDate.toLocaleDateString()} or later.`;
   }
 
-  if (!candidate.urgency || String(candidate.urgency).trim() === '') {
+  if (![1, 2, 3, 4].includes(candidate.urgency)) {
     errors.urgency = "Urgency is required.";
   }
 
@@ -118,32 +134,46 @@ const validateEvent = (candidate) => {
   return errors;
 };
 
-const handleSave = () => {
+const handleSave = async () => {
   const token = localStorage.getItem("token");
   const candidate = selectedEvent ? selectedEvent : newEvent;
-  const errors = validateEvent(candidate);
 
+  const errors = validateEvent(candidate);
   if (Object.keys(errors).length > 0) {
     setValidationErrors(errors);
     return;
   }
 
-  if (selectedEvent) {
-  fetch(`${API_URL}/api/eventManagement/${selectedEvent.id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify(selectedEvent),
-  }).then((res) => {
+  const candidateToSend = {...candidate, date: { start: candidate.date.start.toISOString(), end: candidate.date.end.toISOString() },};
+
+  try {
+    if (selectedEvent) {
+      const res = await fetch(`${API_URL}/api/eventManagement/${selectedEvent.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(candidateToSend),
+      });
       if (!res.ok) throw new Error("Failed to update event");
-      return res.json();
-    }).then((updated) => {
+
+      const updated = await res.json();
       setEvents(events.map(ev => ev.id === updated.id ? updated : ev));
-    }).catch((err) => console.error("Error updating event:", err)).finally(() => {resetModalState(); setIsModalOpen(false);});
-  } else {
-      handleCreateEvent(newEvent);
-      resetModalState();
-      setIsModalOpen(false);
+    } else {
+      const res = await fetch(`${API_URL}/api/eventManagement`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(candidateToSend),
+      });
+      if (!res.ok) throw new Error("Failed to create event");
+
+      const created = await res.json();
+      setEvents([...events, created]);
     }
+  } catch (err) {
+    console.error("Error saving event:", err);
+  } finally {
+    resetModalState();
+    setIsModalOpen(false);
+  }
 };
 
 return (
@@ -203,11 +233,11 @@ return (
 
               <div className="flex flex-col">
                 <div className="flex items-center">
-                  <label htmlFor="eventUrgency" className="w-32">Urgency</label><span className="text-red-500 mr-2">*</span>
-                  <select id="eventUrgency" className="border px-3 py-2 rounded w-full"
-                    value={selectedEvent ? selectedEvent.urgency : newEvent.urgency}
+                  <label htmlFor="eventUrgency" className="w-32">Urgency</label>
+                  <span className="text-red-500 mr-2">*</span>
+                  <select id="eventUrgency" className="border px-3 py-2 rounded w-full" value={selectedEvent ? selectedEvent.urgency : newEvent.urgency || 1}
                     onChange={(e) => {
-                      const value = e.target.value;
+                      const value = parseInt(e.target.value, 10); 
                       if (selectedEvent) {
                         setSelectedEvent({ ...selectedEvent, urgency: value });
                       } else {
@@ -215,14 +245,17 @@ return (
                       }
                       setValidationErrors(prev => ({ ...prev, urgency: undefined }));
                     }}>
-                    <option value="" disabled hidden>Select urgency</option>
-                    <option>Critical</option>
-                    <option>High</option>
-                    <option>Medium</option>
-                    <option>Low</option>
+                    <option value={4}>Critical</option>
+                    <option value={3}>High</option>
+                    <option value={2}>Medium</option>
+                    <option value={1}>Low</option>
                   </select>
                 </div>
-                {validationErrors.urgency && <div className="text-red-600 text-sm mt-1 pl-36">{validationErrors.urgency}</div>}
+                {validationErrors.urgency && (
+                  <div className="text-red-600 text-sm mt-1 pl-36">
+                    {validationErrors.urgency}
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col">

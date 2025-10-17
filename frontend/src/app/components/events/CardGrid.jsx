@@ -2,65 +2,63 @@ import { useState, useMemo } from 'react';
 import { format } from "date-fns";
 import Loading from '../loading/Loading';
 
+const urgencyIntToString = { 4: "Critical", 3: "High", 2: "Medium", 1: "Low" };
+
 function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Event", titleAction = null, userName, tooltip = false, onEventClick, onMatchVolunteers, onToggleJoin, joinedEventIds = []}) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('Event Date (Closest)');
   const tooltipText = tooltip ? "Click to edit event" : null;
 
+
   const normalizedEvents = useMemo(() => 
-    events.map(event => ({...event,
+    events.map(event => ({
+      ...event,
       date: {
         start: event.date.start instanceof Date ? event.date.start : new Date(event.date.start),
         end: event.date.end instanceof Date ? event.date.end : new Date(event.date.end),
-      }})), [events]);
+      }
+    })), [events]);
 
   const filteredAndSortedEvents = useMemo(() => {
-    let result = [...normalizedEvents];
+  let result = [...normalizedEvents];
 
-    if (searchTerm.trim() !== '') {
-      result = result.filter(event =>
-        (event.title || '').toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  if (searchTerm.trim() !== '') {
+    result = result.filter(event =>
+      (event.title || '').toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+
+  result.sort((a, b) => {
+    let primary;
+
+    switch (sortBy) {
+      case "Event Date (Closest)":
+        primary = a.date.start - b.date.start;
+        break;
+      case "Event Date (Furthest)":
+        primary = b.date.start - a.date.start;
+        break;
+      case "Urgency (Highest)":
+        primary = (b.urgency || 1) - (a.urgency || 1);
+        break;
+      case "Urgency (Lowest)":
+        primary = (a.urgency || 1) - (b.urgency || 1);
+        break;
+      default:
+        primary = 0;
     }
 
-    const urgencyOrder = {
-      Critical: 4,
-      High: 3,
-      Medium: 2,
-      Low: 1,
-    };
+    if (primary === 0) {
+      const urgencyDiff = (b.urgency || 1) - (a.urgency || 1);
+      if (urgencyDiff !== 0) return urgencyDiff;
+      return (a.title || "").localeCompare(b.title || "");
+    }
 
-    result.sort((a, b) => {
-      let primary;
+    return primary;
+  });
 
-      switch (sortBy) {
-        case "Event Date (Closest)":
-          primary = a.date.start - b.date.start;
-          break;
-        case "Event Date (Furthest)":
-          primary = b.date.start - a.date.start;
-          break;
-        case "Urgency (Highest)":
-          primary = (urgencyOrder[b.urgency] || 0) - (urgencyOrder[a.urgency] || 0);
-          break;
-        case "Urgency (Lowest)":
-          primary = (urgencyOrder[a.urgency] || 0) - (urgencyOrder[b.urgency] || 0);
-          break;
-        default:
-          primary = 0;
-      }
-
-      if (primary === 0) {
-        const urgencyDiff = (urgencyOrder[b.urgency] || 0) - (urgencyOrder[a.urgency] || 0);
-        if (urgencyDiff !== 0) return urgencyDiff;
-        return (a.title || "").localeCompare(b.title || "");
-      }
-
-      return primary;
-    });
-
-    return result;
-  }, [normalizedEvents, searchTerm, sortBy]);
+  return result;
+}, [normalizedEvents, searchTerm, sortBy]);
 
   return (
     <div className="h-full flex flex-col px-8">
@@ -105,7 +103,7 @@ function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Ev
                           : format(event.date.start, "MMM dd, yyyy")
                         : "No date"}
                     </span>
-                    Urgency: {event.urgency}
+                    Urgency: {urgencyIntToString[event.urgency] || "Low"}
                   </div>
                   <p className="text-gray-700">{event.description}</p>
                   {showButton ? (

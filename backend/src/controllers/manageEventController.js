@@ -136,7 +136,6 @@ const createEvent = (req, res) => {
   res.status(201).json(created);
 };
 
-
 const updateEvent = (req, res) => {
   const { id } = req.params;
   const updated = req.body;

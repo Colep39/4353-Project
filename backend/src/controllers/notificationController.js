@@ -6,6 +6,13 @@ let sampleNotifications = [
 ];
 
 const getNotifications = (req, res) => {
+    const { id } = req.params;
+    const parsedId = parseInt(id, 10);
+
+    if (isNaN(parsedId) || parsedId <= 0) {
+        return res.status(401).json({ message: "Invalid ID parameter" });
+    }
+
     res.json(sampleNotifications);
 }
 

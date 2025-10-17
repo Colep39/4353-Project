@@ -1,8 +1,8 @@
 let sampleProfiles = [
     {
         id: 1,
-        firstName: "Cole",
-        lastName: "Hawke",
+        name: "Cole Hawke",
+        email: "colep3@icloud.com",
         address1: "1234 Elm St",
         address2: "",
         city: "Antarctica City",
@@ -17,8 +17,8 @@ let sampleProfiles = [
     },
     {
         id: 2,
-        firstName: "Jason",
-        lastName: "Pedder",
+        name: "Jason Pedder",
+        email: "jason@outlook.com",
         address1: "4024 Oak St",
         address2: "",
         city: "Sugar Land",
@@ -33,8 +33,8 @@ let sampleProfiles = [
     },
     {
         id: 3,
-        firstName: "Ramsey",
-        lastName: "Chandoklow",
+        name: "Ramsey Chandoklow",
+        email: "ramsey@outlook.com",
         address1: "3456 Pine St",
         address2: "",
         city: "Galveston",
@@ -49,8 +49,8 @@ let sampleProfiles = [
     },
     {
         id: 4,
-        firstName: "Samuel",
-        lastName: "Alvarez",
+        name: "Samuel Alvarez",
+        email: "sammy@outlook.com",
         address1: "7890 Maple St",
         address2: "",
         city: "League City",

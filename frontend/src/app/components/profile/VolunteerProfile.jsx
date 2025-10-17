@@ -37,14 +37,14 @@ export default function VolunteerProfile() {
           <div className="flex items-center gap-6 border-b pb-6 mb-6">
             <Image
               src={user.profilePhoto}
-              alt={`${user.firstName} ${user.lastName}`}
+              alt={`${user.name}`}
               width={120}
               height={120}
               className="rounded-full object-cover border-4 border-green-200"
             />
             <div>
               <h1 className="text-3xl font-bold text-gray-800">
-                {user.firstName} {user.lastName}
+                {user.name}
               </h1>
               <p className="text-gray-500">{user.role}</p>
             </div>
@@ -124,27 +124,14 @@ export default function VolunteerProfile() {
                 </h2>
 
                 <form className="space-y-4">
-                  {/* First Name */}
+                  {/* Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      First Name <span className="text-red-500">*</span>
+                      Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
-                      defaultValue={user.firstName}
-                      required
-                      className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
-                    />
-                  </div>
-
-                  {/* Last Name */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Last Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue={user.lastName}
+                      defaultValue={user.name}
                       required
                       className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
                     />

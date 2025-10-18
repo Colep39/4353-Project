@@ -170,7 +170,7 @@ export default function Navbar() {
 
               {/* Logout */}
               {isLogged && (
-                <button onClick={logout} className="hover:opacity-80 transition flex-shrink-0">
+                <button onClick={logout} className="hover:opacity-80 transition flex-shrink-0 cursor-pointer">
                   <img
                     src="/images/logout.svg"
                     alt="Logout"

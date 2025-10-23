@@ -1,3 +1,4 @@
+/*
 const sampleEvents = [
   {
     id: 1,
@@ -44,9 +45,21 @@ const sampleEvents = [
     image: "/images/events/popup-shop.jpg",
   },
 ];
+*/
 
-const getEvents = (req, res) => {
-    res.json(sampleEvents);
+const supabase = require("../supabaseClient");
+require('dotenv').config();
+
+const getEvents = async (req, res) => {
+    const { data, error } = await supabase
+      .from("events")
+      .select("*");
+
+    if (error){
+      return res.status(500).json({ error: error.message });
+    };
+
+    res.json(data);
 };
 
 module.exports = { getEvents };

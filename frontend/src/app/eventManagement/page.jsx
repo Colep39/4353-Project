@@ -185,6 +185,9 @@ function EventManagement() {
         const created = await res.json();
         setEvents([...events, created]);
       }
+
+      window.location.reload();
+      
     } catch (err) {
       console.error("Error saving event:", err);
     } finally {

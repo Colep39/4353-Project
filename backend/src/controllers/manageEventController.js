@@ -1,5 +1,11 @@
 const supabase = require("../supabaseClient");
 
+const parseDate = (dateString) => {
+  if (!dateString) return null;
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+
 const sanitizeInput = (str) =>
   str.replace(/['";]/g, "").replace(/<[^>]*>/g, "").trim();
 
@@ -34,8 +40,8 @@ const getManageEvents = async (req, res) => {
         image: event.event_image,
         location: event.location || "Unknown location",
         date: {
-          start: new Date(event.start_date),
-          end: new Date(event.end_date)
+          start: parseDate(event.start_date),
+          end: parseDate(event.end_date)
         },
         skills: skillsMapped
           .sort((a, b) => a.description.localeCompare(b.description))
@@ -95,8 +101,8 @@ const createEvent = async (req, res) => {
         location: sanitizeInput(newEvent.location),
         event_urgency: newEvent.urgency,
         event_image: sanitizeInput(newEvent.image),
-        start_date: new Date(newEvent.date.start).toISOString(),
-        end_date: new Date(newEvent.date.end).toISOString(),
+        start_date: new Date(newEvent.date.start).toISOString().split("T")[0],
+        end_date: new Date(newEvent.date.end).toISOString().split("T")[0],
       }])
       .select()
       .single();
@@ -148,8 +154,8 @@ const createEvent = async (req, res) => {
       urgency: eventWithSkills.event_urgency,
       location: sanitizeInput(eventWithSkills.location),
       date: {
-        start: new Date(eventWithSkills.start_date).toISOString(),
-        end: new Date(eventWithSkills.end_date).toISOString(),
+        start: eventWithSkills.start_date,
+        end: eventWithSkills.end_date,
       },
       skills: skillsMapped,
     });
@@ -186,8 +192,8 @@ const updateEvent = async (req, res) => {
         location: sanitizeInput(updated.location),
         event_urgency: updated.urgency,
         event_image: sanitizeInput(updated.image),
-        start_date: updated.date?.start ? new Date(updated.date.start).toISOString() : null,
-        end_date: updated.date?.end ? new Date(updated.date.end).toISOString() : null,
+        start_date: updated.date?.start ? new Date(updated.date.start).toISOString().split("T")[0] : null,
+        end_date: updated.date?.end ? new Date(updated.date.end).toISOString().split("T")[0] : null,
       })
       .eq("event_id", eventId)
       .select()

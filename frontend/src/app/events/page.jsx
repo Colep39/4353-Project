@@ -21,7 +21,10 @@ function EventsPage() {
       headers: { Authorization: `Bearer ${token}`}
     })
       .then((res) => res.json())
-      .then((data) => setEvents(data))
+      .then((data) => { data = data.map(e => { e.date.start = new Date(e.date.start);
+                                               e.date.end = new Date(e.date.end);
+                                               return e});
+                        return setEvents(data);})
       .catch((err) => console.error("Error fetching events:", err));
   }, []);
 

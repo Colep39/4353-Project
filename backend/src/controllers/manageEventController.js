@@ -2,8 +2,7 @@ const supabase = require("../supabaseClient");
 
 const parseDate = (dateString) => {
   if (!dateString) return null;
-  const [year, month, day] = dateString.split("-").map(Number);
-  return new Date(year, month - 1, day);
+  return new Date(dateString);
 };
 
 const sanitizeInput = (str) =>
@@ -22,7 +21,7 @@ const getManageEvents = async (req, res) => {
           )
         )
       `)
-      .gte("end_date", new Date().toISOString())
+      .gte("end_date", "NOW()")
       .order("start_date", { ascending: true });
 
     if (error) throw error;
@@ -101,8 +100,8 @@ const createEvent = async (req, res) => {
         location: sanitizeInput(newEvent.location),
         event_urgency: newEvent.urgency,
         event_image: sanitizeInput(newEvent.image),
-        start_date: new Date(newEvent.date.start).toISOString().split("T")[0],
-        end_date: new Date(newEvent.date.end).toISOString().split("T")[0],
+        start_date: new Date(newEvent.date.start).toISOString(),
+        end_date: new Date(newEvent.date.end).toISOString(),
       }])
       .select()
       .single();
@@ -192,8 +191,8 @@ const updateEvent = async (req, res) => {
         location: sanitizeInput(updated.location),
         event_urgency: updated.urgency,
         event_image: sanitizeInput(updated.image),
-        start_date: updated.date?.start ? new Date(updated.date.start).toISOString().split("T")[0] : null,
-        end_date: updated.date?.end ? new Date(updated.date.end).toISOString().split("T")[0] : null,
+        start_date: updated.date?.start ? updated.date.start : null,
+        end_date: updated.date?.end ? updated.date.end : null,
       })
       .eq("event_id", eventId)
       .select()

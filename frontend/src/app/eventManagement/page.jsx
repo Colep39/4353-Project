@@ -159,7 +159,7 @@ function EventManagement() {
 
     const candidateToSend = {
       ...candidate,
-      date: { start: candidate.date.start.toISOString(), end: candidate.date.end.toISOString() },
+      date: { start: candidate.date.start, end: candidate.date.end },
       skill_ids: candidate.skill_ids || [],
     };
 
@@ -173,6 +173,8 @@ function EventManagement() {
         if (!res.ok) throw new Error("Failed to update event");
 
         const updated = await res.json();
+        updated.date.start = new Date(updated.date.start);
+        updated.date.end = new Date(updated.date.end);
         setEvents(events.map(ev => ev.id === updated.id ? updated : ev));
       } else {
         const res = await fetch(`${API_URL}/api/eventManagement`, {
@@ -183,11 +185,10 @@ function EventManagement() {
         if (!res.ok) throw new Error("Failed to create event");
 
         const created = await res.json();
+        created.date.start = new Date(created.date.start);
+        created.date.end = new Date(created.date.end);
         setEvents([...events, created]);
       }
-
-      window.location.reload();
-      
     } catch (err) {
       console.error("Error saving event:", err);
     } finally {

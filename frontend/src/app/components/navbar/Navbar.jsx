@@ -61,7 +61,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-black text-white shadow-md w-full">
+    <nav className="bg-black text-white shadow-md w-full z-[200] relative">
       <div className="w-full px-[10px]">
         <div className="flex items-center justify-between h-16 w-full">
           {/* Left side */}
@@ -109,15 +109,16 @@ export default function Navbar() {
             <ul className="flex flex-wrap gap-x-6 justify-start flex-grow">
               {visibleLinks.map((link) => (
                 <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className={`relative 
-                      after:absolute after:left-0 after:bottom-[-4px] after:h-[2px] after:w-0 after:bg-green-200 after:transition-all after:duration-300 
-                      hover:after:w-full transition-colors duration-300
-                      ${pathname === link.href ? "text-green-200 font-semibold after:w-full" : ""}`}
-                  >
-                    {link.name}
-                  </Link>
+                <Link
+                  href={link.href}
+                  className={`relative px-3 py-1 rounded-lg transition-all duration-300 
+                    ${pathname === link.href 
+                      ? "bg-green-500/40 text-green-100  scale-105" 
+                      : "hover:bg-green-400/30 hover:text-green-100 "}`
+                  }
+                >
+                  {link.name}
+                </Link>
                 </li>
               ))}
             </ul>
@@ -164,7 +165,8 @@ export default function Navbar() {
                 <img
                   src={user.avatar}
                   alt={user?.fullName}
-                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                  className="w-8 h-8 rounded-full object-cover flex-shrink-0 cursor-pointer 
+                  transform transition-transform duration-300 hover:scale-110"
                 />
               )}
 

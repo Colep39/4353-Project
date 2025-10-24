@@ -28,9 +28,6 @@ const reviews = [
 export default function Home() {
   return (
     <>
-  
-
-      {/* Top section */}
       {/* Hero Section */}
       <div
         className="relative w-full"
@@ -45,27 +42,26 @@ export default function Home() {
           className="object-cover"
         />
 
-        {/* Dark overlay to dim the background */}
+        {/* Dark overlay */}
         <div className="absolute inset-0 bg-black/50"></div>
 
-        {/* Hero content on top of background */}
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center space-y-6">
-          <h1 className="text-white text-4xl md:text-6xl font-bold">
+        {/* Hero Content */}
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center space-y-6 px-4">
+          <h1 className="text-white text-4xl md:text-6xl font-extrabold drop-shadow-lg">
             Welcome to Cougar Connect
           </h1>
-          <p className="text-white text-2xl md:text-3xl font-bold max-w-3xl">
-            We network volunteers and event organizers to transform our great community
+          <p className="text-white text-xl md:text-2xl max-w-3xl font-medium drop-shadow-md">
+            We connect volunteers and event organizers to transform our community — one cause at a time.
           </p>
 
-          {/* Example buttons */}
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 mt-4">
             <Link href="/register">
-              <button className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition cursor-pointer">
+              <button className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition transform hover:scale-105 cursor-pointer">
                 Join Now
               </button>
             </Link>
             <Link href="/aboutUs">
-              <button className="px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition cursor-pointer">
+              <button className="px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-100 transition transform hover:scale-105 cursor-pointer">
                 Learn More
               </button>
             </Link>
@@ -73,49 +69,41 @@ export default function Home() {
         </div>
       </div>
 
-     
-      <div className="font-sans grid items-center justify-items-center p-8 pb-20 gap-16 sm:p-20">
-        {/* What we do */}
-        <section className="w-full bg-gray-50 py-20 rounded-2xl shadow-lg">
+      {/* Main Content */}
+      <main className="font-sans grid items-center justify-items-center p-8 pb-0 gap-16 sm:p-20 bg-white">
+
+        {/* What We Do Section */}
+        <section className="w-full bg-white py-20 rounded-2xl shadow-xl">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center px-6">
-            
-            
-            <div className="bg-white rounded-2xl shadow-lg p-10 text-center md:text-left">
-              <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-green-400">
+            <div className="order-2 md:order-1 text-center md:text-left space-y-6">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-green-300">
                 What We Do
               </h2>
               <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-                Our mission is to match 
-                <span className="font-semibold text-green-400"> energetic volunteers </span> 
-                to their best fitting events, connecting people to causes they care about and helping organizers 
-                find the support they need to make a difference. This is an amazing opportunity to network with 
-                your community and to contribute to something 
-                <span className="italic text-green-500"> bigger than yourself</span>.
+                Our mission is to connect
+                <span className="font-semibold text-green-500"> energetic volunteers </span>
+                to events that inspire them. We help event organizers find
+                dedicated support so they can make a bigger impact. Together, we’re
+                building a stronger, more connected community.
               </p>
             </div>
 
-            <div className="flex items-center justify-center">
+            <div className="order-1 md:order-2 flex items-center justify-center">
               <Image
                 src="/images/harden-volunteering.webp"
-                alt="volunteer photo"
+                alt="volunteering"
                 width={500}
                 height={500}
-                className="rounded-2xl shadow-lg object-cover"
+                className="rounded-2xl shadow-2xl object-cover"
               />
             </div>
           </div>
         </section>
-        
 
-        {/* Incentives to join */}
-        <div className="max-w-3xl text-center">
-
-        </div>
-        
-        {/* Reviews */}
-        <section className="w-full bg-white py-20 rounded-2xl shadow-lg">
+        {/* Reviews Section */}
+        <section className="w-full bg-white py-20 rounded-2xl shadow-xl">
           <div className="max-w-6xl mx-auto px-6 space-y-16">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12 text-green-400">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12 text-green-300">
               What People Are Saying
             </h2>
 
@@ -128,39 +116,78 @@ export default function Home() {
               >
                 {/* Image */}
                 <div className="flex justify-center">
-                  <Image
-                    src={review.image}
-                    alt={review.name}
-                    width={300}
-                    height={300}
-                    className="rounded-full shadow-lg object-cover h-auto w-auto"
-                  />
+                  <div className="w-60 h-60 rounded-full overflow-hidden shadow-lg border-4 border-green-200">
+                    <Image
+                      src={review.image}
+                      alt={review.name}
+                      width={240}
+                      height={240}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
                 </div>
 
-                {/* Quote bubble */}
+                {/* Quote */}
                 <div className="bg-green-50 rounded-2xl shadow-md p-8 relative">
                   <p className="text-lg md:text-xl text-gray-700 italic mb-4">
                     “{review.quote}”
                   </p>
-                  <div className="font-semibold text-green-700">
-                    {review.name}
-                  </div>
+                  <div className="font-semibold text-green-700">{review.name}</div>
                   <div className="text-gray-500 text-sm">{review.role}</div>
                 </div>
               </div>
             ))}
           </div>
         </section>
-        {/* Footer */}
-        <footer className="w-full text-center text-gray-500">
-          &copy; {new Date().getFullYear()} Cougar Connect. All rights reserved.
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-black text-gray-300 py-12 mt-10">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 px-8">
+          {/* About */}
           <div>
-            
-
+            <h3 className="text-white text-xl font-semibold mb-4">About Cougar Connect</h3>
+            <p className="text-sm leading-relaxed">
+              Cougar Connect bridges the gap between passionate volunteers and local organizers,
+              empowering communities through collaboration and shared purpose.
+            </p>
           </div>
-        </footer>
-      </div>
 
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-white text-xl font-semibold mb-4">Quick Links</h3>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/events" className="hover:text-green-400 transition">Events</Link></li>
+              <li><Link href="/eventManagement" className="hover:text-green-400 transition">Manage Events</Link></li>
+              <li><Link href="/volunteerHistory" className="hover:text-green-400 transition">Volunteer History</Link></li>
+              <li><Link href="/aboutUs" className="hover:text-green-400 transition">About Us</Link></li>
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h3 className="text-white text-xl font-semibold mb-4">Contact Us</h3>
+            <p className="text-sm">123 Cougar Lane, Houston, TX 77004</p>
+            <p className="text-sm mt-2">Email: info@cougarconnect.org</p>
+            <p className="text-sm">Phone: (713) 555-1234</p>
+          </div>
+
+          {/* Socials */}
+          <div>
+            <h3 className="text-white text-xl font-semibold mb-4">Follow Us</h3>
+            <div className="flex space-x-4">
+              <a href="#" className="hover:text-green-400 transition">Facebook</a>
+              <a href="#" className="hover:text-green-400 transition">Instagram</a>
+              <a href="#" className="hover:text-green-400 transition">LinkedIn</a>
+              <a href="#" className="hover:text-green-400 transition">Twitter</a>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-10 border-t border-gray-700 text-center pt-6 text-sm text-gray-500">
+          © {new Date().getFullYear()} Cougar Connect. All rights reserved.
+        </div>
+      </footer>
     </>
   );
 }

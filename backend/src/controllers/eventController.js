@@ -1,65 +1,57 @@
-/*
-const sampleEvents = [
-  {
-    id: 1,
-    title: "Traffic Director",
-    date: {
-      start: new Date(2025, 9, 29),
-      end: new Date(2025, 9, 29),
-    },
-    urgency: 4,
-    description: "Help needed to direct traffic for the home game against Rice University. Needed from 5pm to 9pm for directing traffic in and out.",
-    image: "/images/events/traffic-director.jpg",
-  },
-  {
-    id: 2,
-    title: "Soul Cleanup",
-    date: {
-      start: new Date(2025, 10, 1),
-      end: new Date(2025, 10, 1),
-    },
-    urgency: 3,
-    description: "Help needed cleaning the souls of the students who failed their OS exam in the Agnes Arnold auditorium because they didnt study semaphores enough",
-    image: "/images/events/soul-cleanup.jpg",
-  },
-  {
-    id: 3,
-    title: "Rebuild PGH",
-    date: {
-      start: new Date(2025, 10, 13),
-      end: new Date(2025, 10, 15),
-    },
-    urgency: 2,
-    description: "PGH is outdated and needs to be rebuilt. Easy task should take 2 days",
-    image: "/images/events/rebuild-pgh.jpg",
-  },
-  {
-    id: 4,
-    title: "Pop-Up Shop Vendor",
-    date: {
-      start: new Date(2025, 10, 16),
-      end: new Date(2025, 10, 16),
-    },
-    urgency: 2,
-    description: "Looking for vendors to set up tents in the green between PGH and the library, must sell allowed goods such as food, clothing, or jewelry. Must be friendly towards students and report all revenue and provide the campus 25% of total profits",
-    image: "/images/events/popup-shop.jpg",
-  },
-];
-*/
-
 const supabase = require("../supabaseClient");
-require('dotenv').config();
+require("dotenv").config();
+
+// Helper: parse DATE from DB without shifting by timezone
+const parseDate = (dateString) => {
+  if (!dateString) return null;
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day); // month is 0-indexed
+};
 
 const getEvents = async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // normalize to start of today
+
+    // Select events and join event_skills -> skills
     const { data, error } = await supabase
       .from("events")
-      .select("*");
+      .select(`
+        *,
+        event_skills (
+          skill_id,
+          skills (description)
+        )
+      `);
 
-    if (error){
-      return res.status(500).json({ error: error.message });
-    };
+    if (error) throw error;
 
-    res.json(data);
+    const normalized = data
+      .map((event) => {
+        const startDate = parseDate(event.start_date);
+        const endDate = parseDate(event.end_date) || startDate;
+
+        // Extract skill descriptions
+        const skills =  event.event_skills?.map(es => es.skills).filter(Boolean).sort((a, b) => a.description.localeCompare(b.description)).map(s => ({ id: s.skill_id, description: s.description })) || [];
+
+        return {
+          id: event.event_id,
+          title: event.event_name,
+          description: event.event_description,
+          location: event.location,
+          urgency: event.event_urgency,
+          image: event.event_image,
+          date: { start: startDate, end: endDate },
+          skills,
+        };
+      })
+      .filter((event) => event.date.start && event.date.start >= today);
+
+    res.json(normalized);
+  } catch (err) {
+    console.error("Error fetching events:", err);
+    res.status(500).json({ error: err.message });
+  }
 };
 
 module.exports = { getEvents };

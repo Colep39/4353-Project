@@ -11,76 +11,73 @@ function EventManagement() {
   const [recommendedVolunteers, setRecommendedVolunteers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [newEvent, setNewEvent] = useState({title: '', date: { start: null, end: null }, urgency: 1, description: '', image: '',});
+  const [newEvent, setNewEvent] = useState({title: '', location: '', date: { start: null, end: null }, urgency: 1, description: '', image: '', skill_ids: []});
   const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
   const [matchedEvent, setMatchedEvent] = useState(null);
   const [selectedVolunteers, setSelectedVolunteers] = useState([]);
   const [validationErrors, setValidationErrors] = useState({});
+  const [skills, setSkills] = useState([]);
 
   const minSelectableDate = addDays(new Date(), 3);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem("token");
-      const role = localStorage.getItem("role");
+useEffect(() => {
+  const fetchData = async () => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
 
-      if (!token || role !== "admin") {
-        alert("You do not have access to this page! Please login as an admin.");
-        window.location.href = "/login";
-        return;
-      }
+    if (!token || role !== "admin") {
+      alert("You do not have access to this page! Please login as an admin.");
+      window.location.href = "/login";
+      return;
+    }
 
-      try {
-        const resEvents = await fetch(`${API_URL}/api/eventManagement`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!resEvents.ok) {
-          const errData = await resEvents.json();
-          throw new Error(errData.message || "Failed to fetch events");
-        }
-        const eventsData = await resEvents.json();
-        setEvents(Array.isArray(eventsData) ? eventsData : []);
+    try {
+      const resSkills = await fetch(`${API_URL}/api/eventManagement/skills`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!resSkills.ok) throw new Error("Failed to fetch skills");
+      const skillsData = await resSkills.json();
+      setSkills(Array.isArray(skillsData) ? skillsData : []);
 
-        const resVolunteers = await fetch(`${API_URL}/api/eventManagement/recommendedVolunteers`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!resVolunteers.ok) {
-          const errData = await resVolunteers.json();
-          throw new Error(errData.message || "Failed to fetch recommended volunteers");
-        }
-        const volunteersData = await resVolunteers.json();
-        setRecommendedVolunteers(Array.isArray(volunteersData) ? volunteersData : []);
+      const resEvents = await fetch(`${API_URL}/api/eventManagement`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!resEvents.ok) throw new Error("Failed to fetch events");
+      const eventsData = await resEvents.json();
 
-      } catch (err) {
-        console.error("Error fetching data:", err.message);
-        setEvents([]);
-        setRecommendedVolunteers([]);
-      }
-    };
+      const eventsWithSkills = (eventsData || []).map(event => ({
+        ...event,
+        skills: Array.isArray(event.skills) ? event.skills : [],
+        date: {
+          start: event.date?.start ? new Date(event.date.start) : null,
+          end: event.date?.end ? new Date(event.date.end) : null,
+        },
+      }));
 
-    fetchData();
-  }, []);
+      setEvents(eventsWithSkills);
+
+      const resVolunteers = await fetch(`${API_URL}/api/eventManagement/recommendedVolunteers`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!resVolunteers.ok) throw new Error("Failed to fetch recommended volunteers");
+      const volunteersData = await resVolunteers.json();
+      setRecommendedVolunteers(Array.isArray(volunteersData) ? volunteersData : []);
+
+    } catch (err) {
+      console.error("Error fetching data:", err.message);
+      setEvents([]);
+      setRecommendedVolunteers([]);
+      setSkills([]);
+    }
+  };
+
+  fetchData();
+}, []);
 
   const resetModalState = () => {
     setSelectedEvent(null);
-    setNewEvent({ title: '', date: { start: null, end: null }, urgency: 1, description: '', image: '' });
+    setNewEvent({ title: '', location: '', date: { start: null, end: null }, urgency: 1, description: '', image: '', skill_ids: [] });
     setValidationErrors({});
-  };
-
-  const handleCreateEvent = async (eventToAdd) => {
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch(`${API_URL}/api/eventManagement`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(eventToAdd),
-      });
-      if (!res.ok) throw new Error("Failed to create event");
-      const created = await res.json();
-      setEvents([...events, created]);
-    } catch (err) {
-      console.error("Error creating event:", err);
-    }
   };
 
   const handleEditEvent = (event) => {
@@ -101,6 +98,10 @@ const validateEvent = (candidate) => {
     errors.title = "Title must be 3–100 characters.";
   } else if (!/^[a-zA-Z0-9\s'.,!?-]+$/.test(candidate.title.trim())) {
     errors.title = "Title contains invalid characters.";
+  }
+
+  if (!candidate.location || candidate.location.trim() === '') {
+    errors.location = "Location is required.";
   }
 
   const start = candidate.date?.start;
@@ -144,7 +145,7 @@ const handleSave = async () => {
     return;
   }
 
-  const candidateToSend = {...candidate, date: { start: candidate.date.start.toISOString(), end: candidate.date.end.toISOString() },};
+  const candidateToSend = {...candidate, location: candidate.location, date: { start: candidate.date.start.toISOString(), end: candidate.date.end.toISOString() }, skill_ids: candidate.skill_ids || [],};
 
   try {
     if (selectedEvent) {
@@ -215,6 +216,28 @@ return (
 
               <div className="flex flex-col">
                 <div className="flex items-center">
+                  <label htmlFor="eventLocation" className="w-32">Location</label><span className="text-red-500 mr-2">*</span>
+                  <input
+                    type="text"
+                    id="eventLocation"
+                    className="border px-3 py-2 rounded w-full"
+                    value={selectedEvent ? selectedEvent.location || '' : newEvent.location}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (selectedEvent) {
+                        setSelectedEvent({ ...selectedEvent, location: value });
+                      } else {
+                        setNewEvent({ ...newEvent, location: value });
+                      }
+                    }}
+                    placeholder="Enter event location"
+                  />
+                </div>
+                {validationErrors.location && (<div className="text-red-600 text-sm mt-1 pl-36">{validationErrors.location}</div>)}
+              </div>
+
+              <div className="flex flex-col">
+                <div className="flex items-center">
                   <label htmlFor="eventDate" className="w-32">Event Date</label><span className="text-red-500 mr-2">*</span>
                   <DatePicker selectsRange startDate={selectedEvent ? selectedEvent.date?.start : newEvent.date?.start} endDate={selectedEvent ? selectedEvent.date?.end : newEvent.date?.end}
                     onChange={(update) => {
@@ -256,6 +279,36 @@ return (
                     {validationErrors.urgency}
                   </div>
                 )}
+              </div>
+
+              <div className="flex flex-col">
+                <div className="flex items-center">
+                  <label htmlFor="eventSkills" className="w-32">Skills</label><span className="text-red-500 mr-2">*</span>
+                  <select
+                    id="eventSkills"
+                    multiple
+                    className="border px-3 py-2 rounded w-full h-28"
+                    value={
+                      selectedEvent
+                        ? selectedEvent.skill_ids || []
+                        : newEvent.skill_ids || []
+                    }
+                    onChange={(e) => {
+                      const selected = Array.from(e.target.selectedOptions, (opt) => Number(opt.value));
+                      if (selectedEvent) {
+                        setSelectedEvent({ ...selectedEvent, skill_ids: selected });
+                      } else {
+                        setNewEvent({ ...newEvent, skill_ids: selected });
+                      }
+                    }}
+                  >
+                    {skills.map((skill) => (
+                      <option key={skill.id} value={skill.id}>
+                        {skill.description}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="flex flex-col">

@@ -92,16 +92,40 @@ function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Ev
                 </div>
                 <div className="w-[90%] p-4 flex flex-col justify-between">
                   <h2 className="text-xl font-semibold">{event.title}</h2>
-                  <div className="text-sm text-gray-500 mb-2">
-                    <span className="mr-2">
-                      {event.date.start 
-                        ? event.date.end && event.date.start.getTime() !== event.date.end.getTime()
+                  <div className="text-sm text-gray-500 mb-2 flex flex-wrap gap-x-4 gap-y-1">
+                    {event.location && (
+                      <span>
+                        <strong>Location:</strong> {event.location}
+                      </span>
+                    )}
+                    {event.date.start && (
+                      <span>
+                        <strong>Date:</strong>{" "}
+                        {event.date.end && event.date.start.getTime() !== event.date.end.getTime()
                           ? `${format(event.date.start, "MMM dd, yyyy")} - ${format(event.date.end, "MMM dd, yyyy")}`
-                          : format(event.date.start, "MMM dd, yyyy")
-                        : "No date"}
+                          : format(event.date.start, "MMM dd, yyyy")}
+                      </span>
+                    )}
+                    <span>
+                      <strong>Urgency:</strong> {urgencyIntToString[event.urgency] || "Low"}
                     </span>
-                    Urgency: {urgencyIntToString[event.urgency] || "Low"}
                   </div>
+                  {event.skills && event.skills.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {event.skills.map((skill, idx) => {
+                        // Check if skill is an object with 'description', fallback to string
+                        const skillLabel = typeof skill === "string" ? skill : skill.description || "";
+                        return (
+                          <span
+                            key={idx}
+                            className="bg-gray-300 text-gray-900 text-xs px-2 py-1 rounded-full"
+                          >
+                            {skillLabel}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
                   <p className="text-gray-700">{event.description}</p>
                   {showButton ? (
                     <div className="mt-2">

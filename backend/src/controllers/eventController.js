@@ -1,19 +1,13 @@
 const supabase = require("../supabaseClient");
 require("dotenv").config();
 
-// Helper: parse DATE from DB without shifting by timezone
 const parseDate = (dateString) => {
   if (!dateString) return null;
-  const [year, month, day] = dateString.split("-").map(Number);
-  return new Date(year, month - 1, day); // month is 0-indexed
+  return new Date(dateString);
 };
 
 const getEvents = async (req, res) => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // normalize to start of today
-
-    // Select events and join event_skills -> skills
     const { data, error } = await supabase
       .from("events")
       .select(`
@@ -22,7 +16,8 @@ const getEvents = async (req, res) => {
           skill_id,
           skills (description)
         )
-      `);
+      `)
+      .gte("start_date", "NOW()");
 
     if (error) throw error;
 
@@ -44,8 +39,7 @@ const getEvents = async (req, res) => {
           date: { start: startDate, end: endDate },
           skills,
         };
-      })
-      .filter((event) => event.date.start && event.date.start >= today);
+      });
 
     res.json(normalized);
   } catch (err) {

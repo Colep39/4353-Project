@@ -1,38 +1,93 @@
 const { findUser } = require("../models/User");
-const { signToken } = require("../middleware/authMiddleware");
+const supabase = require("../supabaseClient")
 
-const login = (req, res) => {
-    const { email, password } = req.body || {};
-    const user = findUser(email);
+const register = async (req, res) => {
+    try {
+        const { email, password, userType } = req.body || {};
 
-    if (!user || user.password !== password) {
-        return res.status(401).json({ error: "Invalid credentials" });
+        if (!verifyRegister(email, password, userType)){
+            return res.status(400).json({ error: "Invalid registration data"});
+        }
+
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { role: userType }}
+        })
+
+        if (error) return res.status(400).json({ error: error.message });
+        
+        const token = data.session?.access_token;
+        const userId = data.user?.id;
+        const role = data.user?.user_metadata?.role;
+
+        res.json({
+            message: "Registration success",
+            token,
+            role,
+            userId,
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
     }
 
-    const token = signToken(user);
-    return res.json({ token, role: user.role, userId: user.id });
 };
 
-const register = (req, res) => {
-    const { email, password, userType } = req.body || {};
-
+const verifyRegister = (email, password, userType) => {
     if (!email || !password || !userType) {
-        return res.status(400).json({ error: "Missing required fields" });
+        return false;
+    }
+    // add more
+    return true;
+}
+
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body || {};
+        
+        if (!verifyLogin(email, password)){
+            return res.status(400).json({ error: "Invalid input" });
+        }
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) return res.status(400).json({ error: "Invalid credentials" });
+
+        const token = data.session?.access_token;
+        const userId = data.user?.id;
+        const role = data.user?.user_metadata?.role;
+
+        res.json({ token, role, userId });
+    } catch (e){
+        res.status(500).json({ error: e.message });
+    }
+};
+
+const verifyLogin = (email, password) => {
+    if (!email || !password){
+        return false;
     }
 
-    const user = {
-        id: 3,
-        email,
-        role: userType,
-    };
+    return true;
+}
 
-    const token = signToken(user);
-    return res.json({
-        message: "Registration success",
-        token,
-        role: user.role,
-        userId: user.id,
-    });
-};
+const refresh = async (req, res) => {
+    try {
+        const { refresh_token } = req.body;
+        const { data, error } = await supabase.auth.refreshSession({ refresh_token });
+
+        if (error) return res.status(400).json({ error: error.message });
+
+        res.json({
+            token: data.session.access_token,
+            refresh_token: data.session.refresh_token
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+}
 
 module.exports = { login, register };

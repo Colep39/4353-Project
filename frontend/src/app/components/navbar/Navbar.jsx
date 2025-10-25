@@ -140,14 +140,30 @@ export default function Navbar() {
                 </button>
 
                 {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white text-black rounded-xl shadow-lg overflow-hidden z-50">
+                  <div className="absolute right-0 mt-2 w-72 bg-white text-black rounded-xl shadow-xl overflow-hidden z-50 border border-gray-200">
                     {notifications.length > 0 ? (
-                      <ul className="divide-y divide-gray-200">
-                        {notifications.map((note, idx) => (
-                          <li key={idx} className="p-3 hover:bg-gray-100 cursor-pointer">
-                            {note}
-                          </li>
-                        ))}
+                      <ul className="divide-y divide-gray-100">
+                        {notifications.map((note, idx) => {
+                          const date = new Date(note.created_at);
+                          const formattedDate = date.toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          });
+                          return (
+                            <li
+                              key={idx}
+                              className="p-3 hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+                            >
+                              <div className="flex justify-between items-center">
+                                <h3 className="font-semibold text-gray-900 text-sm">
+                                  {note.title}
+                                </h3>
+                                <span className="text-xs text-gray-400">{formattedDate}</span>
+                              </div>
+                              <p className="text-sm text-gray-700 mt-1">{note.message}</p>
+                            </li>
+                          );
+                        })}
                       </ul>
                     ) : (
                       <div className="p-4 text-center text-gray-500">No notifications</div>

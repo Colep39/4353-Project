@@ -1,3 +1,6 @@
+const supabase = require('../supabaseClient');
+require('dotenv').config();
+
 let sampleNotifications = [
     "Event 'Operating Systems Exam 1' starts tomorrow!",
     "A new event has been created that might interest you!",
@@ -5,15 +8,27 @@ let sampleNotifications = [
     "Thank you for attending Santiago's Birthday Bash!",
 ];
 
-const getNotifications = (req, res) => {
-    const { id } = req.params;
-    const parsedId = parseInt(id, 10);
+const getNotifications = async (req, res) => {
+    try{
+        const userId = req.params.id;
+        const { data, error } = await supabase
+            .from('notifications')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
+            .limit(10);
+        
+        if (error) throw error;
 
-    if (isNaN(parsedId) || parsedId <= 0) {
-        return res.status(401).json({ message: "Invalid ID parameter" });
+        if (data && data.length > 0) {
+            const notifications = data.map(notification => notification.message);
+            res.json(notifications);
+        }
     }
-
-    res.json(sampleNotifications);
+    catch(err){
+        console.error("Error fetching notifications:", err);
+        res.status(500).json({ error: err.message });
+    }
 }
 
 const createNotification = (req, res) => {

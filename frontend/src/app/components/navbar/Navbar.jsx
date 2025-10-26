@@ -90,7 +90,7 @@ export default function Navbar() {
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative flex items-center justify-center"
             >
-              <Bell className="w-6 h-6 hover:text-green-200 transition cursor-pointer" />
+              <Bell className="w-6 h-6 hover:text-red-200 transition cursor-pointer" />
               {notifications.length > 0 && (
                 <span className="absolute top-[-4px] right-[-4px] bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
                   {notifications.length}
@@ -99,7 +99,7 @@ export default function Navbar() {
             </button>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="text-white hover:text-green-200 transition"
+              className="text-white hover:text-red-200 transition"
             >
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -115,8 +115,8 @@ export default function Navbar() {
                   href={link.href}
                   className={`relative px-3 py-1 rounded-lg transition-all duration-300 
                     ${pathname === link.href 
-                      ? "bg-green-500/40 text-green-100  scale-105" 
-                      : "hover:bg-green-400/30 hover:text-green-100 "}`
+                      ? "bg-red-500/40 text-red-100  scale-105" 
+                      : "hover:bg-red-400/30 hover:text-red-100 "}`
                   }
                 >
                   {link.name}
@@ -133,7 +133,7 @@ export default function Navbar() {
                   onClick={() => setShowNotifications(!showNotifications)}
                   className="relative flex items-center justify-center"
                 >
-                  <Bell className="w-6 h-6 hover:text-green-200 transition cursor-pointer flex-shrink-0" />
+                  <Bell className="w-6 h-6 hover:text-red-200 transition cursor-pointer flex-shrink-0" />
                   {notifications.length > 0 && (
                     <span className="absolute top-[-4px] right-[-4px] bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
                       {notifications.length}
@@ -214,7 +214,7 @@ export default function Navbar() {
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
                   className={`block px-4 py-2 text-lg transition-colors duration-200 ${
-                    pathname === link.href ? "text-green-200 font-semibold" : "hover:text-green-200"
+                    pathname === link.href ? "text-red-200 font-semibold" : "hover:text-red-200"
                   }`}
                 >
                   {link.name}

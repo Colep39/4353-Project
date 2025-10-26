@@ -48,7 +48,7 @@ export default function VolunteerProfile() {
                 alt={user.name}
                 width={96}
                 height={96}
-                className="rounded-full object-cover border-4 border-green-200"
+                className="rounded-full object-cover border-4 border-red-200"
               />
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">{user.name}</h1>
@@ -59,7 +59,7 @@ export default function VolunteerProfile() {
             {/* Contact Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <h2 className="text-lg font-semibold text-green-600 mb-2">
+                <h2 className="text-lg font-semibold text-red-600 mb-2">
                   Contact Information
                 </h2>
                 <p className="text-gray-700">
@@ -71,7 +71,7 @@ export default function VolunteerProfile() {
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold text-green-600 mb-2">
+                <h2 className="text-lg font-semibold text-red-600 mb-2">
                   Preferences
                 </h2>
                 <p className="text-gray-700">
@@ -83,7 +83,7 @@ export default function VolunteerProfile() {
             {/* Skills and Availability */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-lg font-semibold text-green-600 mb-2">
+                <h2 className="text-lg font-semibold text-red-600 mb-2">
                   Skills
                 </h2>
                 {user.skills.length > 0 ? (
@@ -98,7 +98,7 @@ export default function VolunteerProfile() {
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold text-green-600 mb-2">
+                <h2 className="text-lg font-semibold text-red-600 mb-2">
                   Availability
                 </h2>
                 {user.availability.length > 0 ? (
@@ -117,7 +117,7 @@ export default function VolunteerProfile() {
             <div className="mt-8 flex justify-end">
               <button
                 onClick={openModal}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition cursor-pointer"
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition cursor-pointer"
               >
                 Edit Profile
               </button>
@@ -142,7 +142,7 @@ export default function VolunteerProfile() {
                         type="text"
                         defaultValue={user.name}
                         required
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
                       />
                     </div>
 
@@ -155,7 +155,7 @@ export default function VolunteerProfile() {
                         type="text"
                         defaultValue={user.address1}
                         required
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
                       />
                     </div>
 
@@ -167,7 +167,7 @@ export default function VolunteerProfile() {
                       <input
                         type="text"
                         defaultValue={user.address2}
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
                       />
                     </div>
 
@@ -180,7 +180,7 @@ export default function VolunteerProfile() {
                         type="text"
                         defaultValue={user.city}
                         required
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
                       />
                     </div>
 
@@ -193,7 +193,7 @@ export default function VolunteerProfile() {
                         type="text"
                         defaultValue={user.state}
                         required
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
                       />
                     </div>
 
@@ -206,7 +206,7 @@ export default function VolunteerProfile() {
                         type="text"
                         defaultValue={user.zip}
                         required
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
                       />
                     </div>
 
@@ -220,7 +220,7 @@ export default function VolunteerProfile() {
                         defaultValue={user.skills.join(", ")}
                         required
                         placeholder="Comma-separated, e.g. Event Setup, Fundraising"
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
                       />
                     </div>
 
@@ -232,7 +232,7 @@ export default function VolunteerProfile() {
                       <textarea
                         defaultValue={user.preferences}
                         required
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
                         rows="3"
                       />
                     </div>
@@ -247,7 +247,7 @@ export default function VolunteerProfile() {
                         defaultValue={user.availability.join(", ")}
                         required
                         placeholder="Comma-separated, e.g. Weekdays after 5pm, Weekends"
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
                       />
                     </div>
 
@@ -260,7 +260,7 @@ export default function VolunteerProfile() {
                         type="text"
                         defaultValue={user.profilePhoto}
                         placeholder="Optional: Enter a photo URL"
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
                       />
                     </div>
 
@@ -289,7 +289,7 @@ export default function VolunteerProfile() {
                       <button
                         type="submit"
                         onClick={handleEditProfile}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition cursor-pointer"
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition cursor-pointer"
                       >
                         Save Changes
                       </button>

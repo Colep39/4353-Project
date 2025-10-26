@@ -56,7 +56,7 @@ export default function Home() {
 
           <div className="flex space-x-4 mt-4">
             <Link href="/register">
-              <button className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition transform hover:scale-105 cursor-pointer">
+              <button className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition transform hover:scale-105 cursor-pointer">
                 Join Now
               </button>
             </Link>
@@ -76,12 +76,12 @@ export default function Home() {
         <section className="w-full bg-white py-20 rounded-2xl shadow-xl">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center px-6">
             <div className="order-2 md:order-1 text-center md:text-left space-y-6">
-              <h2 className="text-4xl md:text-5xl font-extrabold text-green-300">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-red-300">
                 What We Do
               </h2>
               <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
                 Our mission is to connect
-                <span className="font-semibold text-green-500"> energetic volunteers </span>
+                <span className="font-semibold text-red-500"> energetic volunteers </span>
                 to events that inspire them. We help event organizers find
                 dedicated support so they can make a bigger impact. Together, we’re
                 building a stronger, more connected community.
@@ -103,7 +103,7 @@ export default function Home() {
         {/* Reviews Section */}
         <section className="w-full bg-white py-20 rounded-2xl shadow-xl">
           <div className="max-w-6xl mx-auto px-6 space-y-16">
-            <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12 text-green-300">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12 text-red-300">
               What People Are Saying
             </h2>
 
@@ -116,7 +116,7 @@ export default function Home() {
               >
                 {/* Image */}
                 <div className="flex justify-center">
-                  <div className="w-60 h-60 rounded-full overflow-hidden shadow-lg border-4 border-green-200">
+                  <div className="w-60 h-60 rounded-full overflow-hidden shadow-lg border-4 border-red-200">
                     <Image
                       src={review.image}
                       alt={review.name}
@@ -128,11 +128,11 @@ export default function Home() {
                 </div>
 
                 {/* Quote */}
-                <div className="bg-green-50 rounded-2xl shadow-md p-8 relative">
+                <div className="bg-red-100 rounded-2xl shadow-md p-8 relative">
                   <p className="text-lg md:text-xl text-gray-700 italic mb-4">
                     “{review.quote}”
                   </p>
-                  <div className="font-semibold text-green-700">{review.name}</div>
+                  <div className="font-semibold text-red-700">{review.name}</div>
                   <div className="text-gray-500 text-sm">{review.role}</div>
                 </div>
               </div>
@@ -157,10 +157,10 @@ export default function Home() {
           <div>
             <h3 className="text-white text-xl font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/events" className="hover:text-green-400 transition">Events</Link></li>
-              <li><Link href="/eventManagement" className="hover:text-green-400 transition">Manage Events</Link></li>
-              <li><Link href="/volunteerHistory" className="hover:text-green-400 transition">Volunteer History</Link></li>
-              <li><Link href="/aboutUs" className="hover:text-green-400 transition">About Us</Link></li>
+              <li><Link href="/events" className="hover:text-red-400 transition">Events</Link></li>
+              <li><Link href="/eventManagement" className="hover:text-red-400 transition">Manage Events</Link></li>
+              <li><Link href="/volunteerHistory" className="hover:text-red-400 transition">Volunteer History</Link></li>
+              <li><Link href="/aboutUs" className="hover:text-redd-400 transition">About Us</Link></li>
             </ul>
           </div>
 
@@ -176,10 +176,10 @@ export default function Home() {
           <div>
             <h3 className="text-white text-xl font-semibold mb-4">Follow Us</h3>
             <div className="flex space-x-4">
-              <a href="#" className="hover:text-green-400 transition">Facebook</a>
-              <a href="#" className="hover:text-green-400 transition">Instagram</a>
-              <a href="#" className="hover:text-green-400 transition">LinkedIn</a>
-              <a href="#" className="hover:text-green-400 transition">Twitter</a>
+              <a href="#" className="hover:text-red-400 transition">Facebook</a>
+              <a href="#" className="hover:text-red-400 transition">Instagram</a>
+              <a href="#" className="hover:text-red-400 transition">LinkedIn</a>
+              <a href="#" className="hover:text-red-400 transition">Twitter</a>
             </div>
           </div>
         </div>

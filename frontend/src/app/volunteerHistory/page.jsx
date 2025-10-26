@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react"; 
 import CardGrid from '../components/events/CardGrid';
+import { fetchWithAuth } from "../authHelper";
 
 const sampleUser = {
   id: 1,
@@ -23,8 +24,7 @@ function VolunteerHistory() {
         return; // i dont think it will reach this but whatever
       }
 
-      fetch(`${API_URL}/api/volunteerHistory`, {
-      headers: { Authorization: `Bearer ${token}`}
+      fetchWithAuth(`${API_URL}/api/volunteerHistory`, {
       })
         .then((res) => res.json())
         .then((data) => setEvents(data))

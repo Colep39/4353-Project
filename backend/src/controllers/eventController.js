@@ -1,5 +1,5 @@
-const supabase = require("../supabaseClient");
 require("dotenv").config();
+const supabaseNoAuth = require("../supabaseNoAuth")
 
 const parseDate = (dateString) => {
   if (!dateString) return null;
@@ -8,7 +8,7 @@ const parseDate = (dateString) => {
 
 const getEvents = async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseNoAuth
       .from("events")
       .select(`
         *,
@@ -17,7 +17,7 @@ const getEvents = async (req, res) => {
           skills (description)
         )
       `)
-      .gte("start_date", "NOW()");
+      .gte("start_date", new Date().toISOString())
 
     if (error) throw error;
 

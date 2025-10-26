@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react"; 
 import CardGrid from '../components/events/CardGrid';
+import { fetchWithAuth } from "../authHelper";
 
 function EventsPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -17,9 +18,7 @@ function EventsPage() {
       return; // i dont think it will reach this but whatever
     }
 
-    fetch(`${API_URL}/api/events`, {
-      headers: { Authorization: `Bearer ${token}`}
-    })
+    fetchWithAuth(`${API_URL}/api/events`)
       .then((res) => res.json())
       .then((data) => { data = data.map(e => { e.date.start = new Date(e.date.start);
                                                e.date.end = new Date(e.date.end);

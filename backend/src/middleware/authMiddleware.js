@@ -1,11 +1,6 @@
-const jwt = require("jsonwebtoken");
+const supabase = require("../supabaseClient")
 
-function signToken(user){
-    const payload = { sub: user.id, role: user.role };
-    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || "1h" });
-};
-
-function requireAuth(req, res, next){
+async function requireAuth(req, res, next){
     try {
         const header = req.headers.authorization || "";
         const token = header.replace(/^Bearer\s+/i, '');
@@ -14,10 +9,18 @@ function requireAuth(req, res, next){
             return res.status(401).json({ error: "Missing token" });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = { id: decoded.sub, role: decoded.role };
+        const { data: {user}, error } = await supabase.auth.getUser(token);
+
+        if (error || !user) return res.status(401).json({ error: "Invalid token" });
+
+        req.user = {
+            id: user.id,
+            role: user.user_metadata?.role,
+            email: user.email
+        };
+
         next();
-    } catch (e) {
+    } catch {
         return res.status(401).json({ error: "Unauthenticated" });
     };
 };
@@ -35,4 +38,4 @@ function requireRole(...roles){
     };
 };
 
-module.exports = { signToken, requireAuth, requireRole };
+module.exports = { requireAuth, requireRole };

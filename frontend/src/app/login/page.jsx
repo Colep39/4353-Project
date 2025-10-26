@@ -56,14 +56,14 @@ export default function RegisterPage() {
                 const data = await res.json();
 
                 if (!res.ok) {
-                  alert(`Error: ${data.error || "Request failed"}`);
+                  alert(`Error: ${data.error || "Request failed"}`); // change from alert so ugly
                   return;
                 }
 
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("role", data.role);
+                localStorage.setItem("refresh_token", data.refresh_token);
 
-                alert(`Register + login successful as ${data.role}`);
                 window.location.href = "/profile";
               } catch (e) {
                 alert("Server error");

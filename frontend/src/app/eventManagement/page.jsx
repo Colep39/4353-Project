@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { addDays, startOfDay, isValid } from "date-fns";
 import Select from "react-select";
 import { useMemo } from "react";
+import { fetchWithAuth } from "../authHelper";
 
 function EventManagement() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -33,22 +34,18 @@ function EventManagement() {
       const role = localStorage.getItem("role");
 
       if (!token || role !== "admin") {
-        alert("You do not have access to this page! Please login as an admin.");
+        alert("You do not have access to this page! Please login as an admin."); // ugly change if u want
         window.location.href = "/login";
         return;
       }
 
       try {
-        const resSkills = await fetch(`${API_URL}/api/eventManagement/skills`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const resSkills = await fetchWithAuth(`${API_URL}/api/eventManagement/skills`);
         if (!resSkills.ok) throw new Error("Failed to fetch skills");
         const skillsData = await resSkills.json();
         setSkills(Array.isArray(skillsData) ? skillsData.sort((a, b) => a.description.localeCompare(b.description)) : []);
 
-        const resEvents = await fetch(`${API_URL}/api/eventManagement`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const resEvents = await fetchWithAuth(`${API_URL}/api/eventManagement`);
         if (!resEvents.ok) throw new Error("Failed to fetch events");
         const eventsData = await resEvents.json();
 
@@ -64,9 +61,7 @@ function EventManagement() {
 
         setEvents(eventsWithSkills);
 
-        const resVolunteers = await fetch(`${API_URL}/api/eventManagement/recommendedVolunteers`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const resVolunteers = await fetchWithAuth(`${API_URL}/api/eventManagement/recommendedVolunteers`);
         if (!resVolunteers.ok) throw new Error("Failed to fetch recommended volunteers");
         const volunteersData = await resVolunteers.json();
         setRecommendedVolunteers(Array.isArray(volunteersData) ? volunteersData : []);
@@ -148,7 +143,6 @@ function EventManagement() {
   };
 
   const handleSave = async () => {
-    const token = localStorage.getItem("token");
     const candidate = selectedEvent ? selectedEvent : newEvent;
 
     const errors = validateEvent(candidate);
@@ -165,9 +159,8 @@ function EventManagement() {
 
     try {
       if (selectedEvent) {
-        const res = await fetch(`${API_URL}/api/eventManagement/${selectedEvent.id}`, {
+        const res = await fetchWithAuth(`${API_URL}/api/eventManagement/${selectedEvent.id}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify(candidateToSend),
         });
         if (!res.ok) throw new Error("Failed to update event");
@@ -177,9 +170,8 @@ function EventManagement() {
         updated.date.end = new Date(updated.date.end);
         setEvents(events.map(ev => ev.id === updated.id ? updated : ev));
       } else {
-        const res = await fetch(`${API_URL}/api/eventManagement`, {
+        const res = await fetchWithAuth(`${API_URL}/api/eventManagement`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
           body: JSON.stringify(candidateToSend),
         });
         if (!res.ok) throw new Error("Failed to create event");
@@ -324,7 +316,7 @@ function EventManagement() {
                   <button onClick={async () => {
                       const token = localStorage.getItem("token");
                       try {
-                        const res = await fetch(`${API_URL}/api/eventManagement/${selectedEvent.id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+                        const res = await fetchWithAuth(`${API_URL}/api/eventManagement/${selectedEvent.id}`, { method: "DELETE" });
                         if (!res.ok) throw new Error("Failed to delete event");
                         setEvents(events.filter(ev => ev.id !== selectedEvent.id));
                       } catch (err) {

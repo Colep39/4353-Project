@@ -1,5 +1,5 @@
-const { findUser } = require("../models/User");
-const supabase = require("../supabaseClient")
+const supabase = require("../supabaseClient");
+const supabaseNoAuth = require("../supabaseNoAuth");
 
 const register = async (req, res) => {
     try {
@@ -17,13 +17,53 @@ const register = async (req, res) => {
 
         if (error) return res.status(400).json({ error: error.message });
         
+
         const token = data.session?.access_token;
+        const refresh_token = data.session?.refresh_token;
         const userId = data.user?.id;
         const role = data.user?.user_metadata?.role;
 
+        // populating the initial user tables with fake data
+        const { error: insertError } = await supabaseNoAuth
+            .from("user_profile")
+            .insert([
+                {
+                    user_id: userId,
+                    full_name: "Update your name",
+                    address_1: "Add your address",
+                    address_2: null,
+                    city: "Add your city",
+                    state_id: 1,
+                    zipcode: "00000",
+                    preferences: "No preferences set",
+                    availability: new Date().toISOString(),
+                    role: role,
+                }
+            ]);
+        
+        if (insertError) {
+            console.log(insertError.message)
+            return res.status(500).json({ error: "Failed to create user profile" });
+        }
+
+        // q for jason: does this need to exist? not sure how this table works
+        const { error: skillsError } = await supabaseNoAuth
+            .from("user_skills")
+            .insert([
+                {
+                    user_id: userId,
+                    skill_id: 1
+                }
+            ]);
+        
+        if (skillsError) {
+            console.log(skillsError.message)
+            return res.status(500).json({ error: "Failed to create skills profile" });
+        }
         res.json({
             message: "Registration success",
             token,
+            refresh_token,
             role,
             userId,
         });
@@ -57,10 +97,11 @@ const login = async (req, res) => {
         if (error) return res.status(400).json({ error: "Invalid credentials" });
 
         const token = data.session?.access_token;
+        const refresh_token = data.session?.refresh_token;
         const userId = data.user?.id;
         const role = data.user?.user_metadata?.role;
 
-        res.json({ token, role, userId });
+        res.json({ token, refresh_token, role, userId });
     } catch (e){
         res.status(500).json({ error: e.message });
     }
@@ -77,6 +118,9 @@ const verifyLogin = (email, password) => {
 const refresh = async (req, res) => {
     try {
         const { refresh_token } = req.body;
+
+        if (!refresh_token) return res.status(400).json({ error: "Missing refresh token" });
+
         const { data, error } = await supabase.auth.refreshSession({ refresh_token });
 
         if (error) return res.status(400).json({ error: error.message });
@@ -90,4 +134,4 @@ const refresh = async (req, res) => {
     }
 }
 
-module.exports = { login, register };
+module.exports = { login, register, refresh };

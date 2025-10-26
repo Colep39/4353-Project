@@ -8,6 +8,8 @@ import { useState, useEffect } from "react";
 const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
+  localStorage.removeItem("refresh_token");
+  
   window.location.href = "/";
 };
 

@@ -1,4 +1,4 @@
-const supabase = require("../supabaseClient");
+const supabaseNoAuth = require("../supabaseNoAuth")
 
 const parseDate = (dateString) => {
   if (!dateString) return null;
@@ -10,7 +10,7 @@ const sanitizeInput = (str) =>
 
 const getManageEvents = async (req, res) => {
   try {
-    const { data: events, error } = await supabase
+    const { data: events, error } = await supabaseNoAuth
       .from("events")
       .select(`
         *,
@@ -57,7 +57,7 @@ const getManageEvents = async (req, res) => {
 
 const getSkills = async (req, res) => {
   try {
-    const { data, error } = await supabase.from("skills").select("*");
+    const { data, error } = await supabaseNoAuth.from("skills").select("*");
     if (error) {
       console.error("Error fetching skills:", error);
       return res.status(500).json({ message: "Failed to fetch skills" });
@@ -92,7 +92,7 @@ const createEvent = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const { data: createdEvent, error: eventError } = await supabase
+    const { data: createdEvent, error: eventError } = await supabaseNoAuth
       .from("events")
       .insert([{
         event_name: sanitizeInput(newEvent.title),
@@ -116,14 +116,14 @@ const createEvent = async (req, res) => {
         skill_id: Number(skill_id), // ensure it's a number
       }));
 
-      const { error: skillsError } = await supabase
+      const { error: skillsError } = await supabaseNoAuth
         .from("event_skills")
         .insert(skillRows);
 
       if (skillsError) throw skillsError;
     }
 
-    const { data: eventWithSkills, error: fetchError } = await supabase
+    const { data: eventWithSkills, error: fetchError } = await supabaseNoAuth
       .from("events")
       .select(`
         *,
@@ -172,7 +172,7 @@ const updateEvent = async (req, res) => {
 
     console.log("updateEvent request body:", updated);
 
-    const { data: existingEvent, error: existError } = await supabase
+    const { data: existingEvent, error: existError } = await supabaseNoAuth
       .from("events")
       .select("*")
       .eq("event_id", eventId)
@@ -183,7 +183,7 @@ const updateEvent = async (req, res) => {
       return res.status(404).json({ message: "Event not found" });
     }
 
-    const { data: updatedEvent, error: updateError } = await supabase
+    const { data: updatedEvent, error: updateError } = await supabaseNoAuth
       .from("events")
       .update({
         event_name: sanitizeInput(updated.title),
@@ -203,7 +203,7 @@ const updateEvent = async (req, res) => {
       return res.status(500).json({ message: updateError.message });
     }
 
-    const { error: deleteSkillsError } = await supabase
+    const { error: deleteSkillsError } = await supabaseNoAuth
       .from("event_skills")
       .delete()
       .eq("event_id", eventId);
@@ -219,7 +219,7 @@ const updateEvent = async (req, res) => {
         skill_id: Number(skill_id),
       }));
 
-      const { error: insertSkillsError } = await supabase
+      const { error: insertSkillsError } = await supabaseNoAuth
         .from("event_skills")
         .insert(skillRows);
 
@@ -229,7 +229,7 @@ const updateEvent = async (req, res) => {
       }
     }
 
-    const { data: eventWithSkills, error: fetchError } = await supabase
+    const { data: eventWithSkills, error: fetchError } = await supabaseNoAuth
       .from("events")
       .select(`
         *,
@@ -278,14 +278,14 @@ const deleteEvent = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const { error: deleteSkillsError } = await supabase
+    const { error: deleteSkillsError } = await supabaseNoAuth
       .from("event_skills")
       .delete()
       .eq("event_id", id);
 
     if (deleteSkillsError) throw deleteSkillsError;
 
-    const { data: deletedEvent, error: deleteEventError } = await supabase
+    const { data: deletedEvent, error: deleteEventError } = await supabaseNoAuth
       .from("events")
       .delete()
       .eq("event_id", id)

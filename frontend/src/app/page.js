@@ -28,6 +28,7 @@ const reviews = [
 export default function Home() {
   return (
     <>
+      <div className="bg-white">
       {/* Hero Section */}
       <div
         className="relative w-full"
@@ -160,7 +161,7 @@ export default function Home() {
               <li><Link href="/events" className="hover:text-red-400 transition">Events</Link></li>
               <li><Link href="/eventManagement" className="hover:text-red-400 transition">Manage Events</Link></li>
               <li><Link href="/volunteerHistory" className="hover:text-red-400 transition">Volunteer History</Link></li>
-              <li><Link href="/aboutUs" className="hover:text-redd-400 transition">About Us</Link></li>
+              <li><Link href="/aboutUs" className="hover:text-red-400 transition">About Us</Link></li>
             </ul>
           </div>
 
@@ -188,6 +189,7 @@ export default function Home() {
           © {new Date().getFullYear()} Cougar Connect. All rights reserved.
         </div>
       </footer>
+      </div>
     </>
   );
 }

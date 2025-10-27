@@ -113,12 +113,11 @@ function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Ev
                   {event.skills && event.skills.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-2">
                       {event.skills.map((skill, idx) => {
-                        // Check if skill is an object with 'description', fallback to string
                         const skillLabel = typeof skill === "string" ? skill : skill.description || "";
                         return (
                           <span
                             key={idx}
-                            className="bg-gray-300 text-gray-900 text-xs px-2 py-1 rounded-full"
+                            className="bg-red-100 text-gray-900 text-xs px-2 py-1 rounded-full"
                           >
                             {skillLabel}
                           </span>
@@ -129,7 +128,7 @@ function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Ev
                   <p className="text-gray-700">{event.description}</p>
                   {showButton ? (
                     <div className="mt-2">
-                      <button className="bg-gray-200 border border-black rounded px-4 py-1 text-sm font-medium hover:bg-gray-300 cursor-pointer"
+                      <button className="bg-red-100 border border-black rounded px-4 py-1 text-sm font-medium hover:bg-red-300 cursor-pointer"
                         onClick={(e) => {
                           e.stopPropagation();
                           if (onToggleJoin) {

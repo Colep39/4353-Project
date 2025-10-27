@@ -193,7 +193,7 @@ function EventManagement() {
     <>
       <div className="max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20">
         <CardGrid events={events} title="Upcoming Events" buttonLabel="Match Volunteers" tooltip={true} onEventClick={handleEditEvent} onMatchVolunteers={handleMatchVolunteers} titleAction={
-            <button className="ml-5 bg-gray-200 border border-black rounded px-2 py-1 text-sm font-medium hover:bg-gray-300 cursor-pointer" onClick={() => { resetModalState(); setIsModalOpen(true); }}>
+            <button className="ml-5 bg-white border border-black rounded px-2 py-1 text-sm font-medium hover:bg-gray-100 cursor-pointer" onClick={() => { resetModalState(); setIsModalOpen(true); }}>
               Create Event
             </button>}/>
       </div>

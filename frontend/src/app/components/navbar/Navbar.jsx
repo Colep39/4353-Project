@@ -4,13 +4,14 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Bell, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { fetchWithAuth, getUserIdFromToken } from '../../authHelper';
 
 const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
   localStorage.removeItem("refresh_token");
   
-  window.location.href = "/";
+  window.location.href = "/login";
 };
 
 export default function Navbar() {
@@ -31,7 +32,10 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/notifications/1`)
+    const userId = getUserIdFromToken();
+    if (!userId) return; // not authenticated
+
+    fetchWithAuth(`${API_URL}/api/notifications/${userId}`)
       .then((res) => res.json())
       .then((data) => setNotifications(data))
       .catch((err) => console.error("Error fetching notifications:", err));
@@ -160,7 +164,7 @@ export default function Navbar() {
                                 <h3 className="font-semibold text-gray-900 text-sm">
                                   {note.title}
                                 </h3>
-                                <span className="text-xs text-gray-400">{formattedDate}</span>
+                                {/*<span className="text-xs text-gray-400">{formattedDate}</span> */}
                               </div>
                               <p className="text-sm text-gray-700 mt-1">{note.message}</p>
                             </li>
@@ -168,7 +172,7 @@ export default function Navbar() {
                         })}
                       </ul>
                     ) : (
-                      <div className="p-4 text-center text-gray-500">No notifications</div>
+                      <div className="p-4 text-center text-gray-500">Login to receive notifications</div>
                     )}
                   </div>
                 )}

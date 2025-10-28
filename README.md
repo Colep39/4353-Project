@@ -1,4 +1,4 @@
-# 4353-The Cougar Connect
+# 4353- Cougar Connect
 **Full-Stack Volunteer Management Application**  
 
 A full-stack web application built for **COSC 4353** using the **PERN stack** (PostgreSQL, Express, React/Next.js, Node.js).  

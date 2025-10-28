@@ -83,7 +83,7 @@ export default function Navbar() {
                 />
               </div>
               <span className="text-lg sm:text-xl md:text-2xl font-bold whitespace-nowrap text-white">
-                The Cougar Connect
+                Cougar Connect
               </span>
             </Link>
           </div>

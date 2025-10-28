@@ -62,9 +62,11 @@ const handleToggleJoin = async (eventId) => {
 };
 
   return (
-    <div className="max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20">
-      <CardGrid events={events} showButton={true} onToggleJoin={handleToggleJoin} joinedEventIds={joinedEventIds}/>
-    </div>
+    <>
+      <div className="max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20">
+        <CardGrid events={events} showButton={true} onToggleJoin={handleToggleJoin} joinedEventIds={joinedEventIds}/>
+      </div>
+    </>
   );
 }
 

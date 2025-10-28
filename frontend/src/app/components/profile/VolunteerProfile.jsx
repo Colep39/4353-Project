@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import Loading from "../loading/Loading";
 import { createPortal } from "react-dom";
+import { fetchWithAuth, getUserIdFromToken } from '../../authHelper';
 
 export default function VolunteerProfile() {
   const [user, setUser] = useState(null);

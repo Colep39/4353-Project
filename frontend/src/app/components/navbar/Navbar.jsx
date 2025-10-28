@@ -172,7 +172,7 @@ export default function Navbar() {
                         })}
                       </ul>
                     ) : (
-                      <div className="p-4 text-center text-gray-500">Login to receive notifications</div>
+                      <div className="p-4 text-center text-gray-500">No notifications</div>
                     )}
                   </div>
                 )}

@@ -1,22 +1,35 @@
 const supabase = require('../supabaseClient');
+const supabaseNoAuth = require('../supabaseNoAuth');
 require('dotenv').config();
 
-const getNotifications = async (req, res) => {
+async function getNotifications(req, res) {
     try{
-        const userId = req.params.id;
-        const { data, error } = await supabase
+        const header = req.headers.authorization || "";
+        const token = header.replace(/^Bearer\s+/i, "")
+        if (!token) {
+            return res.status(401).json({ error: "Missing token"});
+        }
+        const { data, error } = await supabaseNoAuth.auth.getUser(token);
+        if (error || !data?.user) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
+        const userId = data.user.id;
+
+        const { data: notifications, error: notificationsError } = await supabaseNoAuth
             .from('notifications')
             .select('*')
             .eq('user_id', userId)
             .order('created_at', { ascending: false })
             .limit(10);
-        
-        if (error) throw error;
 
-        if (data && data.length > 0) {
-            const notifications = data.map(notification => notification.message);
-            res.json(notifications);
+        if (notificationsError) throw notificationsError;
+
+        // responding even if empty
+        if (!notifications|| notifications.length === 0){
+            return res.json([]);
         }
+
+        res.json(notifications);
     }
     catch(err){
         console.error("Error fetching notifications:", err);

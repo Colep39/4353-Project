@@ -17,7 +17,6 @@ const register = async (req, res) => {
 
         if (error) return res.status(400).json({ error: error.message });
         
-
         const token = data.session?.access_token;
         const refresh_token = data.session?.refresh_token;
         const userId = data.user?.id;

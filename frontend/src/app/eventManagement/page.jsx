@@ -20,6 +20,8 @@ function EventManagement() {
   const [selectedVolunteers, setSelectedVolunteers] = useState([]);
   const [validationErrors, setValidationErrors] = useState({});
   const [skills, setSkills] = useState([]);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState(null);
 
   const minSelectableDate = addDays(new Date(), 3);
 
@@ -313,18 +315,9 @@ function EventManagement() {
 
               <div className="flex justify-between items-center mt-4">
                 {selectedEvent ? (
-                  <button onClick={async () => {
-                      const token = localStorage.getItem("token");
-                      try {
-                        const res = await fetchWithAuth(`${API_URL}/api/eventManagement/${selectedEvent.id}`, { method: "DELETE" });
-                        if (!res.ok) throw new Error("Failed to delete event");
-                        setEvents(events.filter(ev => ev.id !== selectedEvent.id));
-                      } catch (err) {
-                        console.error("Error deleting event:", err);
-                      } finally {
-                        setIsModalOpen(false);
-                        resetModalState();
-                      }
+                  <button onClick={() => {
+                      setEventToDelete(selectedEvent);
+                      setIsConfirmOpen(true);
                     }} className="bg-red-600 text-white py-2 rounded hover:bg-red-500 px-4">
                     Cancel Event
                   </button>) : <div className="w-24"></div>}
@@ -334,6 +327,44 @@ function EventManagement() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isConfirmOpen && eventToDelete && (
+        <div className="fixed inset-0 backdrop-blur-xs flex justify-center items-center z-[60]">
+          <div className="bg-white border border-black rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
+            <h3 className="text-lg font-semibold mb-4">Confirm Cancellation</h3>
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to <span className="font-semibold text-red-600">cancel {eventToDelete.title}</span> event?<br />
+              This action cannot be undone.
+            </p>
+
+            <div className="flex justify-center gap-4">
+              <button onClick={() => setIsConfirmOpen(false)} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Keep Event</button>
+              <button onClick={async () => {
+                  try {
+                    const res = await fetchWithAuth(
+                      `${API_URL}/api/eventManagement/${eventToDelete.id}`,
+                      { method: "DELETE" }
+                    );
+                    if (!res.ok) throw new Error("Failed to delete event");
+
+                    setEvents(events.filter(ev => ev.id !== eventToDelete.id));
+                  } catch (err) {
+                    console.error("Error deleting event:", err);
+                    alert("Something went wrong while deleting the event.");
+                  } finally {
+                    setIsConfirmOpen(false);
+                    setIsModalOpen(false);
+                    setEventToDelete(null);
+                    resetModalState();
+                  }
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500">
+                Yes, Delete
+              </button>
             </div>
           </div>
         </div>

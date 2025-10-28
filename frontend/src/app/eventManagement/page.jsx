@@ -337,7 +337,7 @@ function EventManagement() {
           <div className="bg-white border border-black rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
             <h3 className="text-lg font-semibold mb-4">Confirm Cancellation</h3>
             <p className="text-gray-700 mb-6">
-              Are you sure you want to <span className="font-semibold text-red-600">cancel "{eventToDelete.title}"</span>?<br />
+              Are you sure you want to <span className="font-semibold text-red-600">cancel {eventToDelete.title}</span> event?<br />
               This action cannot be undone.
             </p>
 

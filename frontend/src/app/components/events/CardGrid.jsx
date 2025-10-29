@@ -1,13 +1,23 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { format } from "date-fns";
 import Loading from '../loading/Loading';
 
 const urgencyIntToString = { 4: "Critical", 3: "High", 2: "Medium", 1: "Low" };
 
-function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Event", titleAction = null, userName, tooltip = false, onEventClick, onMatchVolunteers, onToggleJoin, joinedEventIds = []}) {
+function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Event", titleAction = null, userName, tooltip = false, onEventClick, onMatchVolunteers, onToggleJoin, joinedEventIds = [],}) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('Event Date (Closest)');
+  const [isInferringLoading, setIsInferringLoading] = useState(true);
   const tooltipText = tooltip ? "Click to edit event" : null;
+
+  useEffect(() => {
+    if (events.length > 0) {
+      setIsInferringLoading(false);
+      return;
+    }
+    const timer = setTimeout(() => setIsInferringLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, [events]);
 
   const normalizedEvents = useMemo(() => 
     events.map(event => ({...event,
@@ -59,8 +69,21 @@ function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Ev
 
   return (
     <div className="h-full flex flex-col px-8">
-      {normalizedEvents.length === 0 ? (
+      {isInferringLoading ? (
         <Loading />
+      ) : normalizedEvents.length === 0 ? (
+        <div className="flex flex-col items-center justify-center flex-1 text-center text-black">
+          <h1 className="font-sans text-2xl font-semibold">
+            {title ? "No upcoming events" : userName ? `${userName}'s journey is just beginning` : "No events available right now"}
+          </h1>
+          <p className="text-sm text-gray-500 mb-5">
+            {title ? 'Click "Create Event" to start planning one!' : userName ? "Your next adventure is waiting — join an event to see it here!" : "You'll get a notification when new events are recommended for you."}
+          </p>
+          {titleAction && <span className="ml-2">{titleAction}</span>}
+          <div className="mt-10">
+            <img src="/images/events/event-fallback.jpg" alt="event-fallback" className="rounded-lg shadow-md"/>
+          </div>
+        </div>
       ) : (
         <>
           <div className="shrink-0 py-4 pr-2 ml-2 mr-4">

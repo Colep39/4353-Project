@@ -1,11 +1,10 @@
 "use client";
-import { useState, useEffect } from "react"; 
+import { useState, useEffect, useMemo } from "react"; 
 import CardGrid from '../components/events/CardGrid';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { addDays, startOfDay, isValid } from "date-fns";
 import Select from "react-select";
-import { useMemo } from "react";
 import { fetchWithAuth } from "../authHelper";
 
 function EventManagement() {
@@ -22,6 +21,7 @@ function EventManagement() {
   const [skills, setSkills] = useState([]);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const minSelectableDate = addDays(new Date(), 3);
 
@@ -40,6 +40,7 @@ function EventManagement() {
         window.location.href = "/login";
         return;
       }
+      setIsLoading(true);
 
       try {
         const resSkills = await fetchWithAuth(`${API_URL}/api/eventManagement/skills`);
@@ -73,11 +74,13 @@ function EventManagement() {
         setEvents([]);
         setRecommendedVolunteers([]);
         setSkills([]);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [API_URL]);
 
   const resetModalState = () => {
     setSelectedEvent(null);
@@ -194,7 +197,7 @@ function EventManagement() {
   return (
     <>
       <div className="max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20">
-        <CardGrid events={events} title="Upcoming Events" buttonLabel="Match Volunteers" tooltip={true} onEventClick={handleEditEvent} onMatchVolunteers={handleMatchVolunteers} titleAction={
+        <CardGrid events={events} title="Upcoming Events" isLoading={isLoading} buttonLabel="Match Volunteers" tooltip={true} onEventClick={handleEditEvent} onMatchVolunteers={handleMatchVolunteers} titleAction={
             <button className="ml-5 bg-white border border-black rounded px-2 py-1 text-sm font-medium hover:bg-gray-100 cursor-pointer" onClick={() => { resetModalState(); setIsModalOpen(true); }}>
               Create Event
             </button>}/>

@@ -7,6 +7,7 @@ function EventsPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [events, setEvents] = useState([]);
   const [joinedEventIds, setJoinedEventIds] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const role = localStorage.getItem("role");
@@ -18,9 +19,13 @@ function EventsPage() {
       return;
     }
 
-    fetchWithAuth(`${API_URL}/api/events`)
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchEvents = async () => {
+      try {
+        setIsLoading(true);
+
+        const res = await fetchWithAuth(`${API_URL}/api/events`);
+        const data = await res.json();
+
         const formatted = data.map((e) => ({...e,
           date: {
             start: new Date(e.date.start),
@@ -31,7 +36,14 @@ function EventsPage() {
 
         const joinedIds = formatted.filter((e) => e.isJoined).map((e) => e.id);
         setJoinedEventIds(joinedIds);
-      }).catch((err) => console.error("Error fetching events:", err));
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEvents();
   }, [API_URL]);
 
 const handleToggleJoin = async (eventId) => {
@@ -64,7 +76,7 @@ const handleToggleJoin = async (eventId) => {
   return (
     <>
       <div className="max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20">
-        <CardGrid events={events} showButton={true} onToggleJoin={handleToggleJoin} joinedEventIds={joinedEventIds}/>
+        <CardGrid events={events} isLoading={isLoading} showButton={true} onToggleJoin={handleToggleJoin} joinedEventIds={joinedEventIds}/>
       </div>
     </>
   );

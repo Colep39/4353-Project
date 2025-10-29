@@ -4,7 +4,7 @@ import Loading from '../loading/Loading';
 
 const urgencyIntToString = { 4: "Critical", 3: "High", 2: "Medium", 1: "Low" };
 
-function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Event", titleAction = null, userName, tooltip = false, onEventClick, onMatchVolunteers, onToggleJoin, joinedEventIds = [],}) {
+function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Event", titleAction = null, userName, tooltip = false, onEventClick, onMatchVolunteers, onToggleJoin, joinedEventIds = []}) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('Event Date (Closest)');
   const [isInferringLoading, setIsInferringLoading] = useState(true);

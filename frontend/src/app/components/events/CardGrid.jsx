@@ -80,9 +80,6 @@ function CardGrid({events = [], title, showButton = true, buttonLabel = "Join Ev
             {title ? 'Click "Create Event" to start planning one!' : userName ? "Your next adventure is waiting — join an event to see it here!" : "You'll get a notification when new events are recommended for you."}
           </p>
           {titleAction && <span className="ml-2">{titleAction}</span>}
-          <div className="mt-10">
-            <img src="/images/events/event-fallback.jpg" alt="event-fallback" className="rounded-lg shadow-md"/>
-          </div>
         </div>
       ) : (
         <>

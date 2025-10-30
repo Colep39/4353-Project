@@ -290,7 +290,7 @@ function EventManagement() {
               <div className="flex flex-col">
                 <div className="flex items-center">
                   <label htmlFor="eventDescription" className="w-32">Description</label><span className="text-red-500 mr-2">*</span>
-                  <textarea id="eventDescription" className="border px-3 py-2 rounded w-full"
+                  <textarea id="eventDescription" className="border px-3 py-2 rounded w-full" maxLength={500}
                     value={selectedEvent ? selectedEvent.description : newEvent.description}
                     onChange={(e) => {
                       const value = e.target.value;

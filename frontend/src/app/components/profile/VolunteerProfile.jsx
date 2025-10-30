@@ -1,9 +1,11 @@
 "use client";
 import Image from "next/image";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
 import Loading from "../loading/Loading";
 import { createPortal } from "react-dom";
 import { fetchWithAuth, getUserIdFromToken } from '../../authHelper';
+
 
 export default function VolunteerProfile() {
   const [user, setUser] = useState(null);
@@ -11,9 +13,35 @@ export default function VolunteerProfile() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
-    fetch(`${API_URL}/api/users/1`)
+    const userId = getUserIdFromToken()
+    if (!userId) return; // not authenticated
+
+    fetchWithAuth(`${API_URL}/api/users/${userId}`)
       .then((res) => res.json())
-      .then((data) => setUser(data))
+      .then((data) => {
+          setUser({
+            ...data,
+            name: data.full_name || "Unnamed User",
+            profilePhoto: data.profilePhoto,
+            address1: data.address_1 || "No address on file",
+            address2: data.address_2 || "",
+            city: data.city || "Unknown City",
+            state: data.state?.state_code || "N/A",
+            stateName: data.state?.state_name || "Unknown",
+            zip: data.zipcode || "N/A",
+            role: data.role || "No role assigned",
+            preferences: data.preferences,
+            skills: Array.isArray(data.skills)
+              ? data.skills.map((s) => s.skills?.description)
+              : [],
+            availability: Array.isArray(data.availability)
+              ? data.availability
+              : data.availability
+              ? [data.availability] // wrap single date
+              : [],
+          });
+        })
+
       .catch((err) => console.error("Error fetching user data:", err));
   }, []);
 
@@ -25,6 +53,13 @@ export default function VolunteerProfile() {
     // put request to update the profile
     closeModal();
   };
+
+  const MissingField = ({ text }) => (
+    <p className="text-gray-400 flex items-center gap-1 italic">
+      <ExclamationTriangleIcon className="h-4 w-4 text-gray-400" />
+      {text}
+    </p>
+  );
 
   return (
     <>
@@ -45,71 +80,83 @@ export default function VolunteerProfile() {
             {/* Header with photo + name */}
             <div className="flex items-center gap-5 border-b pb-5 mb-5">
               <Image
-                src={user.profilePhoto}
-                alt={user.name}
+                src={user.profilePhoto || "/images/avatars/cole.jpg"}
+                alt={user.name || "Unnamed User"}
                 width={96}
                 height={96}
                 className="rounded-full object-cover border-4 border-red-200"
               />
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">{user.name}</h1>
-                <p className="text-gray-500">{user.role}</p>
+                <h1 className="text-2xl font-bold text-gray-800">
+                  {user.name || (
+                    <span className="text-gray-400 italic flex items-center gap-1">
+                      <ExclamationTriangleIcon className="h-4 w-4 text-gray-400" />
+                      No name provided
+                    </span>
+                  )}
+                </h1>
+                <p className="text-gray-500">{user.role || "No role"}</p>
               </div>
             </div>
 
             {/* Contact Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <h2 className="text-lg font-semibold text-red-600 mb-2">
-                  Contact Information
-                </h2>
-                <p className="text-gray-700">
-                  {user.address1} {user.address2 && `, ${user.address2}`}
-                </p>
-                <p className="text-gray-700">
-                  {user.city}, {user.state} {user.zip}
-                </p>
+                <h2 className="text-lg font-semibold text-red-600 mb-2">Contact Information</h2>
+
+                {user.address1 ? (
+                  <p className="text-gray-700">
+                    {user.address1}
+                    {user.address2 && `, ${user.address2}`}
+                  </p>
+                ) : (
+                  <MissingField text="No address provided." />
+                )}
+
+                {(user.city || user.state || user.zip) ? (
+                  <p className="text-gray-700">
+                    {user.city || "Unknown City"}, {user.state} {user.zip || "N/A"}
+                  </p>
+                ) : (
+                  <MissingField text="No city/state/ZIP provided." />
+                )}
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold text-red-600 mb-2">
-                  Preferences
-                </h2>
-                <p className="text-gray-700">
-                  {user.preferences || "No preferences set."}
-                </p>
+                <h2 className="text-lg font-semibold text-red-600 mb-2">Preferences</h2>
+                {user.preferences ? (
+                  <p className="text-gray-700">{user.preferences}</p>
+                ) : (
+                  <MissingField text="No preferences specified." />
+                )}
               </div>
             </div>
 
             {/* Skills and Availability */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-lg font-semibold text-red-600 mb-2">
-                  Skills
-                </h2>
-                {user.skills.length > 0 ? (
+                <h2 className="text-lg font-semibold text-red-600 mb-2">Skills</h2>
+                {user.skills && user.skills.length > 0 ? (
                   <ul className="list-disc list-inside text-gray-700">
                     {user.skills.map((skill, idx) => (
                       <li key={idx}>{skill}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-500 italic">No skills listed.</p>
+                  <MissingField text="No skills specified." />
                 )}
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold text-red-600 mb-2">
-                  Availability
-                </h2>
-                {user.availability.length > 0 ? (
+                <h2 className="text-lg font-semibold text-red-600 mb-2">Availability</h2>
+                {user.availability && user.availability.length > 0 ? (
                   <ul className="list-disc list-inside text-gray-700">
                     {user.availability.map((slot, idx) => (
                       <li key={idx}>{slot}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-500 italic">No availability set.</p>
+                  <MissingField text="No availability set." />
                 )}
               </div>
             </div>
@@ -218,7 +265,7 @@ export default function VolunteerProfile() {
                       </label>
                       <input
                         type="text"
-                        defaultValue={user.skills.join(", ")}
+                        defaultValue={user.skills?.join(", ") || ""}
                         required
                         placeholder="Comma-separated, e.g. Event Setup, Fundraising"
                         className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
@@ -245,7 +292,7 @@ export default function VolunteerProfile() {
                       </label>
                       <input
                         type="text"
-                        defaultValue={user.availability.join(", ")}
+                        defaultValue={user.availability?.join(", ") || ""}
                         required
                         placeholder="Comma-separated, e.g. Weekdays after 5pm, Weekends"
                         className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"

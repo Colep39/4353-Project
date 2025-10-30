@@ -98,10 +98,10 @@ const showHeader = !isLoading && normalizedEvents.length > 0
           </div>
         ) : (
           filteredAndSortedEvents.map((event) => (
-            <div key={event.id} className={`mt-2 ml-2 flex bg-white rounded-lg shadow-md overflow-hidden ${tooltip ? "hover:outline hover:outline-black cursor-pointer" : ""}`}
+            <div key={event.id} className={`min-h-[20vh] mt-2 ml-2 flex bg-white rounded-lg shadow-md overflow-hidden ${tooltip ? "hover:outline hover:outline-black cursor-pointer" : ""}`}
                   {...(tooltipText ? { title: tooltipText } : {})} {...(tooltip ? { onClick: () => onEventClick(event) } : {})}>
-              <div className="w-[10%] m-2 h-[150px]">
-                <img src={event.image} alt={event.title} className="object-cover h-full w-full"/>
+              <div className="w-[10%] m-2">
+                <img src={event.image} alt={event.title} className="object-cover h-full w-full rounded"/>
               </div>
               <div className="w-[90%] p-4 flex flex-col justify-between">
                 <h2 className="text-xl font-semibold">{event.title}</h2>

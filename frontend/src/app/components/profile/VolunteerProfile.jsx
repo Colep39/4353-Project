@@ -10,6 +10,7 @@ import { fetchWithAuth, getUserIdFromToken } from '../../authHelper';
 export default function VolunteerProfile() {
   const [user, setUser] = useState(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [states, setStates] = useState(null);
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
@@ -43,6 +44,15 @@ export default function VolunteerProfile() {
         })
 
       .catch((err) => console.error("Error fetching user data:", err));
+  }, []);
+
+  useEffect(() => {
+    fetchWithAuth(`${API_URL}/api/states/`)
+      .then((res) => res.json())
+      .then((data) => {
+        setStates(data)
+      })
+      .catch((err) => console.error("Error fetching states:", err));
   }, []);
 
   const openModal = () => setProfileModalOpen(true);

@@ -342,7 +342,6 @@ const uploadEventImage = async (req, res) => {
   }
 };
 
-
 module.exports = {
   getManageEvents,
   getRecommendedVolunteers,

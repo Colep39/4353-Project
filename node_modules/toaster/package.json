@@ -1,0 +1,22 @@
+{
+  "author": "Corpix <me@corpix.ru> (http://corpix.ru)",
+  "name": "toaster",
+  "description": "Image resizing middleware for express",
+  "version": "0.1.2",
+  "repository": {
+    "url": ""
+  },
+  "main": "index.js",
+  "engines": {
+    "node": ">0.5.1"
+  },
+  "dependencies": {
+    "gm": "*",
+    "async": "*",
+    "fructose": "*",
+    "Class": "*",
+    "mkdirp": "*",
+    "express-errors": "*"
+  },
+  "devDependencies": {}
+}

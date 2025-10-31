@@ -21,6 +21,7 @@ async function getUserProfile(req, res) {
                 address_1,
                 address_2,
                 city,
+                state_id,
                 zipcode,
                 preferences,
                 availability,

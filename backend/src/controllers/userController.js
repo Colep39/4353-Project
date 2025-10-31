@@ -67,7 +67,64 @@ async function updateProfile(req, res) {
             return res.status(401).json({ error: "Invalid or expired token" });
         }
         const userId = data.user.id;
-        
+        const body = req.body;
+
+        const { data: stateRow } = await supabaseNoAuth
+            .from('states')
+            .select('state_id')
+            .or(`state_code.eq.${body.state}, state_name.eq.${body.state}`)
+            .single();
+
+        const state_id = stateRow?.state_id ?? null;
+
+        // updating the main profile fields
+        const { error: updateError } = await supabaseNoAuth
+            .from('user_profile')
+            .update({
+                full_name: body.full_name,
+                address_1: body.address_1,
+                address_2: body.address_2,
+                city: body.city,
+                zipcode: body.zipcode,
+                preferences: body.preferences,
+                availability: body.availability,
+                state_id: state_id
+            })
+             .eq("user_id", userId);
+
+        if (updateError) throw updateError;
+
+        // update the user skills table
+        await supabaseNoAuth
+            .from('user_skills')
+            .delete()
+            .eq('user_id', userId)
+
+        const skills = Array.isArray(body.skills)
+      ? body.skills
+      : body.skills.split(",").map(s => s.trim()).filter(Boolean);
+
+        if (skills.length > 0) {
+        // Fetch skill IDs
+        const { data: skillRows } = await supabaseNoAuth
+            .from("skills")
+            .select("skill_id, description")
+            .in("description", skills);
+
+        // Insert join rows
+        if (skillRows && skillRows.length > 0) {
+            await supabaseNoAuth
+            .from("user_skills")
+            .insert(
+                skillRows.map((row) => ({
+                user_id: userId,
+                skill_id: row.skill_id
+                }))
+            );
+        }
+        }
+
+        return res.status(200).json({ message: "Profile updated successfully" });
     }
     catch(error){
         console.error(error);

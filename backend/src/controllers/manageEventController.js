@@ -314,6 +314,35 @@ const deleteEvent = async (req, res) => {
   }
 };
 
+const uploadEventImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No image uploaded" });
+    }
+
+    const supabase = supabaseNoAuth;
+    const file = req.file;
+    const uniqueName = `${Date.now()}-${file.originalname}`;
+    const filePath = `event-images/${uniqueName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("event-images")
+      .upload(filePath, file.buffer, {
+        contentType: file.mimetype,
+        upsert: false,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: publicUrlData } = supabase.storage.from("event-images").getPublicUrl(filePath);
+
+    return res.json({ url: publicUrlData.publicUrl });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to upload image" });
+  }
+};
+
+
 module.exports = {
   getManageEvents,
   getRecommendedVolunteers,
@@ -321,4 +350,5 @@ module.exports = {
   updateEvent,
   deleteEvent,
   getSkills,
+  uploadEventImage,
 };

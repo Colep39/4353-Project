@@ -16,9 +16,10 @@ export function getUserIdFromToken() {
 export async function fetchWithAuth(url, options = {}) {
     const token = localStorage.getItem("token");
     const refreshToken = localStorage.getItem("refresh_token");
+    const isFormData = options.body instanceof FormData;
 
     const headers = {
-        "Content-Type": "application/json",
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...(options.headers || {}),
         Authorization: `Bearer ${token}`,
     };
@@ -38,7 +39,8 @@ export async function fetchWithAuth(url, options = {}) {
             localStorage.setItem("refresh_token", newTokens.refresh_token);
 
             const retryHeaders = {
-                ...headers,
+                ...(isFormData ? {} : { "Content-Type": "application/json" }),
+                ...(options.headers || {}),
                 Authorization: `Bearer ${newTokens.token}`,
             };
             return fetch(url, { ...options, headers: retryHeaders });

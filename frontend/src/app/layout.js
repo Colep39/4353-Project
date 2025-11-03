@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Poppins, Bungee } from "next/font/google";
 import "./globals.css";
 import Navbar from './components/navbar/Navbar';
 import AuthProvider from './components/authProvider/authProvider';
@@ -11,6 +11,16 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '600'],
+});
+
+const bungee = Bungee({
+  weight: "400",
   subsets: ["latin"],
 });
 

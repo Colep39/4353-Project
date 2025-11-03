@@ -5,6 +5,13 @@ import { usePathname } from "next/navigation";
 import { Bell, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { fetchWithAuth, getUserIdFromToken } from '../../authHelper';
+import { Bungee } from "next/font/google";
+
+const bungee = Bungee({
+  subsets: ["latin"],
+  weight: "400",
+});
+
 
 const logout = () => {
   localStorage.removeItem("token");
@@ -21,8 +28,21 @@ export default function Navbar() {
   const [role, setRole] = useState(null);
   const [isLogged, setIsLogged] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const [user, setUser] = useState(null);
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+  const fetchProfile = async () => {
+    const userId = getUserIdFromToken();
+    if (!userId) return;
+
+    const res = await fetchWithAuth(`${API_URL}/api/users/${userId}`);
+    if (!res.ok) {
+      console.error("Error fetching user data");
+      return;
+    }
+    const data = await res.json();
+    setUser(data);
+  }
 
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
@@ -30,6 +50,10 @@ export default function Navbar() {
     setRole(storedRole);
     setIsLogged(!!token);
   }, []);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [API_URL]);
 
   useEffect(() => {
     const userId = getUserIdFromToken();
@@ -40,6 +64,7 @@ export default function Navbar() {
       .then((data) => setNotifications(data))
       .catch((err) => console.error("Error fetching notifications:", err));
   }, []);
+
 
   const links = [
     { name: "Home", href: "/" },
@@ -60,14 +85,9 @@ export default function Navbar() {
     return true;
   });
 
-  const user = {
-    id: 1,
-    fullName: "Cole Hawke",
-    avatar: "/images/avatars/cole.jpg",
-  };
 
   return (
-    <nav className="bg-black text-white shadow-md w-full z-[200] relative">
+    <nav className="bg-black text-white shadow-md w-full z-[200] relative font-semibold">
       <div className="w-full px-[10px]">
         <div className="flex items-center justify-between h-16 w-full">
           {/* Left side */}
@@ -82,7 +102,7 @@ export default function Navbar() {
                   className="object-contain w-full h-full"
                 />
               </div>
-              <span className="text-lg sm:text-xl md:text-2xl font-bold whitespace-nowrap text-white">
+              <span className={`${bungee.className} text-lg sm:text-xl md:text-2xl font-bold whitespace-nowrap text-white tracking-wide`}>
                 Cougar Connect
               </span>
             </Link>
@@ -180,17 +200,15 @@ export default function Navbar() {
 
               {/* User info */}
               <span className="text-sm md:text-base whitespace-nowrap">
-                Welcome, {user?.fullName || "User"}
+                Welcome, {user?.full_name || "Guest"}
               </span>
 
-              {user?.avatar && (
-                <img
-                  src={user.avatar}
-                  alt={user?.fullName}
-                  className="w-8 h-8 rounded-full object-cover flex-shrink-0 cursor-pointer 
-                  transform transition-transform duration-300 hover:scale-110"
-                />
-              )}
+              <img
+                src={user?.profilePhoto || "/images/avatars/cole.jpg"}
+                alt={user?.full_name}
+                className="w-8 h-8 rounded-full object-cover flex-shrink-0 cursor-pointer 
+                transform transition-transform duration-300 hover:scale-110"
+              />
 
               {/* Logout */}
               {isLogged && (

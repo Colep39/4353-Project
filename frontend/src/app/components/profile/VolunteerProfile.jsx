@@ -242,7 +242,7 @@ export default function VolunteerProfile() {
       ) : (
         <div
           className="min-h-[calc(100vh-4rem)] flex justify-center bg-cover bg-center bg-no-repeat p-6 relative"
-          style={{ backgroundImage: "url('/profile_background.jpg')" }}
+          style={{ backgroundImage: "url('/Cherry Blossoms.jpg')" }}
         >
           {/* Background overlay */}
           <div className="absolute inset-0 bg-black/40" />

@@ -1,19 +1,14 @@
 "use client";
 import { useState, useEffect } from "react"; 
 import CardGrid from '../components/events/CardGrid';
-import { fetchWithAuth } from "../authHelper";
-
-const sampleUser = {
-  id: 1,
-  fullName: "Cole Mole",
-  avatar: "/images/avatars/cole.jpg",
-}
+import { fetchWithAuth, getUserIdFromToken } from "../authHelper";
 
 
 function VolunteerHistory() {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const [events, setEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [sampleUser, getUserProfile] = useState([]);
 
     useEffect(() => {
       const role = localStorage.getItem("role");
@@ -31,6 +26,16 @@ function VolunteerHistory() {
         .then((res) => res.json())
         .then((data) => setEvents(data))
         .catch((err) => console.error("Error fetching events:", err))
+        .finally(() => { setIsLoading(false); });
+
+      const userId = getUserIdFromToken();
+      if (!userId) return;
+
+      fetchWithAuth(`${API_URL}/api/users/${userId}`, {
+      })
+        .then((res) => res.json())
+        .then((data) => getUserProfile(data))
+        .catch((err) => console.error("Error fetching user", err))
         .finally(() => { setIsLoading(false); });
     }, [API_URL]);
 

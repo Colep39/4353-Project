@@ -18,12 +18,12 @@ const volunteerToken = jwt.sign(
 describe("Event management routes", () => {
   let tempEventId;
 
-  // Create a fresh event before each test that needs it
   beforeEach(async () => {
-    const res = await request(app).post("/api/eventManagement").set("Authorization", `Bearer ${adminToken}`)
-      .send({title: "Temp Event", date: { start: new Date(2025, 10, 10), end: new Date(2025, 10, 11) }, urgency: 3, description: "Temporary event for testing", image: "/images/events/temp.jpg",});
-    tempEventId = res.body.id;
-  });
+  const res = await request(app).post("/api/eventManagement").set("Authorization", `Bearer ${adminToken}`)
+    .send({title: "Temp Event", description: "Temporary event for testing", location: "Austin", urgency: 3, image: "/images/events/temp.jpg", date: { start: new Date(2025, 10, 10).toISOString(), end: new Date(2025, 10, 11).toISOString() },});
+  console.log("Created temp event:", res.body);
+  tempEventId = res.body.id;
+});
 
   // Delete the temp event after each test
   afterEach(async () => {await request(app).delete(`/api/eventManagement/${tempEventId}`).set("Authorization", `Bearer ${adminToken}`);});
@@ -97,12 +97,12 @@ describe("Event management routes", () => {
 
   it("POST /api/eventManagement should create event for valid data", async () => {
     const res = await request(app).post("/api/eventManagement").set("Authorization", `Bearer ${adminToken}`)
-      .send({title: "Valid Event", date: { start: new Date(2025, 11, 1), end: new Date(2025, 11, 2) }, urgency: 3, description: "A proper event", image: "/images/events/temp.jpg",});
+      .send({title: "Valid Event", description: "A proper event", location: "Houston",  urgency: 3, image: "/images/events/temp.jpg", date: {start: new Date(2025, 11, 1).toISOString(), end: new Date(2025, 11, 2).toISOString(),}, skill_ids: [1, 2],});
+
     expect(res.statusCode).toBe(201);
     expect(res.body).toHaveProperty("id");
     expect(res.body.title).toBe("Valid Event");
 
-    // Clean up
     await request(app).delete(`/api/eventManagement/${res.body.id}`).set("Authorization", `Bearer ${adminToken}`);
   });
 
@@ -114,7 +114,7 @@ describe("Event management routes", () => {
 
   it("PUT /api/eventManagement/:id should update existing event", async () => {
     const res = await request(app).put(`/api/eventManagement/${tempEventId}`).set("Authorization", `Bearer ${adminToken}`)
-      .send({title: "Updated Event", date: { start: new Date(2025, 11, 1), end: new Date(2025, 11, 2) }, urgency: 2, description: "Updated description", image: "/images/events/temp.jpg",});
+      .send({title: "Updated Event", description: "Updated description", location: "Dallas", urgency: 2, image: "/images/events/temp.jpg", date: {start: new Date(2025, 11, 1).toISOString(), end: new Date(2025, 11, 2).toISOString(),}, skill_ids: [1],});
     expect(res.statusCode).toBe(200);
     expect(res.body.title).toBe("Updated Event");
     expect(res.body).toHaveProperty("id", tempEventId);
@@ -122,10 +122,18 @@ describe("Event management routes", () => {
 
   it("DELETE /api/eventManagement/:id should return 200 with ID", async () => {
     const createRes = await request(app).post("/api/eventManagement").set("Authorization", `Bearer ${adminToken}`)
-      .send({title: "To Delete", date: { start: new Date(2025, 11, 1), end: new Date(2025, 11, 2) }, urgency: 1, description: "Will be deleted", image: "/images/events/temp.jpg",});
-    const idToDelete = createRes.body.id;
+      .send({title: "To Delete", description: "Will be deleted", location: "Austin", urgency: 1, image: "/images/events/temp.jpg", date: {start: new Date(2025, 11, 1).toISOString(), end: new Date(2025, 11, 2).toISOString()}, skill_ids: [1, 2],});
+
+    const idToDelete = createRes.body?.id;
+    console.log("Created event to delete:", createRes.body);
+
+    if (!idToDelete) {
+      throw new Error("POST /api/eventManagement did not return a valid id");
+    }
 
     const deleteRes = await request(app).delete(`/api/eventManagement/${idToDelete}`).set("Authorization", `Bearer ${adminToken}`);
+
+    console.log("DELETE response:", deleteRes.body);
 
     expect(deleteRes.statusCode).toBe(200);
     expect(deleteRes.body).toHaveProperty("id", idToDelete);

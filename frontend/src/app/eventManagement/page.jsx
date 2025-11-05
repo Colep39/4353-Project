@@ -111,6 +111,8 @@ function EventManagement() {
 
     if (!candidate.location || candidate.location.trim() === '') {
       errors.location = "Location is required.";
+    } else if (!/^[A-Za-z\s'.-]{1,50}, [A-Za-z]{2}$/.test(candidate.location.trim())) {
+      errors.location = "Location must be in the format 'City, ST' (e.g., Austin, TX).";
     }
 
     const start = candidate.date?.start;
@@ -252,8 +254,7 @@ function EventManagement() {
                     <input type="text" id="eventLocation" className="border px-3 py-2 rounded w-full" value={selectedEvent ? selectedEvent.location || '' : newEvent.location} onChange={(e) => {
                         const value = e.target.value;
                         selectedEvent ? setSelectedEvent({ ...selectedEvent, location: value }) : setNewEvent({ ...newEvent, location: value });
-                      }}
-                      placeholder="Enter event location"/>
+                      }} placeholder="Format: City, ST" pattern="^[A-Za-z][A-Za-z\s'.-]{0,49}, [A-Za-z]{2}$" title="Format: City, ST (e.g., Austin, TX)"/>
                     {validationErrors.location && <div className="text-red-600 text-sm mt-1">{validationErrors.location}</div>}
                   </div>
 

@@ -75,13 +75,59 @@ const getSkills = async (req, res) => {
   }
 };
 
-const getRecommendedVolunteers = (req, res) => {
-  res.json([
-    { firstName: "Alice Malice", email: "alicemalice@example.com", location: "Houston" },
-    { firstName: "Bob Job", email: "bobjob@example.com", location: "Dallas" },
-    { firstName: "Charlie Harley", email: "charlieharley@example.com", location: "Austin" },
-    { firstName: "Denise Quenise", email: "denisequenise@example.com", location: "San Antonio" },
-  ]);
+const getRecommendedVolunteers = async (req, res) => {
+  try {
+    // Step 1: Fetch volunteer profiles
+    const { data: profiles, error: profileError } = await supabaseNoAuth
+      .from("user_profile")
+      .select(`
+        user_id,
+        full_name,
+        city,
+        state_id,
+        states!user_profile_state_id_fkey (
+          state_name
+        )
+      `)
+      .not("full_name", "is", null)
+      .not("city", "is", null)
+      .not("state_id", "is", null)
+      .not("zipcode", "is", null)
+      .not("availability", "is", null)
+      .eq("role", "volunteer")
+      .order("full_name", { ascending: true });
+
+    if (profileError) throw profileError;
+
+    // Step 2: Fetch emails from the user_emails view
+    const { data: emails, error: emailError } = await supabaseNoAuth
+      .from("user_emails")
+      .select("user_id, email");
+
+    if (emailError) throw emailError;
+
+    // Step 3: Map emails by user_id
+    const emailMap = new Map(emails.map(u => [u.user_id, u.email]));
+
+    // Step 4: Merge profiles with emails
+    const formatted = profiles.map(v => ({
+      id: v.user_id,
+      name: v.full_name ?? "No name",
+      email: emailMap.get(v.user_id) ?? "No email",
+      location:
+        v.city && v.states?.[0]?.state_name
+          ? `${v.city}, ${v.states[0].state_name}`
+          : v.city || "Unknown",
+    }));
+
+    res.json(formatted);
+  } catch (err) {
+    console.error("🔥 Error fetching recommended volunteers:", err);
+    res.status(500).json({
+      message: "Failed to fetch recommended volunteers",
+      details: err.message,
+    });
+  }
 };
 
 const createEvent = async (req, res) => {

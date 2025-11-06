@@ -413,7 +413,7 @@ function EventManagement() {
                           setSelectedVolunteers(updated);
                         }}/>
                     </td>
-                    <td className="border border-black px-2 py-1">{volunteer.firstName}</td>
+                    <td className="border border-black px-2 py-1">{volunteer.name}</td>
                     <td className="border border-black px-2 py-1">{volunteer.email}</td>
                     <td className="border border-black px-2 py-1">{volunteer.location}</td>
                   </tr>

@@ -424,13 +424,32 @@ function EventManagement() {
                 </table>
 
                 <div className="flex justify-end">
-                  <button onClick={() => {
-                      console.log("Saved volunteers for event:", matchedEvent.title);
-                      console.log("Selected Volunteers:", selectedVolunteers);
-                      setIsMatchModalOpen(false);
-                      setMatchedEvent(null);
-                      setSelectedVolunteers([]);
-                    }} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">Save
+                  <button onClick={async () => {
+                      try {
+                        console.log("Selected volunteer objects:", selectedVolunteers);
+                        const payload = {
+                          event_id: matchedEvent.id,
+                          user_ids: selectedVolunteers.map(v => v.id),
+                        };
+
+                        const res = await fetchWithAuth(`${API_URL}/api/eventManagement/recommendedVolunteers`, {
+                          method: "POST",
+                          body: JSON.stringify(payload),
+                        });
+
+                        if (!res.ok) {
+                          throw new Error("Failed to save volunteer recommendations");
+                        }
+                      } catch (err) {
+                        console.error("Error saving recommendations:", err);
+                        alert("Something went wrong while saving recommendations.");
+                      } finally {
+                        setIsMatchModalOpen(false);
+                        setMatchedEvent(null);
+                        setSelectedVolunteers([]);
+                      }
+                    }} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+                    Save
                   </button>
                 </div>
               </>

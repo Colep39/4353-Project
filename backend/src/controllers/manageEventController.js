@@ -145,7 +145,7 @@ const getRecommendedVolunteers = async (req, res) => {
 
     res.json(filtered);
   } catch (err) {
-    console.error("🔥 Error fetching recommended volunteers:", err);
+    console.error("Error fetching recommended volunteers:", err);
     res.status(500).json({
       message: "Failed to fetch recommended volunteers",
       details: err.message,
@@ -411,6 +411,52 @@ const uploadEventImage = async (req, res) => {
   }
 };
 
+const saveRecommendedVolunteers = async (req, res) => {
+  try {
+    const { event_id, user_ids } = req.body;
+
+    if (!event_id || !Array.isArray(user_ids)) {
+      return res.status(400).json({ message: "Invalid request body" });
+    }
+
+    // Step 1: Clear any existing recommendations for this event
+    const { error: deleteError } = await supabaseNoAuth
+      .from("recommended_events")
+      .delete()
+      .eq("event_id", event_id);
+
+    if (deleteError) {
+      console.error("Error clearing old recommendations:", deleteError);
+      return res.status(500).json({ message: "Failed to clear old recommendations" });
+    }
+
+    // Step 2: Insert new recommendations (if any)
+    if (user_ids.length > 0) {
+      const insertRows = user_ids.map((user_id) => ({
+        event_id,
+        user_id,
+      }));
+
+      const { error: insertError } = await supabaseNoAuth
+        .from("recommended_events")
+        .insert(insertRows);
+
+      if (insertError) {
+        console.error("Error inserting recommendations:", insertError);
+        return res.status(500).json({ message: "Failed to save recommendations" });
+      }
+    }
+
+    res.status(200).json({ message: "Recommendations updated successfully" });
+  } catch (err) {
+    console.error("🔥 Error saving recommended volunteers:", err);
+    res.status(500).json({
+      message: "Failed to save recommended volunteers",
+      details: err.message,
+    });
+  }
+};
+
 module.exports = {
   getManageEvents,
   getRecommendedVolunteers,
@@ -419,4 +465,5 @@ module.exports = {
   deleteEvent,
   getSkills,
   uploadEventImage,
+  saveRecommendedVolunteers,
 };

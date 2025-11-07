@@ -79,21 +79,32 @@ const getRecommendedVolunteers = async (req, res) => {
     const eventId = req.query.event_id;
     if (!eventId) return res.status(400).json({ message: "event_id is required" });
 
-    const { data: event } = await supabaseNoAuth
+    const { data: event, error: eventError } = await supabaseNoAuth
       .from("events")
-      .select("event_id, location")
+      .select("event_id, location, start_date")
       .eq("event_id", eventId)
       .single();
 
+    if (eventError) throw eventError;
     if (!event) return res.status(404).json({ message: "Event not found" });
 
     const [eventCity, eventStateCode] = (event.location || "").split(",").map(s => s.trim());
     const eventCityTrimmed = eventCity?.toLowerCase();
     const eventStateTrimmed = eventStateCode?.toLowerCase();
+    const eventStartKey = new Date(event.start_date).toISOString().split("T")[0];
 
-    const { data: profiles } = await supabaseNoAuth
+    const { data: eventSkills, error: eventSkillsError } = await supabaseNoAuth
+      .from("event_skills")
+      .select("skill_id")
+      .eq("event_id", eventId);
+
+    if (eventSkillsError) throw eventSkillsError;
+
+    const requiredSkillIds = new Set(eventSkills.map(s => s.skill_id));
+
+    const { data: profiles, error: profileError } = await supabaseNoAuth
       .from("user_profile")
-      .select(`user_id, full_name, city, states!user_profile_state_id_fkey (state_code)`)
+      .select(`user_id, full_name, city, states!user_profile_state_id_fkey (state_code), availability`)
       .not("full_name", "is", null)
       .not("city", "is", null)
       .not("state_id", "is", null)
@@ -101,13 +112,28 @@ const getRecommendedVolunteers = async (req, res) => {
       .not("availability", "is", null)
       .eq("role", "volunteer");
 
-    const { data: emails } = await supabaseNoAuth.from("user_emails").select("user_id, email");
+    if (profileError) throw profileError;
+
+    const { data: userSkills, error: userSkillsError } = await supabaseNoAuth
+      .from("user_skills")
+      .select("user_id, skill_id");
+    if (userSkillsError) throw userSkillsError;
+
+    const skillsMap = new Map();
+    for (const us of userSkills) {
+      if (!skillsMap.has(us.user_id)) skillsMap.set(us.user_id, []);
+      skillsMap.get(us.user_id).push(us.skill_id);
+    }
+
+    const { data: emails, error: emailError } = await supabaseNoAuth.from("user_emails").select("user_id, email");
+    if (emailError) throw emailError;
     const emailMap = new Map(emails.map(u => [u.user_id, u.email]));
 
-    const { data: recommended } = await supabaseNoAuth
+    const { data: recommended, error: recommendedError } = await supabaseNoAuth
       .from("recommended_events")
       .select("user_id")
       .eq("event_id", eventId);
+    if (recommendedError) throw recommendedError;
 
     const recommendedSet = new Set((recommended || []).map(r => r.user_id));
 
@@ -115,6 +141,23 @@ const getRecommendedVolunteers = async (req, res) => {
       let points = 0;
       if (v.states?.state_code?.trim().toLowerCase() === eventStateTrimmed) points += 1;
       if (v.city?.trim().toLowerCase() === eventCityTrimmed) points += 1;
+
+      const availableDates = (v.availability || []).map(dateStr => {
+        return new Date(dateStr).toISOString().split("T")[0];
+      });
+
+      const isAvailable = availableDates.includes(eventStartKey);
+
+      if (!isAvailable) {
+        points = 0;
+      }
+
+      const volunteerSkills = skillsMap.get(v.user_id) || [];
+      const matchingSkillsCount = volunteerSkills.filter(skillId =>
+        requiredSkillIds.has(skillId)
+      ).length;
+
+      points += matchingSkillsCount;
 
       return {
         id: v.user_id,

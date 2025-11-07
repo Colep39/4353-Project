@@ -141,7 +141,7 @@ const getRecommendedVolunteers = async (req, res) => {
       };
     });
 
-    const filtered = formatted.filter(v => v.points > 0).sort((a, b) => b.points - a.points);
+    const filtered = formatted.filter(v => v.points > 0).sort((a, b) => b.points - a.points).slice(0, 10);;
 
     res.json(filtered);
   } catch (err) {

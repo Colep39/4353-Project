@@ -42,9 +42,8 @@ const getManageEvents = async (req, res) => {
           start: parseDate(event.start_date),
           end: parseDate(event.end_date)
         },
-        skills: skillsMapped
-          .sort((a, b) => a.description.localeCompare(b.description))
-          .map(s => ({ id: s.skill_id, description: s.description })),
+        skills: skillsMapped,
+        skill_ids: skillsMapped.map(s => s.id),
       };
     });
 
@@ -77,17 +76,30 @@ const getSkills = async (req, res) => {
 
 const getRecommendedVolunteers = async (req, res) => {
   try {
-    // Step 1: Fetch volunteer profiles
+    const eventId = req.query.event_id;
+    if (!eventId) return res.status(400).json({ message: "event_id is required" });
+
+    const { data: event, error: eventError } = await supabaseNoAuth
+      .from("events")
+      .select("event_id, location")
+      .eq("event_id", eventId)
+      .single();
+
+    if (eventError || !event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    const [eventCity, eventStateCode] = (event.location || "").split(",").map(s => s.trim());
+    const eventCityTrimmed = eventCity?.toLowerCase();
+    const eventStateTrimmed = eventStateCode?.toLowerCase();
+
     const { data: profiles, error: profileError } = await supabaseNoAuth
       .from("user_profile")
       .select(`
         user_id,
         full_name,
         city,
-        state_id,
-        states!user_profile_state_id_fkey (
-          state_name
-        )
+        states!user_profile_state_id_fkey (state_code)
       `)
       .not("full_name", "is", null)
       .not("city", "is", null)
@@ -99,28 +111,39 @@ const getRecommendedVolunteers = async (req, res) => {
 
     if (profileError) throw profileError;
 
-    // Step 2: Fetch emails from the user_emails view
     const { data: emails, error: emailError } = await supabaseNoAuth
       .from("user_emails")
       .select("user_id, email");
 
     if (emailError) throw emailError;
 
-    // Step 3: Map emails by user_id
     const emailMap = new Map(emails.map(u => [u.user_id, u.email]));
 
-    // Step 4: Merge profiles with emails
-    const formatted = profiles.map(v => ({
-      id: v.user_id,
-      name: v.full_name ?? "No name",
-      email: emailMap.get(v.user_id) ?? "No email",
-      location:
-        v.city && v.states?.[0]?.state_name
-          ? `${v.city}, ${v.states[0].state_name}`
-          : v.city || "Unknown",
-    }));
+    const formatted = profiles.map(v => {
+      let points = 0;
 
-    res.json(formatted);
+      const stateCode = v.states?.state_code?.trim().toLowerCase();
+      if (stateCode  && eventStateTrimmed && stateCode === eventStateTrimmed) {
+        points += 1;
+      }
+
+      const cityName = v.city?.trim().toLowerCase();
+      if (cityName && eventCityTrimmed && cityName === eventCityTrimmed) {
+        points += 1;
+      }
+
+      return {
+        id: v.user_id,
+        name: v.full_name ?? "No name",
+        email: emailMap.get(v.user_id) ?? "No email",
+        location: v.city || "Unknown",
+        points,
+      };
+    });
+
+    const filtered = formatted.filter(v => v.points > 0).sort((a, b) => b.points - a.points);
+
+    res.json(filtered);
   } catch (err) {
     console.error("🔥 Error fetching recommended volunteers:", err);
     res.status(500).json({
@@ -159,7 +182,7 @@ const createEvent = async (req, res) => {
     if (Array.isArray(newEvent.skill_ids) && newEvent.skill_ids.length > 0) {
       const skillRows = newEvent.skill_ids.map(skill_id => ({
         event_id: eventId,
-        skill_id: Number(skill_id), // ensure it's a number
+        skill_id: Number(skill_id),
       }));
 
       const { error: skillsError } = await supabaseNoAuth

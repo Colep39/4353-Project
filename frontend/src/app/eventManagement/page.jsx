@@ -44,31 +44,19 @@ function EventManagement() {
       setIsLoading(true);
 
       try {
-        const resSkills = await fetchWithAuth(`${API_URL}/api/eventManagement/skills`);
+        const [resSkills, resEvents] = await Promise.all([
+          fetchWithAuth(`${API_URL}/api/eventManagement/skills`),
+          fetchWithAuth(`${API_URL}/api/eventManagement`),
+        ]);
+
         if (!resSkills.ok) throw new Error("Failed to fetch skills");
+        if (!resEvents.ok) throw new Error("Failed to fetch events"); 
+
         const skillsData = await resSkills.json();
         setSkills(Array.isArray(skillsData) ? skillsData.sort((a, b) => a.description.localeCompare(b.description)) : []);
 
-        const resEvents = await fetchWithAuth(`${API_URL}/api/eventManagement`);
-        if (!resEvents.ok) throw new Error("Failed to fetch events");
         const eventsData = await resEvents.json(); 
-
-        const eventsWithSkills = (eventsData || []).map(event => ({
-          ...event,
-          skills: Array.isArray(event.skills) ? event.skills : [],
-          skill_ids: (event.skill_ids || []).map(id => Number(id)),
-          date: {
-            start: event.date?.start ? new Date(event.date.start) : null,
-            end: event.date?.end ? new Date(event.date.end) : null,
-          },
-        }));
-
-        setEvents(eventsWithSkills);
-
-        const resVolunteers = await fetchWithAuth(`${API_URL}/api/eventManagement/recommendedVolunteers`);
-        if (!resVolunteers.ok) throw new Error("Failed to fetch recommended volunteers");
-        const volunteersData = await resVolunteers.json();
-        setRecommendedVolunteers(Array.isArray(volunteersData) ? volunteersData : []);
+        setEvents(eventsData);
 
       } catch (err) {
         console.error("Error fetching data:", err.message);
@@ -95,10 +83,20 @@ function EventManagement() {
     setIsModalOpen(true);
   };
 
-  const handleMatchVolunteers = (event) => {
+  const handleMatchVolunteers = async (event) => {
     setMatchedEvent(event);
     setIsMatchModalOpen(true);
-  };
+
+    try {
+      const res = await fetchWithAuth(`${API_URL}/api/eventManagement/recommendedVolunteers?event_id=${event.id}`);
+      if (!res.ok) throw new Error("Failed to fetch recommended volunteers");
+      const data = await res.json();
+      setRecommendedVolunteers(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Error fetching volunteers:", err);
+      setRecommendedVolunteers([]);
+    }
+};
 
   const validateEvent = (candidate) => {
     const errors = {};
@@ -382,58 +380,65 @@ function EventManagement() {
       {isMatchModalOpen && matchedEvent && (
         <div className="fixed inset-0 backdrop-blur-xs flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-2xl relative border border-black">
-            <button onClick={() => {setIsMatchModalOpen(false); setMatchedEvent(null); setSelectedVolunteers([]);}}
-                    className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-black">
+            <button onClick={() => {setIsMatchModalOpen(false); setMatchedEvent(null); setSelectedVolunteers([]);}} className="absolute top-2 right-3 text-xl font-bold text-gray-600 hover:text-black">
               &times;
             </button>
 
             <h2 className="text-xl font-semibold mb-4">Recommended Volunteers for "{matchedEvent.title}"</h2>
 
-            <table className="w-full border border-black mb-4">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="border border-black px-2 py-1">Select</th>
-                  <th className="border border-black px-2 py-1">First Name</th>
-                  <th className="border border-black px-2 py-1">Email</th>
-                  <th className="border border-black px-2 py-1">Location</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recommendedVolunteers.map((volunteer, index) => (
-                  <tr key={index}>
-                    <td className="border border-black px-2 py-1 text-center">
-                      <input type="checkbox" checked={selectedVolunteers.includes(volunteer)}
-                        onChange={(e) => {
-                          const updated = [...selectedVolunteers];
-                          if (e.target.checked) updated.push(volunteer);
-                          else {
-                            const idx = updated.indexOf(volunteer);
-                            if (idx > -1) updated.splice(idx, 1);
-                          }
-                          setSelectedVolunteers(updated);
-                        }}/>
-                    </td>
-                    <td className="border border-black px-2 py-1">{volunteer.name}</td>
-                    <td className="border border-black px-2 py-1">{volunteer.email}</td>
-                    <td className="border border-black px-2 py-1">{volunteer.location}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {recommendedVolunteers.length > 0 ? (
+              <>
+                <table className="w-full border border-black mb-4">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="border border-black px-2 py-1">Select</th>
+                      <th className="border border-black px-2 py-1">First Name</th>
+                      <th className="border border-black px-2 py-1">Email</th>
+                      <th className="border border-black px-2 py-1">Location</th>
+                      <th className="border border-black px-2 py-1">Points</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recommendedVolunteers.map((volunteer, index) => (
+                      <tr key={index}>
+                        <td className="border border-black px-2 py-1 text-center">
+                          <input type="checkbox" checked={selectedVolunteers.includes(volunteer)} onChange={(e) => {
+                              const updated = [...selectedVolunteers];
+                              if (e.target.checked) updated.push(volunteer);
+                              else {
+                                const idx = updated.indexOf(volunteer);
+                                if (idx > -1) updated.splice(idx, 1);
+                              }
+                              setSelectedVolunteers(updated);
+                            }}/>
+                        </td>
+                        <td className="border border-black px-2 py-1">{volunteer.name}</td>
+                        <td className="border border-black px-2 py-1">{volunteer.email}</td>
+                        <td className="border border-black px-2 py-1">{volunteer.location}</td>
+                        <td className="border border-black px-2 py-1 text-center">
+                          {volunteer.points}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
 
-            <div className="flex justify-end">
-              <button
-                onClick={() => {
-                  console.log("Saved volunteers for event:", matchedEvent.title);
-                  console.log("Selected Volunteers:", selectedVolunteers);
-                  setIsMatchModalOpen(false);
-                  setMatchedEvent(null);
-                  setSelectedVolunteers([]);
-                }}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
-                Save
-              </button>
-            </div>
+                <div className="flex justify-end">
+                  <button onClick={() => {
+                      console.log("Saved volunteers for event:", matchedEvent.title);
+                      console.log("Selected Volunteers:", selectedVolunteers);
+                      setIsMatchModalOpen(false);
+                      setMatchedEvent(null);
+                      setSelectedVolunteers([]);
+                    }} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">Save
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="text-center text-gray-600 italic py-8 border border-black rounded bg-gray-50">
+                No volunteers to recommend for this event.
+              </div>
+            )}
           </div>
         </div>
       )}

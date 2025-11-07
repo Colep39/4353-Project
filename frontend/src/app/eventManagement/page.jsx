@@ -7,6 +7,7 @@ import { addDays, startOfDay, isValid } from "date-fns";
 import Select from "react-select";
 import { fetchWithAuth } from "../authHelper";
 import { createPortal } from "react-dom";
+import Loading from "../components/loading/Loading";
 
 function EventManagement() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -23,6 +24,8 @@ function EventManagement() {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [volunteerCache, setVolunteerCache] = useState({});
+  const [loadingVolunteers, setLoadingVolunteers] = useState(false);
 
   const minSelectableDate = addDays(new Date(), 3);
 
@@ -86,20 +89,31 @@ function EventManagement() {
   const handleMatchVolunteers = async (event) => {
     setMatchedEvent(event);
     setIsMatchModalOpen(true);
+    setLoadingVolunteers(true);
+    setRecommendedVolunteers([]);
+    setSelectedVolunteers([]);
+
+    if (volunteerCache[event.id]) {
+      setRecommendedVolunteers(volunteerCache[event.id]);
+      setSelectedVolunteers(volunteerCache[event.id].filter(v => v.isRecommended));
+      setLoadingVolunteers(false);
+      return;
+    }
 
     try {
       const res = await fetchWithAuth(`${API_URL}/api/eventManagement/recommendedVolunteers?event_id=${event.id}`);
       if (!res.ok) throw new Error("Failed to fetch recommended volunteers");
       const data = await res.json();
 
-      setRecommendedVolunteers(Array.isArray(data) ? data : []);
-      setSelectedVolunteers(
-        (Array.isArray(data) ? data : []).filter(v => v.isRecommended)
-      );
+      setVolunteerCache(prev => ({ ...prev, [event.id]: data }));
+      setRecommendedVolunteers(data);
+      setSelectedVolunteers(data.filter(v => v.isRecommended));
     } catch (err) {
       console.error("Error fetching volunteers:", err);
       setRecommendedVolunteers([]);
       setSelectedVolunteers([]);
+    } finally {
+      setLoadingVolunteers(false);
     }
 };
 
@@ -391,7 +405,12 @@ function EventManagement() {
 
             <h2 className="text-xl font-semibold mb-4">Recommended Volunteers for "{matchedEvent.title}"</h2>
 
-            {recommendedVolunteers.length > 0 ? (
+            {loadingVolunteers ? (
+              <div className="flex flex-col items-center justify-center h-full space-y-2">
+                <Loading />
+                <span className="text-gray-600 font-medium">Matching volunteers...</span>
+              </div>
+            ) :recommendedVolunteers.length > 0 ? (
               <>
                 <table className="w-full border border-black mb-4">
                   <thead className="bg-gray-100">

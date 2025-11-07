@@ -140,7 +140,7 @@ const getRecommendedVolunteers = async (req, res) => {
     const formatted = (profiles || []).map(v => {
       let points = 0;
       if (v.states?.state_code?.trim().toLowerCase() === eventStateTrimmed) points += 1;
-      if (v.city?.trim().toLowerCase() === eventCityTrimmed) points += 1;
+      if (v.city?.trim().toLowerCase() === eventCityTrimmed) points += 2;
 
       const availableDates = (v.availability || []).map(dateStr => {
         return new Date(dateStr).toISOString().split("T")[0];
@@ -444,7 +444,6 @@ const saveRecommendedVolunteers = async (req, res) => {
       return res.status(400).json({ message: "Invalid request body" });
     }
 
-    // Step 1: Clear any existing recommendations for this event
     const { error: deleteError } = await supabaseNoAuth
       .from("recommended_events")
       .delete()

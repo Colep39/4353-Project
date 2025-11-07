@@ -91,10 +91,15 @@ function EventManagement() {
       const res = await fetchWithAuth(`${API_URL}/api/eventManagement/recommendedVolunteers?event_id=${event.id}`);
       if (!res.ok) throw new Error("Failed to fetch recommended volunteers");
       const data = await res.json();
+
       setRecommendedVolunteers(Array.isArray(data) ? data : []);
+      setSelectedVolunteers(
+        (Array.isArray(data) ? data : []).filter(v => v.isRecommended)
+      );
     } catch (err) {
       console.error("Error fetching volunteers:", err);
       setRecommendedVolunteers([]);
+      setSelectedVolunteers([]);
     }
 };
 

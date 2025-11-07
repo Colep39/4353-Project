@@ -79,58 +79,42 @@ const getRecommendedVolunteers = async (req, res) => {
     const eventId = req.query.event_id;
     if (!eventId) return res.status(400).json({ message: "event_id is required" });
 
-    const { data: event, error: eventError } = await supabaseNoAuth
+    const { data: event } = await supabaseNoAuth
       .from("events")
       .select("event_id, location")
       .eq("event_id", eventId)
       .single();
 
-    if (eventError || !event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
+    if (!event) return res.status(404).json({ message: "Event not found" });
 
     const [eventCity, eventStateCode] = (event.location || "").split(",").map(s => s.trim());
     const eventCityTrimmed = eventCity?.toLowerCase();
     const eventStateTrimmed = eventStateCode?.toLowerCase();
 
-    const { data: profiles, error: profileError } = await supabaseNoAuth
+    const { data: profiles } = await supabaseNoAuth
       .from("user_profile")
-      .select(`
-        user_id,
-        full_name,
-        city,
-        states!user_profile_state_id_fkey (state_code)
-      `)
+      .select(`user_id, full_name, city, states!user_profile_state_id_fkey (state_code)`)
       .not("full_name", "is", null)
       .not("city", "is", null)
       .not("state_id", "is", null)
       .not("zipcode", "is", null)
       .not("availability", "is", null)
-      .eq("role", "volunteer")
-      .order("full_name", { ascending: true });
+      .eq("role", "volunteer");
 
-    if (profileError) throw profileError;
-
-    const { data: emails, error: emailError } = await supabaseNoAuth
-      .from("user_emails")
-      .select("user_id, email");
-
-    if (emailError) throw emailError;
-
+    const { data: emails } = await supabaseNoAuth.from("user_emails").select("user_id, email");
     const emailMap = new Map(emails.map(u => [u.user_id, u.email]));
 
-    const formatted = profiles.map(v => {
+    const { data: recommended } = await supabaseNoAuth
+      .from("recommended_events")
+      .select("user_id")
+      .eq("event_id", eventId);
+
+    const recommendedSet = new Set((recommended || []).map(r => r.user_id));
+
+    const formatted = (profiles || []).map(v => {
       let points = 0;
-
-      const stateCode = v.states?.state_code?.trim().toLowerCase();
-      if (stateCode  && eventStateTrimmed && stateCode === eventStateTrimmed) {
-        points += 1;
-      }
-
-      const cityName = v.city?.trim().toLowerCase();
-      if (cityName && eventCityTrimmed && cityName === eventCityTrimmed) {
-        points += 1;
-      }
+      if (v.states?.state_code?.trim().toLowerCase() === eventStateTrimmed) points += 1;
+      if (v.city?.trim().toLowerCase() === eventCityTrimmed) points += 1;
 
       return {
         id: v.user_id,
@@ -138,18 +122,16 @@ const getRecommendedVolunteers = async (req, res) => {
         email: emailMap.get(v.user_id) ?? "No email",
         location: v.city || "Unknown",
         points,
+        isRecommended: recommendedSet.has(v.user_id), 
       };
     });
 
-    const filtered = formatted.filter(v => v.points > 0).sort((a, b) => b.points - a.points).slice(0, 10);;
+    const filtered = formatted.filter(v => v.points > 0).sort((a, b) => b.points - a.points).slice(0, 10);
 
     res.json(filtered);
   } catch (err) {
-    console.error("Error fetching recommended volunteers:", err);
-    res.status(500).json({
-      message: "Failed to fetch recommended volunteers",
-      details: err.message,
-    });
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch recommended volunteers", details: err.message });
   }
 };
 
@@ -430,12 +412,8 @@ const saveRecommendedVolunteers = async (req, res) => {
       return res.status(500).json({ message: "Failed to clear old recommendations" });
     }
 
-    // Step 2: Insert new recommendations (if any)
     if (user_ids.length > 0) {
-      const insertRows = user_ids.map((user_id) => ({
-        event_id,
-        user_id,
-      }));
+      const insertRows = user_ids.map((user_id) => ({event_id, user_id,}));
 
       const { error: insertError } = await supabaseNoAuth
         .from("recommended_events")

@@ -42,9 +42,8 @@ const getManageEvents = async (req, res) => {
           start: parseDate(event.start_date),
           end: parseDate(event.end_date)
         },
-        skills: skillsMapped
-          .sort((a, b) => a.description.localeCompare(b.description))
-          .map(s => ({ id: s.skill_id, description: s.description })),
+        skills: skillsMapped,
+        skill_ids: skillsMapped.map(s => s.id),
       };
     });
 
@@ -75,13 +74,65 @@ const getSkills = async (req, res) => {
   }
 };
 
-const getRecommendedVolunteers = (req, res) => {
-  res.json([
-    { firstName: "Alice Malice", email: "alicemalice@example.com", location: "Houston" },
-    { firstName: "Bob Job", email: "bobjob@example.com", location: "Dallas" },
-    { firstName: "Charlie Harley", email: "charlieharley@example.com", location: "Austin" },
-    { firstName: "Denise Quenise", email: "denisequenise@example.com", location: "San Antonio" },
-  ]);
+const getRecommendedVolunteers = async (req, res) => {
+  try {
+    const eventId = req.query.event_id;
+    if (!eventId) return res.status(400).json({ message: "event_id is required" });
+
+    const { data: event } = await supabaseNoAuth
+      .from("events")
+      .select("event_id, location")
+      .eq("event_id", eventId)
+      .single();
+
+    if (!event) return res.status(404).json({ message: "Event not found" });
+
+    const [eventCity, eventStateCode] = (event.location || "").split(",").map(s => s.trim());
+    const eventCityTrimmed = eventCity?.toLowerCase();
+    const eventStateTrimmed = eventStateCode?.toLowerCase();
+
+    const { data: profiles } = await supabaseNoAuth
+      .from("user_profile")
+      .select(`user_id, full_name, city, states!user_profile_state_id_fkey (state_code)`)
+      .not("full_name", "is", null)
+      .not("city", "is", null)
+      .not("state_id", "is", null)
+      .not("zipcode", "is", null)
+      .not("availability", "is", null)
+      .eq("role", "volunteer");
+
+    const { data: emails } = await supabaseNoAuth.from("user_emails").select("user_id, email");
+    const emailMap = new Map(emails.map(u => [u.user_id, u.email]));
+
+    const { data: recommended } = await supabaseNoAuth
+      .from("recommended_events")
+      .select("user_id")
+      .eq("event_id", eventId);
+
+    const recommendedSet = new Set((recommended || []).map(r => r.user_id));
+
+    const formatted = (profiles || []).map(v => {
+      let points = 0;
+      if (v.states?.state_code?.trim().toLowerCase() === eventStateTrimmed) points += 1;
+      if (v.city?.trim().toLowerCase() === eventCityTrimmed) points += 1;
+
+      return {
+        id: v.user_id,
+        name: v.full_name ?? "No name",
+        email: emailMap.get(v.user_id) ?? "No email",
+        location: v.city || "Unknown",
+        points,
+        isRecommended: recommendedSet.has(v.user_id), 
+      };
+    });
+
+    const filtered = formatted.filter(v => v.points > 0).sort((a, b) => b.points - a.points).slice(0, 10);
+
+    res.json(filtered);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch recommended volunteers", details: err.message });
+  }
 };
 
 const createEvent = async (req, res) => {
@@ -113,7 +164,7 @@ const createEvent = async (req, res) => {
     if (Array.isArray(newEvent.skill_ids) && newEvent.skill_ids.length > 0) {
       const skillRows = newEvent.skill_ids.map(skill_id => ({
         event_id: eventId,
-        skill_id: Number(skill_id), // ensure it's a number
+        skill_id: Number(skill_id),
       }));
 
       const { error: skillsError } = await supabaseNoAuth
@@ -342,6 +393,48 @@ const uploadEventImage = async (req, res) => {
   }
 };
 
+const saveRecommendedVolunteers = async (req, res) => {
+  try {
+    const { event_id, user_ids } = req.body;
+
+    if (!event_id || !Array.isArray(user_ids)) {
+      return res.status(400).json({ message: "Invalid request body" });
+    }
+
+    // Step 1: Clear any existing recommendations for this event
+    const { error: deleteError } = await supabaseNoAuth
+      .from("recommended_events")
+      .delete()
+      .eq("event_id", event_id);
+
+    if (deleteError) {
+      console.error("Error clearing old recommendations:", deleteError);
+      return res.status(500).json({ message: "Failed to clear old recommendations" });
+    }
+
+    if (user_ids.length > 0) {
+      const insertRows = user_ids.map((user_id) => ({event_id, user_id,}));
+
+      const { error: insertError } = await supabaseNoAuth
+        .from("recommended_events")
+        .insert(insertRows);
+
+      if (insertError) {
+        console.error("Error inserting recommendations:", insertError);
+        return res.status(500).json({ message: "Failed to save recommendations" });
+      }
+    }
+
+    res.status(200).json({ message: "Recommendations updated successfully" });
+  } catch (err) {
+    console.error("🔥 Error saving recommended volunteers:", err);
+    res.status(500).json({
+      message: "Failed to save recommended volunteers",
+      details: err.message,
+    });
+  }
+};
+
 module.exports = {
   getManageEvents,
   getRecommendedVolunteers,
@@ -350,4 +443,5 @@ module.exports = {
   deleteEvent,
   getSkills,
   uploadEventImage,
+  saveRecommendedVolunteers,
 };

@@ -31,6 +31,15 @@ const getEvents = async (req, res) => {
 
     const joinedEventIds = new Set(volunteerData.map(v => v.event_id));
 
+    const { data: recommendedData, error: recommendedError } = await supabaseNoAuth
+      .from("recommended_events")
+      .select("event_id")
+      .eq("user_id", userId);
+
+    if (recommendedError) throw recommendedError;
+
+    const recommendedEventIds = new Set(recommendedData.map(r => r.event_id));
+
     const normalized = data
       .map((event) => {
         const startDate = parseDate(event.start_date);
@@ -48,6 +57,7 @@ const getEvents = async (req, res) => {
           date: { start: startDate, end: endDate },
           skills,
           isJoined: joinedEventIds.has(event.event_id),
+          isRecommended: recommendedEventIds.has(event.event_id),
         };
       });
 

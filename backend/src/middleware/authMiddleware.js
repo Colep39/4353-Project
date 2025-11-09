@@ -17,6 +17,13 @@ async function requireAuth(req, res, next){
             return res.status(401).json({ error: "Missing token" });
         }
 
+        if (process.env.NODE_ENV === "test") {
+            const jwt = require("jsonwebtoken");
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = { id: decoded.sub || decoded.id, role: decoded.role };
+            return next();
+        }
+
         const { data: {user}, error } = await supabase.auth.getUser(token);
 
         if (error || !user) return res.status(401).json({ error: "Invalid token" });

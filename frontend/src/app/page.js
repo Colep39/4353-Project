@@ -1,5 +1,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Bungee } from "next/font/google";
+
+const bungee = Bungee({
+  subsets: ["latin"],
+  weight: "400",
+});
 
 const reviews = [
   {
@@ -28,7 +34,7 @@ const reviews = [
 export default function Home() {
   return (
     <>
-      <div className="bg-white">
+      <div className={`bg-white ${bungee.className}`}>
       {/* Hero Section */}
       <div
         className="relative w-full"
@@ -71,7 +77,7 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <main className="font-sans grid items-center justify-items-center p-8 pb-0 gap-16 sm:p-20 bg-white">
+      <main className={`${bungee.className} grid items-center justify-items-center p-8 pb-0 gap-16 sm:p-20 bg-white`}>
 
         {/* What We Do Section */}
         <section className="w-full bg-white py-20 rounded-2xl shadow-xl">
@@ -176,7 +182,7 @@ export default function Home() {
           {/* Socials */}
           <div>
             <h3 className="text-white text-xl font-semibold mb-4">Follow Us</h3>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 text-sm">
               <a href="#" className="hover:text-red-400 transition">Facebook</a>
               <a href="#" className="hover:text-red-400 transition">Instagram</a>
               <a href="#" className="hover:text-red-400 transition">LinkedIn</a>

@@ -2,12 +2,14 @@
 const express = require('express');
 const cors = require('cors');
 
-const authRoutes = require('./routes/authRoutes')
+const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const manageEventRoutes = require('./routes/manageEventRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
-const historyRoutes = require('./routes/historyRoutes')
+const historyRoutes = require('./routes/historyRoutes');
+const stateRoutes = require('./routes/stateRoutes.js');
+const skillsRoutes = require('./routes/skillsRoutes');
 
 const app = express();
 
@@ -25,6 +27,8 @@ app.use('/api/events', eventRoutes);
 app.use('/api/eventManagement', manageEventRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/volunteerHistory', historyRoutes);
+app.use('/api/states', stateRoutes);
+app.use('/api/skills', skillsRoutes);
 
 app.get('/', (req, res) => {
     res.send("API is up and going....");

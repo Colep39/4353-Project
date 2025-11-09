@@ -1,30 +1,53 @@
-let sampleProfiles = [
-    {
-        id: 1,
-        name: "Cole Hawke",
-        email: "colep3@icloud.com",
-        address1: "1234 Elm St",
-        address2: "",
-        city: "Antarctica City",
-        state: "",
-        zip: "99999",
-        skills: ["Event Setup", "Food Distribution", "Fundraising"],
-        preferences: "Prefers outdoor volunteering opportunities.",
-        availability: ["Weekdays after 5pm", "Weekends"],
-        joinedEvents: [],
-        profilePhoto: "/images/avatars/cole.jpg",
-        role: "Admin",
-    },
-];
+const supabaseNoAuth = require('../supabaseNoAuth');
+require('dotenv').config();
 
 async function getUserProfile(req, res) {
     try{
-        const { id } = req.params;
-        const user = sampleProfiles.find(user => user.id === parseInt(id));
-        if (!user){
-            return res.status(404).json({ message: "User not found"});
-        } 
-        res.json(user);
+        const header = req.headers.authorization || "";
+        const token = header.replace(/^Bearer\s+/i, "")
+        if (!token) {
+            return res.status(401).json({ error: "Missing token"});
+        }
+        const { data, error } = await supabaseNoAuth.auth.getUser(token);
+        if (error || !data?.user) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
+        const userId = data.user.id;
+
+        const { data: userProfile, error: profileError } = await supabaseNoAuth
+            .from("user_profile")
+            .select(`
+                full_name,
+                address_1,
+                address_2,
+                city,
+                zipcode,
+                preferences,
+                availability,
+                role,
+                state:states (
+                    state_id,
+                    state_code,
+                    state_name
+                ),
+                skills:user_skills (
+                    skill_id,
+                    skills (
+                        description
+                    )
+                )
+            `)
+            .eq("user_id", userId)
+            .single();
+        
+        if (profileError) throw profileError;
+
+        // throw error if there was no user profile
+        if (!userProfile || userProfile.length === 0){
+            return res.status(404).json({ message: 'User Profile was not found'});
+        }
+
+        res.json(userProfile);
     }
     catch(error){
         console.error(error);
@@ -33,15 +56,75 @@ async function getUserProfile(req, res) {
 }
 
 async function updateProfile(req, res) {
-    const { id, name, address1, address2, city, state, zip, skills, preferences, availability, joinedEvents, profilePhoto } = req.body;
     try{
-        const userIndex = sampleProfiles.findIndex(user => user.id === parseInt(id));
-        if (userIndex === -1){
-            return res.status(404).json({ message: "User not found" });
+        const header = req.headers.authorization || "";
+        const token = header.replace(/^Bearer\s+/i, "")
+        if (!token) {
+            return res.status(401).json({ error: "Missing token"});
         }
-        const updatedUser = { ...sampleProfiles[userIndex], name, address1, address2, city, state, zip, skills, preferences, availability, joinedEvents, profilePhoto };
-        sampleProfiles[userIndex] = updatedUser;
-        res.json(updatedUser);
+        const { data, error } = await supabaseNoAuth.auth.getUser(token);
+        if (error || !data?.user) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
+        const userId = data.user.id;
+        const body = req.body;
+
+        const { data: stateRow } = await supabaseNoAuth
+            .from('states')
+            .select('state_id')
+            .or(`state_code.eq.${body.state}, state_name.eq.${body.state}`)
+            .single();
+
+        const state_id = stateRow?.state_id ?? null;
+
+        // updating the main profile fields
+        const { error: updateError } = await supabaseNoAuth
+            .from('user_profile')
+            .update({
+                full_name: body.full_name,
+                address_1: body.address_1,
+                address_2: body.address_2,
+                city: body.city,
+                zipcode: body.zipcode,
+                preferences: body.preferences,
+                availability: body.availability,
+                state_id: state_id
+            })
+             .eq("user_id", userId);
+
+        if (updateError) throw updateError;
+
+        // update the user skills table
+        await supabaseNoAuth
+            .from('user_skills')
+            .delete()
+            .eq('user_id', userId)
+
+        const skills = Array.isArray(body.skills)
+      ? body.skills
+      : body.skills.split(",").map(s => s.trim()).filter(Boolean);
+
+        if (skills.length > 0) {
+        // Fetch skill IDs
+        const { data: skillRows } = await supabaseNoAuth
+            .from("skills")
+            .select("skill_id, description")
+            .in("description", skills);
+
+        // Insert join rows
+        if (skillRows && skillRows.length > 0) {
+            await supabaseNoAuth
+            .from("user_skills")
+            .insert(
+                skillRows.map((row) => ({
+                user_id: userId,
+                skill_id: row.skill_id
+                }))
+            );
+        }
+        }
+
+        return res.status(200).json({ message: "Profile updated successfully" });
     }
     catch(error){
         console.error(error);

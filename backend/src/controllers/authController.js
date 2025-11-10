@@ -35,7 +35,7 @@ const register = async (req, res) => {
                     state_id: 1,
                     zipcode: "00000",
                     preferences: "No preferences set",
-                    availability: new Date().toISOString(),
+                    availability: [new Date().toISOString()],
                     role: role,
                 }
             ]);

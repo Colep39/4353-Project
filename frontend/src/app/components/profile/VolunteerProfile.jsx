@@ -235,124 +235,134 @@ export default function VolunteerProfile() {
 
   return (
     <>
-      {!user ? (
-        <div className="flex justify-center items-center mt-20">
-          <Loading />
-        </div>
-      ) : (
-        <div
-          className="min-h-[calc(100vh-4rem)] flex justify-center bg-cover bg-center bg-no-repeat p-6 relative"
-          style={{ backgroundImage: "url('/Cherry Blossoms.jpg')" }}
-        >
+      <div
+      className="min-h-[calc(100vh-4rem)] flex justify-center bg-cover bg-center bg-no-repeat p-6 relative"
+      style={{ backgroundImage: "url('/Cherry Blossoms.jpg')" }}
+      >
           {/* Background overlay */}
           <div className="absolute inset-0 bg-black/40" />
 
           {/* Profile content card */}
           <div className="relative z-10 bg-white/85 backdrop-blur-md p-6 rounded-2xl shadow-2xl max-w-3xl w-full my-10 animate-fadeIn self-start">
-            {/* Header */}
-            <div className="flex items-center gap-5 border-b pb-5 mb-5">
-              <Image
-                src={form.profilePhoto || "/images/avatars/cole.jpg"}
-                alt={form.name || "Unnamed User"}
-                width={96}
-                height={96}
-                className="rounded-full object-cover border-4 border-red-200"
-              />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800">
-                  {form.name || (
-                    <span className="text-gray-400 italic flex items-center gap-1">
-                      <ExclamationTriangleIcon className="h-4 w-4 text-gray-400" />
-                      No name provided
-                    </span>
-                  )}
-                </h1>
-                <p className="text-gray-500">Volunteer</p>
+            {/* Conditional loading inside the card */}
+            {!user ? (
+              <div className="flex justify-center items-center py-20">
+                <Loading />
               </div>
-            </div>
+            ) : (
+              <>
+                {/* Header */}
+                <div className="flex items-center gap-5 border-b pb-5 mb-5">
+                  <Image
+                    src={form.profilePhoto || "/images/avatars/cole.jpg"}
+                    alt={form.name || "Unnamed User"}
+                    width={96}
+                    height={96}
+                    className="rounded-full object-cover border-4 border-red-200"
+                  />
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-800">
+                      {form.name || (
+                        <span className="text-gray-400 italic flex items-center gap-1">
+                          <ExclamationTriangleIcon className="h-4 w-4 text-gray-400" />
+                          No name provided
+                        </span>
+                      )}
+                    </h1>
+                    <p className="text-gray-500">Volunteer</p>
+                  </div>
+                </div>
 
-            {/* Contact & Preferences */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <h2 className="text-lg font-semibold text-red-600 mb-2">
-                  Contact Information
-                </h2>
+                {/* Contact & Preferences */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <h2 className="text-lg font-semibold text-red-600 mb-2">
+                      Contact Information
+                    </h2>
 
-                {form.address1 ? (
-                  <p className="text-gray-700">
-                    {form.address1}
-                    {form.address2 && `, ${form.address2}`}
-                  </p>
-                ) : (
-                  <MissingField text="No address provided." />
-                )}
+                    {form.address1 ? (
+                      <p className="text-gray-700">
+                        {form.address1}
+                        {form.address2 && `, ${form.address2}`}
+                      </p>
+                    ) : (
+                      <MissingField text="No address provided." />
+                    )}
 
-                {form.city || form.state || form.zip ? (
-                  <p className="text-gray-700">
-                    {form.city || "Unknown City"}, {form.state || "N/A"}{" "}
-                    {form.zip || "N/A"}
-                  </p>
-                ) : (
-                  <MissingField text="No city/state/ZIP provided." />
-                )}
-              </div>
+                    {form.city || form.state || form.zip ? (
+                      <p className="text-gray-700">
+                        {form.city || "Unknown City"}, {form.state || "N/A"}{" "}
+                        {form.zip || "N/A"}
+                      </p>
+                    ) : (
+                      <MissingField text="No city/state/ZIP provided." />
+                    )}
+                  </div>
 
-              <div>
-                <h2 className="text-lg font-semibold text-red-600 mb-2">
-                  Preferences
-                </h2>
-                {form.preferences ? (
-                  <p className="text-gray-700">{form.preferences}</p>
-                ) : (
-                  <MissingField text="No preferences specified." />
-                )}
-              </div>
-            </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-red-600 mb-2">
+                      Preferences
+                    </h2>
+                    {form.preferences ? (
+                      <p className="text-gray-700">{form.preferences}</p>
+                    ) : (
+                      <MissingField text="No preferences specified." />
+                    )}
+                  </div>
+                </div>
 
-            {/* Skills & Availability */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h2 className="text-lg font-semibold text-red-600 mb-2">
-                  Skills
-                </h2>
-                {selectedSkills && selectedSkills.length > 0 ? (
-                  <ul className="list-disc list-inside text-gray-700">
-                    {selectedSkills.map((skill, idx) => (
-                      <li key={`${skill}-${idx}`}>{skill}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <MissingField text="No skills specified." />
-                )}
-              </div>
+                {/* Skills & Availability */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h2 className="text-lg font-semibold text-red-600 mb-2">
+                      Skills
+                    </h2>
+                    {selectedSkills && selectedSkills.length > 0 ? (
+                      <div className="relative max-h-48 overflow-y-auto bg-white/60 rounded-lg p-3 border border-gray-200">
+                        <ul className="list-disc list-inside text-gray-700 space-y-1">
+                          {selectedSkills.map((skill, idx) => (
+                            <li key={`${skill}-${idx}`}>{skill}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      <MissingField text="No skills specified." />
+                    )}
+                  </div>
+                  {/* 
+                  <div>
+                    <h2 className="text-lg font-semibold text-red-600 mb-2">
+                      Availability
+                    </h2>
+                    {selectedDates && selectedDates.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {selectedDates.map((d) => (
+                          <span
+                            key={d}
+                            className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm"
+                          >
+                            {new Date(d).toLocaleDateString()}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <MissingField text="No availability set." />
+                    )}
+                  </div>
+                  */}
+                </div>
 
-              <div>
-                <h2 className="text-lg font-semibold text-red-600 mb-2">
-                  Availability
-                </h2>
-                {selectedDates && selectedDates.length > 0 ? (
-                  <ul className="list-disc list-inside text-gray-700">
-                    {selectedDates.map((d) => (
-                      <li key={d}>
-                        {new Date(d).toLocaleDateString()}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <MissingField text="No availability set." />
-                )}
-              </div>
-            </div>
-
-            {/* Edit button */}
-            <div className="mt-8 flex justify-end">
-              <button
-                onClick={openModal}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition cursor-pointer"
-              >
-                Edit Profile
-              </button>
-            </div>
+                {/* Edit button */}
+                <div className="mt-8 flex justify-end">
+                  <button
+                    onClick={openModal}
+                    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition cursor-pointer"
+                  >
+                    Edit Profile
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
           {profileModalOpen &&
@@ -534,15 +544,6 @@ export default function VolunteerProfile() {
                         Availability (pick multiple dates — required)
                       </label>
 
-                      {/* Single date adder */}
-                      <input
-                        type="date"
-                        min={todayISO}
-                        onChange={(e) => addDate(e.target.value)}
-                        onKeyDown={(e) => e.preventDefault()}
-                        className="border p-2 rounded w-full"
-                      />
-
                       {/* Chips */}
                       <div className="flex flex-wrap mt-2 gap-2">
                         {selectedDates.map((date) => (
@@ -701,8 +702,8 @@ export default function VolunteerProfile() {
               </div>,
               document.body
             )}
-        </div>
-      )}
+      
+      </div>
     </>
   );
 }

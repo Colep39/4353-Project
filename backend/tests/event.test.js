@@ -9,26 +9,89 @@ const token = jwt.sign(
   { expiresIn: '1h' }
 );
 
-describe("Event routes", () =>{
-    /* This endpoint needs to be updated to use a mock DB instead of a real connection. This can be handled later.
-    it("GET /api/events should return a JSON", async () => {
-        const res = await request(app).get('/api/events').set("Authorization", `Bearer ${token}`);
-        expect(res.headers['content-type']).toMatch(/json/);
-        expect(res.statusCode).toBe(200);
-        expect(res.body).toBeInstanceOf(Array);
-        expect(res.body[0]).toHaveProperty("id");
-        expect(res.body[0]).toHaveProperty("title");
-        expect(res.body[0]).toHaveProperty("date");
-        expect(res.body[0].date).toHaveProperty("start");
-        expect(res.body[0].date).toHaveProperty("end");
-        expect(res.body[0]).toHaveProperty("urgency");
-        expect(res.body[0]).toHaveProperty("description");
-        expect(res.body[0]).toHaveProperty("image");
+describe("Event routes", () => {
+  let tempEventId;
 
-    })
-    */
-    it("GET /api/events/unknown should return a 404", async () => {
-        const res = await request(app).get('/api/events/unknown').set("Authorization", `Bearer ${token}`);
-        expect(res.statusCode).toBe(404);
-    })
-})
+  // Seed a temporary event so there's guaranteed data
+  beforeEach(async () => {
+    const res = await request(app)
+      .post("/api/eventManagement")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        title: "Temp Event",
+        description: "Temporary event for testing",
+        location: "Houston",
+        urgency: 2,
+        image: "/images/events/temp.jpg",
+        date: {
+          start: new Date(2026, 1, 10).toISOString(),
+          end: new Date(2026, 1, 11).toISOString(),
+        },
+        skill_ids: [1],
+      });
+
+    tempEventId = res.body.id;
+  });
+
+  // Clean up after tests
+  afterEach(async () => {
+    if (tempEventId) {
+      await request(app)
+        .delete(`/api/eventManagement/${tempEventId}`)
+        .set("Authorization", `Bearer ${token}`);
+    }
+  });
+
+  it("should return 401 with no authorization token", async () => {
+    const res = await request(app).get('/api/events');
+    expect(res.statusCode).toBe(401);
+  });
+
+  it("GET /api/events should return a list of events", async () => {
+    const res = await request(app)
+      .get('/api/events')
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.headers['content-type']).toMatch(/json/);
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+
+    if (res.body.length > 0) {
+      const event = res.body[0];
+      expect(event).toHaveProperty("id");
+      expect(event).toHaveProperty("title");
+      expect(event).toHaveProperty("date");
+      expect(event.date).toHaveProperty("start");
+      expect(event.date).toHaveProperty("end");
+      expect(event).toHaveProperty("urgency");
+      expect(event).toHaveProperty("description");
+      expect(event).toHaveProperty("image");
+    }
+  });
+
+  it("GET /api/events/:id should return event details", async () => {
+    const res = await request(app)
+      .get(`/api/events/${tempEventId}`)
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toHaveProperty("id");
+    expect(res.body).toHaveProperty("title");
+  });
+
+  it("GET /api/events/unknown should return 404", async () => {
+    const res = await request(app)
+      .get('/api/events/unknown')
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(404);
+  });
+
+  it("GET /api/events/999999 should return 404 for unknown event id", async () => {
+    const res = await request(app)
+      .get('/api/events/999999')
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(404);
+  });
+});

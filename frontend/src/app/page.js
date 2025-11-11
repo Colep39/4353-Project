@@ -38,7 +38,7 @@ export default function Home() {
       {/* Hero Section */}
       <div
         className="relative w-full"
-        style={{ height: "calc(100vh - 64px)" }} // 64px = navbar height
+        style={{ height: "calc(100vh - 64px)" }}
       >
         {/* Background image */}
         <Image

@@ -1,6 +1,12 @@
 "use client";
 import { useState } from "react"; 
 import PersonCard from '../components/aboutUs/PersonCard';
+import { Bungee } from "next/font/google";
+
+const bungee = Bungee({
+  subsets: ["latin"],
+  weight: "400",
+});
 
 const memberInfo = [
   {
@@ -28,7 +34,7 @@ const memberInfo = [
 function AboutMe(){
   return(
     <>
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100 py-16 px-6">
+      <div className={`min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100 py-16 px-6 ${bungee.className}`}>
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 mb-4">

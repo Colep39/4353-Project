@@ -8,6 +8,12 @@ import Select from "react-select";
 import { fetchWithAuth } from "../authHelper";
 import { createPortal } from "react-dom";
 import Loading from "../components/loading/Loading";
+import { Bungee } from "next/font/google";
+
+const bungee = Bungee({
+  subsets: ["latin"],
+  weight: "400",
+});
 
 function EventManagement() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -239,7 +245,7 @@ function EventManagement() {
 
   return (
     <>
-      <div className="max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20">
+      <div className={`max-h-[calc(100vh-12rem)] h-[calc(100vh-12rem)] mt-20 ${bungee.className}`}>
         <CardGrid events={events} title="Upcoming Events" isLoading={isLoading} buttonLabel="Match Volunteers" tooltip={true} onEventClick={handleEditEvent} onMatchVolunteers={handleMatchVolunteers} titleAction={
             <button className="ml-5 bg-white border border-black rounded px-2 py-1 text-sm font-medium hover:bg-gray-100 cursor-pointer" onClick={() => { resetModalState(); setIsModalOpen(true); }}>
               Create Event

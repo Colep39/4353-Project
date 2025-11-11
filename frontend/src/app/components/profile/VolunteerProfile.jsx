@@ -24,7 +24,7 @@ export default function VolunteerProfile() {
     state: "",
     zip: "",
     preferences: "",
-    profilePhoto: "",
+    profile_photo: "",
     role: "",
   });
 
@@ -105,7 +105,7 @@ export default function VolunteerProfile() {
       state: data.state?.state_code || "",
       zip: data.zipcode || "",
       preferences: data.preferences || "",
-      profilePhoto: data.profilePhoto || "",
+      profile_photo: data.profile_photo || "",
       role: data.role || "Volunteer",
     });
     setSelectedSkills(normalizedSkills);
@@ -176,6 +176,40 @@ export default function VolunteerProfile() {
     form.address1.length > 100 ||
     form.address2.length > 100 ||
     form.city.length > 100;
+
+  // handle file uploads
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // show preview
+    const previewUrl = URL.createObjectURL(file);
+    setForm((f) => ({ ...f, profile_photo: previewUrl }));
+
+    try {
+      const userId = getUserIdFromToken();
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("userId", userId);
+
+      // send to backend endpoint that uploads to Supabase Storage or saves locally
+      const res = await fetch(`${API_URL}/api/upload/profile-photo`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+      const { fileUrl } = await res.json();
+
+      // update form to use permanent URL
+      setForm((f) => ({ ...f, profile_photo: fileUrl }));
+      toast.success("Profile photo uploaded!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Error uploading profile photo.");
+    }
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -254,7 +288,7 @@ export default function VolunteerProfile() {
                 {/* Header */}
                 <div className="flex items-center gap-5 border-b pb-5 mb-5">
                   <Image
-                    src={form.profilePhoto || "/images/avatars/cole.jpg"}
+                    src={form.profile_photo || "/images/avatars/cole.jpg"}
                     alt={form.name || "Unnamed User"}
                     width={96}
                     height={96}
@@ -653,19 +687,71 @@ export default function VolunteerProfile() {
                       </div>
                     </div>
 
-                    {/* Profile Photo */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Profile Photo URL (optional)
+                    {/* Profile Photo Upload */}
+                    <div className="flex flex-col items-center">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Profile Photo (optional)
                       </label>
-                      <input
-                        type="text"
-                        name="profilePhoto"
-                        value={form.profilePhoto}
-                        onChange={onChange}
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
-                      />
+
+                      {/* Upload area */}
+                      <div className="w-full flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-6 bg-gray-50 hover:border-red-400 hover:bg-red-50 transition cursor-pointer relative">
+                        <input
+                          id="profilePhotoUpload"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileUpload}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+
+                        {/* Upload icon & text */}
+                        <div className="text-center pointer-events-none">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="mx-auto h-10 w-10 text-gray-400 mb-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6.1a5 5 0 011.1 9.9H7z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 12v9m0 0l-3-3m3 3l3-3"
+                            />
+                          </svg>
+                          <p className="text-sm text-gray-600">
+                            <span className="font-semibold text-red-600">Click to upload</span> or drag & drop
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">PNG, JPG, or JPEG up to 5 MB</p>
+                        </div>
+                      </div>
+
+                      {/* Preview */}
+                      {form.profile_photo && (
+                        <div className="mt-4 flex flex-col items-center">
+                          <Image
+                            src={form.profile_photo}
+                            alt="Profile Preview"
+                            width={120}
+                            height={120}
+                            className="rounded-full border-4 border-red-200 object-cover shadow-md"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setForm((f) => ({ ...f, profile_photo: "" }))}
+                            className="mt-3 text-sm text-red-600 hover:text-red-800 transition"
+                          >
+                            Remove photo
+                          </button>
+                        </div>
+                      )}
                     </div>
+
 
                     {/* Role (read-only) */}
                     <div>
@@ -702,7 +788,6 @@ export default function VolunteerProfile() {
               </div>,
               document.body
             )}
-      
       </div>
     </>
   );

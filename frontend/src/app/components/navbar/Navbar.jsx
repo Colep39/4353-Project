@@ -205,7 +205,7 @@ export default function Navbar() {
               </span>
 
               <img
-                src={user?.profilePhoto || "/images/avatars/cole.jpg"}
+                src={user?.profile_photo || "/images/avatars/cole.jpg"}
                 alt={user?.full_name}
                 className="w-8 h-8 rounded-full object-cover flex-shrink-0 cursor-pointer 
                 transform transition-transform duration-300 hover:scale-110"

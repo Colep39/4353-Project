@@ -25,6 +25,7 @@ async function getUserProfile(req, res) {
                 preferences,
                 availability,
                 role,
+                profile_photo,
                 state:states (
                     state_id,
                     state_code,
@@ -88,7 +89,8 @@ async function updateProfile(req, res) {
                 zipcode: body.zipcode,
                 preferences: body.preferences,
                 availability: body.availability,
-                state_id: state_id
+                state_id: state_id,
+                profile_photo: body.profile_photo
             })
              .eq("user_id", userId);
 

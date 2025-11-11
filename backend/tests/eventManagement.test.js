@@ -43,7 +43,6 @@ describe("Event management routes", () => {
       .set("Authorization", `Bearer ${adminToken}`);
   });
 
-  // ===== Existing CRUD Tests =====
   it("GET /api/eventManagement should return a JSON array of events", async () => {
     const res = await request(app)
       .get("/api/eventManagement")
@@ -236,7 +235,6 @@ describe("Event management routes", () => {
 
 const path = require("path");
 
-// Additional Event management routes
 describe("Additional Event management routes", () => {
   it("GET /api/eventManagement/skills should return a JSON array of skills", async () => {
     const res = await request(app)
@@ -250,7 +248,6 @@ describe("Additional Event management routes", () => {
     if (res.body.length > 0) {
       const skill = res.body[0];
       expect(skill).toHaveProperty("id");
-      // API returns "description" not "name"
       expect(skill).toHaveProperty("description");
     }
   });
@@ -267,17 +264,17 @@ describe("Additional Event management routes", () => {
     const res = await request(app)
       .post("/api/eventManagement/upload")
       .set("Authorization", `Bearer ${adminToken}`)
-      .attach("image", path.join(__dirname, "fixtures/test-image.jpg")); // ⚡ use "image" here
+      .attach("image", path.join(__dirname, "fixtures/test-image.jpg")); 
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty("url"); // matches your uploadEventImage
+    expect(res.body).toHaveProperty("url"); 
   });
 
   it("POST /api/eventManagement/upload should reject non-admin users", async () => {
     const res = await request(app)
       .post("/api/eventManagement/upload")
       .set("Authorization", `Bearer ${volunteerToken}`)
-      .attach("image", path.join(__dirname, "fixtures/test-image.jpg")); // ⚡ same fix
+      .attach("image", path.join(__dirname, "fixtures/test-image.jpg"));
 
     expect([401, 403]).toContain(res.statusCode);
   });

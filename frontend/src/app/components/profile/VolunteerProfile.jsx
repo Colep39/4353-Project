@@ -24,7 +24,7 @@ export default function VolunteerProfile() {
     state: "",
     zip: "",
     preferences: "",
-    profilePhoto: "",
+    profile_photo: "",
     role: "",
   });
 
@@ -105,7 +105,7 @@ export default function VolunteerProfile() {
       state: data.state?.state_code || "",
       zip: data.zipcode || "",
       preferences: data.preferences || "",
-      profilePhoto: data.profilePhoto || "",
+      profile_photo: data.profile_photo || "",
       role: data.role || "Volunteer",
     });
     setSelectedSkills(normalizedSkills);
@@ -177,6 +177,40 @@ export default function VolunteerProfile() {
     form.address2.length > 100 ||
     form.city.length > 100;
 
+  // handle file uploads
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // show preview
+    const previewUrl = URL.createObjectURL(file);
+    setForm((f) => ({ ...f, profile_photo: previewUrl }));
+
+    try {
+      const userId = getUserIdFromToken();
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("userId", userId);
+
+      // send to backend endpoint that uploads to Supabase Storage or saves locally
+      const res = await fetch(`${API_URL}/api/upload/profile-photo`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+      const { fileUrl } = await res.json();
+
+      // update form to use permanent URL
+      setForm((f) => ({ ...f, profile_photo: fileUrl }));
+      toast.success("Profile photo uploaded!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Error uploading profile photo.");
+    }
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -235,124 +269,134 @@ export default function VolunteerProfile() {
 
   return (
     <>
-      {!user ? (
-        <div className="flex justify-center items-center mt-20">
-          <Loading />
-        </div>
-      ) : (
-        <div
-          className="min-h-[calc(100vh-4rem)] flex justify-center bg-cover bg-center bg-no-repeat p-6 relative"
-          style={{ backgroundImage: "url('/Cherry Blossoms.jpg')" }}
-        >
+      <div
+      className="min-h-[calc(100vh-4rem)] flex justify-center bg-cover bg-center bg-no-repeat p-6 relative"
+      style={{ backgroundImage: "url('/Cherry Blossoms.jpg')" }}
+      >
           {/* Background overlay */}
           <div className="absolute inset-0 bg-black/40" />
 
           {/* Profile content card */}
           <div className="relative z-10 bg-white/85 backdrop-blur-md p-6 rounded-2xl shadow-2xl max-w-3xl w-full my-10 animate-fadeIn self-start">
-            {/* Header */}
-            <div className="flex items-center gap-5 border-b pb-5 mb-5">
-              <Image
-                src={form.profilePhoto || "/images/avatars/cole.jpg"}
-                alt={form.name || "Unnamed User"}
-                width={96}
-                height={96}
-                className="rounded-full object-cover border-4 border-red-200"
-              />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800">
-                  {form.name || (
-                    <span className="text-gray-400 italic flex items-center gap-1">
-                      <ExclamationTriangleIcon className="h-4 w-4 text-gray-400" />
-                      No name provided
-                    </span>
-                  )}
-                </h1>
-                <p className="text-gray-500">Volunteer</p>
+            {/* Conditional loading inside the card */}
+            {!user ? (
+              <div className="flex justify-center items-center py-20">
+                <Loading />
               </div>
-            </div>
+            ) : (
+              <>
+                {/* Header */}
+                <div className="flex items-center gap-5 border-b pb-5 mb-5">
+                  <Image
+                    src={form.profile_photo || "/images/avatars/cole.jpg"}
+                    alt={form.name || "Unnamed User"}
+                    width={96}
+                    height={96}
+                    className="rounded-full object-cover border-4 border-red-200"
+                  />
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-800">
+                      {form.name || (
+                        <span className="text-gray-400 italic flex items-center gap-1">
+                          <ExclamationTriangleIcon className="h-4 w-4 text-gray-400" />
+                          No name provided
+                        </span>
+                      )}
+                    </h1>
+                    <p className="text-gray-500">Volunteer</p>
+                  </div>
+                </div>
 
-            {/* Contact & Preferences */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <h2 className="text-lg font-semibold text-red-600 mb-2">
-                  Contact Information
-                </h2>
+                {/* Contact & Preferences */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <h2 className="text-lg font-semibold text-red-600 mb-2">
+                      Contact Information
+                    </h2>
 
-                {form.address1 ? (
-                  <p className="text-gray-700">
-                    {form.address1}
-                    {form.address2 && `, ${form.address2}`}
-                  </p>
-                ) : (
-                  <MissingField text="No address provided." />
-                )}
+                    {form.address1 ? (
+                      <p className="text-gray-700">
+                        {form.address1}
+                        {form.address2 && `, ${form.address2}`}
+                      </p>
+                    ) : (
+                      <MissingField text="No address provided." />
+                    )}
 
-                {form.city || form.state || form.zip ? (
-                  <p className="text-gray-700">
-                    {form.city || "Unknown City"}, {form.state || "N/A"}{" "}
-                    {form.zip || "N/A"}
-                  </p>
-                ) : (
-                  <MissingField text="No city/state/ZIP provided." />
-                )}
-              </div>
+                    {form.city || form.state || form.zip ? (
+                      <p className="text-gray-700">
+                        {form.city || "Unknown City"}, {form.state || "N/A"}{" "}
+                        {form.zip || "N/A"}
+                      </p>
+                    ) : (
+                      <MissingField text="No city/state/ZIP provided." />
+                    )}
+                  </div>
 
-              <div>
-                <h2 className="text-lg font-semibold text-red-600 mb-2">
-                  Preferences
-                </h2>
-                {form.preferences ? (
-                  <p className="text-gray-700">{form.preferences}</p>
-                ) : (
-                  <MissingField text="No preferences specified." />
-                )}
-              </div>
-            </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-red-600 mb-2">
+                      Preferences
+                    </h2>
+                    {form.preferences ? (
+                      <p className="text-gray-700">{form.preferences}</p>
+                    ) : (
+                      <MissingField text="No preferences specified." />
+                    )}
+                  </div>
+                </div>
 
-            {/* Skills & Availability */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h2 className="text-lg font-semibold text-red-600 mb-2">
-                  Skills
-                </h2>
-                {selectedSkills && selectedSkills.length > 0 ? (
-                  <ul className="list-disc list-inside text-gray-700">
-                    {selectedSkills.map((skill, idx) => (
-                      <li key={`${skill}-${idx}`}>{skill}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <MissingField text="No skills specified." />
-                )}
-              </div>
+                {/* Skills & Availability */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h2 className="text-lg font-semibold text-red-600 mb-2">
+                      Skills
+                    </h2>
+                    {selectedSkills && selectedSkills.length > 0 ? (
+                      <div className="relative max-h-48 overflow-y-auto bg-white/60 rounded-lg p-3 border border-gray-200">
+                        <ul className="list-disc list-inside text-gray-700 space-y-1">
+                          {selectedSkills.map((skill, idx) => (
+                            <li key={`${skill}-${idx}`}>{skill}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      <MissingField text="No skills specified." />
+                    )}
+                  </div>
+                  {/* 
+                  <div>
+                    <h2 className="text-lg font-semibold text-red-600 mb-2">
+                      Availability
+                    </h2>
+                    {selectedDates && selectedDates.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {selectedDates.map((d) => (
+                          <span
+                            key={d}
+                            className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm"
+                          >
+                            {new Date(d).toLocaleDateString()}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <MissingField text="No availability set." />
+                    )}
+                  </div>
+                  */}
+                </div>
 
-              <div>
-                <h2 className="text-lg font-semibold text-red-600 mb-2">
-                  Availability
-                </h2>
-                {selectedDates && selectedDates.length > 0 ? (
-                  <ul className="list-disc list-inside text-gray-700">
-                    {selectedDates.map((d) => (
-                      <li key={d}>
-                        {new Date(d).toLocaleDateString()}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <MissingField text="No availability set." />
-                )}
-              </div>
-            </div>
-
-            {/* Edit button */}
-            <div className="mt-8 flex justify-end">
-              <button
-                onClick={openModal}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition cursor-pointer"
-              >
-                Edit Profile
-              </button>
-            </div>
+                {/* Edit button */}
+                <div className="mt-8 flex justify-end">
+                  <button
+                    onClick={openModal}
+                    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition cursor-pointer"
+                  >
+                    Edit Profile
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
           {profileModalOpen &&
@@ -534,15 +578,6 @@ export default function VolunteerProfile() {
                         Availability (pick multiple dates — required)
                       </label>
 
-                      {/* Single date adder */}
-                      <input
-                        type="date"
-                        min={todayISO}
-                        onChange={(e) => addDate(e.target.value)}
-                        onKeyDown={(e) => e.preventDefault()}
-                        className="border p-2 rounded w-full"
-                      />
-
                       {/* Chips */}
                       <div className="flex flex-wrap mt-2 gap-2">
                         {selectedDates.map((date) => (
@@ -652,19 +687,71 @@ export default function VolunteerProfile() {
                       </div>
                     </div>
 
-                    {/* Profile Photo */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Profile Photo URL (optional)
+                    {/* Profile Photo Upload */}
+                    <div className="flex flex-col items-center">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Profile Photo (optional)
                       </label>
-                      <input
-                        type="text"
-                        name="profilePhoto"
-                        value={form.profilePhoto}
-                        onChange={onChange}
-                        className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-red-400"
-                      />
+
+                      {/* Upload area */}
+                      <div className="w-full flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-6 bg-gray-50 hover:border-red-400 hover:bg-red-50 transition cursor-pointer relative">
+                        <input
+                          id="profilePhotoUpload"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileUpload}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+
+                        {/* Upload icon & text */}
+                        <div className="text-center pointer-events-none">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="mx-auto h-10 w-10 text-gray-400 mb-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6.1a5 5 0 011.1 9.9H7z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 12v9m0 0l-3-3m3 3l3-3"
+                            />
+                          </svg>
+                          <p className="text-sm text-gray-600">
+                            <span className="font-semibold text-red-600">Click to upload</span> or drag & drop
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">PNG, JPG, or JPEG up to 5 MB</p>
+                        </div>
+                      </div>
+
+                      {/* Preview */}
+                      {form.profile_photo && (
+                        <div className="mt-4 flex flex-col items-center">
+                          <Image
+                            src={form.profile_photo}
+                            alt="Profile Preview"
+                            width={120}
+                            height={120}
+                            className="rounded-full border-4 border-red-200 object-cover shadow-md"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setForm((f) => ({ ...f, profile_photo: "" }))}
+                            className="mt-3 text-sm text-red-600 hover:text-red-800 transition"
+                          >
+                            Remove photo
+                          </button>
+                        </div>
+                      )}
                     </div>
+
 
                     {/* Role (read-only) */}
                     <div>
@@ -701,8 +788,7 @@ export default function VolunteerProfile() {
               </div>,
               document.body
             )}
-        </div>
-      )}
+      </div>
     </>
   );
 }

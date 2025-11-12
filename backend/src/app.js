@@ -10,6 +10,8 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const historyRoutes = require('./routes/historyRoutes');
 const stateRoutes = require('./routes/stateRoutes.js');
 const skillsRoutes = require('./routes/skillsRoutes');
+const uploadRoutes = require("./routes/upload");
+
 
 const app = express();
 
@@ -29,6 +31,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/volunteerHistory', historyRoutes);
 app.use('/api/states', stateRoutes);
 app.use('/api/skills', skillsRoutes);
+app.use("/api/upload", uploadRoutes);
 
 app.get('/', (req, res) => {
     res.send("API is up and going....");

@@ -1,4 +1,3 @@
-const supabase = require('../supabaseClient');
 const supabaseNoAuth = require('../supabaseNoAuth');
 require('dotenv').config();
 

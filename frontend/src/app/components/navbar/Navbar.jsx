@@ -71,6 +71,7 @@ export default function Navbar() {
     { name: "Events", href: "/events" },
     { name: "Event Management", href: "/eventManagement" },
     { name: "Volunteer History", href: "/volunteerHistory" },
+    { name: "Reports", href: "/reports"},
     { name: "Profile", href: "/profile" },
     { name: "Login", href: "/login" },
     { name: "Register", href: "/register" },
@@ -78,10 +79,10 @@ export default function Navbar() {
   ];
 
   const visibleLinks = links.filter((link) => {
-    if (role === "volunteer" && link.href === "/eventManagement") return false;
+    if (role === "volunteer" && (link.href === "/eventManagement" || link.href === "/reports")) return false;
     if (role === "admin" && (link.href === "/volunteerHistory" || link.href === "/events")) return false;
     if (isLogged && (link.href === "/login" || link.href === "/register")) return false;
-    if (!isLogged && ["/volunteerHistory", "/eventManagement", "/events", "/profile"].includes(link.href)) return false;
+    if (!isLogged && ["/volunteerHistory", "/eventManagement", "/reports", "/events", "/profile"].includes(link.href)) return false;
     return true;
   });
 
@@ -204,7 +205,7 @@ export default function Navbar() {
               </span>
 
               <img
-                src={user?.profilePhoto || "/images/avatars/cole.jpg"}
+                src={user?.profile_photo || "/images/avatars/cole.jpg"}
                 alt={user?.full_name}
                 className="w-8 h-8 rounded-full object-cover flex-shrink-0 cursor-pointer 
                 transform transition-transform duration-300 hover:scale-110"

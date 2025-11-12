@@ -36,7 +36,6 @@ function VolunteerHistory() {
         .then((res) => res.json())
         .then((data) => getUserProfile(data))
         .catch((err) => console.error("Error fetching user", err))
-        .finally(() => { setIsLoading(false); });
     }, [API_URL]);
 
 

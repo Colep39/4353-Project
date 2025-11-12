@@ -25,6 +25,7 @@ async function getUserProfile(req, res) {
                 preferences,
                 availability,
                 role,
+                profile_photo,
                 state:states (
                     state_id,
                     state_code,
@@ -88,7 +89,8 @@ async function updateProfile(req, res) {
                 zipcode: body.zipcode,
                 preferences: body.preferences,
                 availability: body.availability,
-                state_id: state_id
+                state_id: state_id,
+                profile_photo: body.profile_photo
             })
              .eq("user_id", userId);
 
@@ -132,4 +134,36 @@ async function updateProfile(req, res) {
     }
 }
 
-module.exports = { getUserProfile, updateProfile };
+async function updateAdminProfile(req, res){
+    try{
+        const header = req.headers.authorization || "";
+        const token = header.replace(/^Bearer\s+/i, "")
+        if (!token) {
+            return res.status(401).json({ error: "Missing token"});
+        }
+        const { data, error } = await supabaseNoAuth.auth.getUser(token);
+        if (error || !data?.user) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
+        const userId = data.user.id;
+        const body = req.body;
+
+        // updating the main profile fields
+        const { error: updateError } = await supabaseNoAuth
+            .from('user_profile')
+            .update({
+                full_name: body.full_name,
+            })
+             .eq("user_id", userId);
+
+        if (updateError) throw updateError;
+        
+        return res.status(200).json({ message: "Profile updated successfully" });
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).json({ message: 'Error updating profile' });
+    }
+}
+
+module.exports = { getUserProfile, updateProfile, updateAdminProfile };

@@ -504,6 +504,10 @@ function EventManagement() {
                           user_ids: selectedVolunteers.map(v => v.id),
                         };
 
+                        setIsMatchModalOpen(false);
+                        setMatchedEvent(null);
+                        setSelectedVolunteers([]);
+
                         const res = await fetchWithAuth(`${API_URL}/api/eventManagement/recommendedVolunteers`, {
                           method: "POST",
                           body: JSON.stringify(payload),
@@ -512,15 +516,16 @@ function EventManagement() {
                         if (!res.ok) {
                           throw new Error("Failed to save volunteer recommendations");
                         }
+
+                        setVolunteerCache(prev => {
+                          const updatedCache = { ...prev };
+                          delete updatedCache[matchedEvent.id];
+                          return updatedCache;
+                        });
                       } catch (err) {
                         console.error("Error saving recommendations:", err);
                         alert("Something went wrong while saving recommendations.");
-                      } finally {
-                        setIsMatchModalOpen(false);
-                        setMatchedEvent(null);
-                        setSelectedVolunteers([]);
-                      }
-                    }} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+                      }}} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
                     Save
                   </button>
                 </div>

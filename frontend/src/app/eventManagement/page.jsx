@@ -253,116 +253,164 @@ function EventManagement() {
       </div>
 
       {isModalOpen &&
-        createPortal (
-          <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/10 backdrop-blur-sm p-4 overflow-y-auto">
-            <div className="bg-white rounded-2xl shadow-2xl border border-black w-full max-w-6xl mt-20 mb-20 p-6 max-h-[90vh] relative">
-              <button onClick={() => { setIsModalOpen(false); resetModalState(); }} className="absolute top-3 right-3 text-xl font-bold text-gray-600 hover:text-black cursor-pointer">
-                &times;
-              </button>
-              <h2 className="text-xl font-semibold mb-6">{selectedEvent ? "Edit Event" : "Create New Event"}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex flex-col space-y-4">
-                  <div className="flex flex-col">
-                    <label htmlFor="eventName" className="font-medium">Event Name <span className="text-red-500">*</span></label>
-                    <input type="text" id="eventName" className="border px-3 py-2 rounded w-full" value={selectedEvent ? selectedEvent.title : newEvent.title} onChange={(e) => {
-                        const value = e.target.value;
-                        selectedEvent ? setSelectedEvent({ ...selectedEvent, title: value }) : setNewEvent({ ...newEvent, title: value });
-                        setValidationErrors(prev => ({ ...prev, title: undefined }));
-                      }}/>
-                    {validationErrors.title && <div className="text-red-600 text-sm mt-1">{validationErrors.title}</div>}
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/10 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl border border-black w-full max-w-6xl max-h-[90vh] flex flex-col relative">
+              <div className="flex justify-between items-center p-6">
+                <h2 className="text-xl font-semibold">
+                  {selectedEvent ? "Edit Event" : "Create New Event"}
+                </h2>
+                <button onClick={() => { setIsModalOpen(false); resetModalState();}} className="text-2xl font-bold text-gray-600 hover:text-black">
+                  &times;
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex flex-col space-y-4">
+                    <div className="flex flex-col">
+                      <label htmlFor="eventName" className="font-medium">Event Name <span className="text-red-500">*</span></label>
+                      <input type="text" id="eventName" className="border px-3 py-2 rounded w-full" value={selectedEvent ? selectedEvent.title : newEvent.title} onChange={(e) => {
+                          const value = e.target.value;
+                          selectedEvent
+                            ? setSelectedEvent({ ...selectedEvent, title: value })
+                            : setNewEvent({ ...newEvent, title: value });
+                          setValidationErrors((prev) => ({...prev, title: undefined,}));
+                        }}/>
+                      {validationErrors.title && (
+                        <div className="text-red-600 text-sm mt-1">
+                          {validationErrors.title}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col">
+                      <label htmlFor="eventLocation" className="font-medium">Location <span className="text-red-500">*</span></label>
+                      <input type="text" id="eventLocation" className="border px-3 py-2 rounded w-full" value={selectedEvent ? selectedEvent.location || "" : newEvent.location} onChange={(e) => {
+                          const value = e.target.value;
+                          selectedEvent
+                            ? setSelectedEvent({ ...selectedEvent, location: value })
+                            : setNewEvent({ ...newEvent, location: value });
+                        }} placeholder="Format: City, ST"/>
+                      {validationErrors.location && (
+                        <div className="text-red-600 text-sm mt-1">
+                          {validationErrors.location}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col">
+                      <label htmlFor="eventDate" className="font-medium">Event Date <span className="text-red-500">*</span></label>
+                      <DatePicker selectsRange startDate={selectedEvent ? selectedEvent.date?.start : newEvent.date?.start} endDate={selectedEvent ? selectedEvent.date?.end : newEvent.date?.end} onChange={(update) => {
+                          const [start, end] = update;
+                          selectedEvent
+                            ? setSelectedEvent({ ...selectedEvent, date: { start, end } })
+                            : setNewEvent({ ...newEvent, date: { start, end } });
+                          setValidationErrors((prev) => ({...prev, date: undefined,}));
+                        }} isClearable className="border px-3 py-2 rounded w-full" wrapperClassName="w-full" placeholderText={`Select a date range (${minSelectableDate.toLocaleDateString()} onwards)`} minDate={minSelectableDate}/>
+                      {validationErrors.date && (
+                        <div className="text-red-600 text-sm mt-1">
+                          {validationErrors.date}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col">
+                      <label htmlFor="eventUrgency" className="font-medium">Urgency <span className="text-red-500">*</span></label>
+                      <select id="eventUrgency" className="border px-3 py-2 rounded w-full" value={selectedEvent ? selectedEvent.urgency : newEvent.urgency || 1} onChange={(e) => {
+                          const value = parseInt(e.target.value, 10);
+                          selectedEvent
+                            ? setSelectedEvent({ ...selectedEvent, urgency: value })
+                            : setNewEvent({ ...newEvent, urgency: value });
+                          setValidationErrors((prev) => ({...prev, urgency: undefined,}));
+                        }}>
+                        <option value={4}>Critical</option>
+                        <option value={3}>High</option>
+                        <option value={2}>Medium</option>
+                        <option value={1}>Low</option>
+                      </select>
+                      {validationErrors.urgency && (
+                        <div className="text-red-600 text-sm mt-1">
+                          {validationErrors.urgency}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col">
+                      <label htmlFor="eventDescription" className="font-medium">Description <span className="text-red-500">*</span></label>
+                      <textarea id="eventDescription" className="border px-3 py-2 rounded w-full resize-none" maxLength={400} value={selectedEvent ? selectedEvent.description : newEvent.description} onChange={(e) => {
+                          const value = e.target.value;
+                          selectedEvent
+                            ? setSelectedEvent({ ...selectedEvent, description: value })
+                            : setNewEvent({ ...newEvent, description: value });
+                          setValidationErrors((prev) => ({...prev, description: undefined,}));
+                        }}/>
+                      {validationErrors.description && (
+                        <div className="text-red-600 text-sm mt-1">
+                          {validationErrors.description}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="flex flex-col">
-                    <label htmlFor="eventLocation" className="font-medium">Location <span className="text-red-500">*</span></label>
-                    <input type="text" id="eventLocation" className="border px-3 py-2 rounded w-full" value={selectedEvent ? selectedEvent.location || '' : newEvent.location} onChange={(e) => {
-                        const value = e.target.value;
-                        selectedEvent ? setSelectedEvent({ ...selectedEvent, location: value }) : setNewEvent({ ...newEvent, location: value });
-                      }} placeholder="Format: City, ST" pattern="^[A-Za-z][A-Za-z\s'.-]{0,49}, [A-Za-z]{2}$" title="Format: City, ST (e.g., Austin, TX)"/>
-                    {validationErrors.location && <div className="text-red-600 text-sm mt-1">{validationErrors.location}</div>}
-                  </div>
+                  <div className="flex flex-col space-y-4">
+                    <div className="flex flex-col">
+                      <label htmlFor="eventSkills" className="font-medium">Skills <span className="text-red-500">*</span></label>
+                      <Select isMulti options={skillOptions} onChange={(selectedOptions) => {
+                          const ids = selectedOptions ? selectedOptions.map((opt) => opt.value) : [];
+                          selectedEvent ? setSelectedEvent({ ...selectedEvent, skill_ids: ids }) : setNewEvent({ ...newEvent, skill_ids: ids });}}
+                        className="w-full border-black border rounded" classNamePrefix="select" placeholder="Select required skills" closeMenuOnSelect={false}
+                        isDisabled={skills.length === 0} noOptionsMessage={() => "Loading skills..."} styles={{
+                          multiValue: (base) => ({...base, maxHeight: "2.5rem", overflowY: "auto",}),
+                          multiValueLabel: (base) => ({...base, whiteSpace: "normal",}),
+                          valueContainer: (base) => ({...base, maxHeight: "6rem", overflowY: "auto",}),}}/>
+                      {validationErrors.skills && (
+                        <div className="text-red-600 text-sm mt-1">
+                          {validationErrors.skills}
+                        </div>
+                      )}
+                    </div>
 
-                  <div className="flex flex-col">
-                    <label htmlFor="eventDate" className="font-medium">Event Date <span className="text-red-500">*</span></label>
-                    <DatePicker selectsRange startDate={selectedEvent ? selectedEvent.date?.start : newEvent.date?.start} endDate={selectedEvent ? selectedEvent.date?.end : newEvent.date?.end} onChange={(update) => {
-                        const [start, end] = update;
-                        selectedEvent ? setSelectedEvent({ ...selectedEvent, date: { start, end } }) : setNewEvent({ ...newEvent, date: { start, end } });
-                        setValidationErrors(prev => ({ ...prev, date: undefined }));
-                      }} isClearable className="border px-3 py-2 rounded w-full" wrapperClassName="w-full" placeholderText={`Select a date range (${minSelectableDate.toLocaleDateString()} onwards)`} minDate={minSelectableDate}/>
-                    {validationErrors.date && <div className="text-red-600 text-sm mt-1">{validationErrors.date}</div>}
-                  </div>
-
-                  <div className="flex flex-col">
-                    <label htmlFor="eventUrgency" className="font-medium">Urgency <span className="text-red-500">*</span></label>
-                    <select id="eventUrgency" className="border px-3 py-2 rounded w-full" value={selectedEvent ? selectedEvent.urgency : newEvent.urgency || 1} onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        selectedEvent ? setSelectedEvent({ ...selectedEvent, urgency: value }) : setNewEvent({ ...newEvent, urgency: value });
-                        setValidationErrors(prev => ({ ...prev, urgency: undefined }));
-                      }}>
-                      <option value={4}>Critical</option>
-                      <option value={3}>High</option>
-                      <option value={2}>Medium</option>
-                      <option value={1}>Low</option>
-                    </select>
-                    {validationErrors.urgency && <div className="text-red-600 text-sm mt-1">{validationErrors.urgency}</div>}
-                  </div>
-
-                  <div className="flex flex-col">
-                    <label htmlFor="eventDescription" className="font-medium">Description <span className="text-red-500">*</span></label>
-                    <textarea id="eventDescription" className="border px-3 py-2 rounded w-full resize-none" maxLength={400} value={selectedEvent ? selectedEvent.description : newEvent.description} onChange={(e) => {
-                        const value = e.target.value;
-                        selectedEvent ? setSelectedEvent({ ...selectedEvent, description: value }) : setNewEvent({ ...newEvent, description: value });
-                        setValidationErrors(prev => ({ ...prev, description: undefined }));
-                      }}/>
-                    {validationErrors.description && <div className="text-red-600 text-sm mt-1">{validationErrors.description}</div>}
-                  </div>
-                </div> 
-                <div className="flex flex-col space-y-4">
-                  <div className="flex flex-col">
-                    <label htmlFor="eventSkills" className="font-medium">
-                      Skills <span className="text-red-500">*</span>
-                    </label>
-                    <Select isMulti options={skillOptions} onChange={(selectedOptions) => {
-                        const ids = selectedOptions ? selectedOptions.map(opt => opt.value) : [];
-                        selectedEvent ? setSelectedEvent({ ...selectedEvent, skill_ids: ids }) : setNewEvent({ ...newEvent, skill_ids: ids });
-                      }} className="w-full border-black border rounded" classNamePrefix="select" placeholder="Select required skills" closeMenuOnSelect={false} isDisabled={skills.length === 0} noOptionsMessage={() => "Loading skills..."}
-                      styles={{multiValue: (base) => ({ ...base, maxHeight: '2.5rem', overflowY: 'auto' }), multiValueLabel: (base) => ({ ...base, whiteSpace: 'normal' }), valueContainer: (base) => ({ ...base, maxHeight: '6rem', overflowY: 'auto' })}}/>
-                    {validationErrors.skills && <div className="text-red-600 text-sm mt-1">{validationErrors.skills}</div>}
-                  </div>
-
-                  <div className="flex flex-col">
-                    <label htmlFor="eventImage" className="font-medium">Event Image <span className="text-red-500">*</span></label>
-                    <input type="file" accept="image/*" id="eventImage" className="border px-3 py-2 rounded w-full" onChange={(e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          selectedEvent ? handleImageUpload(file, setSelectedEvent) : handleImageUpload(file, setNewEvent);
-                          setValidationErrors(prev => ({ ...prev, image: undefined }));
-                        }
-                      }}/>
-                    {(selectedEvent?.image || newEvent.image) && (
-                      <div className="mt-2">
-                        <img src={selectedEvent ? selectedEvent.image : newEvent.image} alt="Event preview" className="rounded-lg border w-full h-40 object-cover"/>
-                      </div>
-                    )}
-                    {validationErrors.image && <div className="text-red-600 text-sm mt-1">{validationErrors.image}</div>}
+                    <div className="flex flex-col">
+                      <label htmlFor="eventImage" className="font-medium">Event Image <span className="text-red-500">*</span></label>
+                      <label htmlFor="eventImage" className="border border-black hover:border-gray-400 transition-colors cursor-pointer px-3 py-2 rounded w-full text-gray-500 flex items-center">
+                        {selectedEvent?.image || newEvent.image ? "Click to change File" : "Click to choose file"}
+                      </label>
+                      <input type="file" accept="image/*" id="eventImage" className="hidden" onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            selectedEvent ? handleImageUpload(file, setSelectedEvent) : handleImageUpload(file, setNewEvent);
+                            setValidationErrors((prev) => ({ ...prev, image: undefined }));
+                          }}}/>
+                      {(selectedEvent?.image || newEvent.image) && (
+                        <div className="mt-2">
+                          <img src={selectedEvent ? selectedEvent.image : newEvent.image} alt="Event preview" className="rounded-lg border w-full h-40 object-cover"/>
+                        </div>
+                      )}
+                      {validationErrors.image && (
+                        <div className="text-red-600 text-sm mt-1">
+                          {validationErrors.image}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-
-              <div className="flex justify-between items-center mt-6 bg-white pt-4">
+              <div className="sticky bottom-0 bg-white p-4 flex justify-between items-center">
                 {selectedEvent ? (
-                  <button onClick={() => { setEventToDelete(selectedEvent); setIsConfirmOpen(true); }} className="bg-red-600 text-white py-2 rounded hover:bg-red-500 px-4">
+                  <button onClick={() => {setEventToDelete(selectedEvent); setIsConfirmOpen(true);}} className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-500">
                     Cancel Event
                   </button>
-                ) : <div className="w-24"></div>}
-                  <button onClick={handleSave} className="bg-blue-600 text-white py-2 rounded hover:bg-blue-500 px-4 cursor-pointer">
+                ) : (
+                  <div></div>
+                )}
+                <button onClick={handleSave} className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500">
                   {selectedEvent ? "Save" : "Add Event"}
                 </button>
               </div>
             </div>
           </div>,
           document.body
-        )
-      }
+        )}
 
       {isConfirmOpen && eventToDelete && (
         <div className="fixed inset-0 backdrop-blur-xs flex justify-center items-center z-[60]">
@@ -462,6 +510,10 @@ function EventManagement() {
                           user_ids: selectedVolunteers.map(v => v.id),
                         };
 
+                        setIsMatchModalOpen(false);
+                        setMatchedEvent(null);
+                        setSelectedVolunteers([]);
+
                         const res = await fetchWithAuth(`${API_URL}/api/eventManagement/recommendedVolunteers`, {
                           method: "POST",
                           body: JSON.stringify(payload),
@@ -470,15 +522,16 @@ function EventManagement() {
                         if (!res.ok) {
                           throw new Error("Failed to save volunteer recommendations");
                         }
+
+                        setVolunteerCache(prev => {
+                          const updatedCache = { ...prev };
+                          delete updatedCache[matchedEvent.id];
+                          return updatedCache;
+                        });
                       } catch (err) {
                         console.error("Error saving recommendations:", err);
                         alert("Something went wrong while saving recommendations.");
-                      } finally {
-                        setIsMatchModalOpen(false);
-                        setMatchedEvent(null);
-                        setSelectedVolunteers([]);
-                      }
-                    }} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
+                      }}} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">
                     Save
                   </button>
                 </div>

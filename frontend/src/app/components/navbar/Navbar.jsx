@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Bell, Menu, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { fetchWithAuth, getUserIdFromToken } from '../../authHelper';
 import { Bungee } from "next/font/google";
 
@@ -21,6 +21,7 @@ const logout = () => {
   window.location.href = "/login";
 };
 
+
 export default function Navbar() {
   const pathname = usePathname();
   const [showNotifications, setShowNotifications] = useState(false);
@@ -28,6 +29,7 @@ export default function Navbar() {
   const [role, setRole] = useState(null);
   const [isLogged, setIsLogged] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const notifRef = useRef(null);
   const [user, setUser] = useState(null);
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -65,6 +67,15 @@ export default function Navbar() {
       .catch((err) => console.error("Error fetching notifications:", err));
   }, []);
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const links = [
     { name: "Home", href: "/" },
@@ -167,34 +178,47 @@ export default function Navbar() {
                 </button>
 
                 {showNotifications && (
-                  <div className="absolute right-0 mt-2 w-72 bg-white text-black rounded-xl shadow-xl overflow-hidden z-50 border border-gray-200">
-                    {notifications.length > 0 ? (
-                      <ul className="divide-y divide-gray-100">
-                        {notifications.map((note, idx) => {
-                          const date = new Date(note.created_at);
-                          const formattedDate = date.toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                          });
-                          return (
-                            <li
-                              key={idx}
-                              className="p-3 hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
-                            >
-                              <div className="flex justify-between items-center">
-                                <h3 className="font-semibold text-gray-900 text-sm">
-                                  {note.title}
-                                </h3>
-                                {/*<span className="text-xs text-gray-400">{formattedDate}</span> */}
-                              </div>
-                              <p className="text-sm text-gray-700 mt-1">{note.message}</p>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    ) : (
-                      <div className="p-4 text-center text-gray-500">No notifications</div>
-                    )}
+                  <div
+                    ref={notifRef}
+                    className="absolute right-0 mt-3 w-80 bg-white text-black rounded-2xl shadow-2xl border border-gray-200 z-[999]
+                              animate-fade-in-up"
+                  >
+                    {/* Header */}
+                    <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 sticky top-0 rounded-t-2xl">
+                      <h3 className="text-sm font-semibold text-gray-800">Notifications</h3>
+                    </div>
+
+                    {/* Scrollable content */}
+                    <div className="max-h-80 overflow-y-auto custom-scrollbar">
+                      {notifications.length > 0 ? (
+                        <ul className="divide-y divide-gray-100">
+                          {notifications.map((note, idx) => {
+                            const date = new Date(note.created_at);
+                            const formattedDate = date.toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            });
+
+                            return (
+                              <li
+                                key={idx}
+                                className="px-4 py-3 hover:bg-gray-50 transition cursor-pointer"
+                              >
+                                <div className="flex justify-between items-center">
+                                  <h4 className="font-semibold text-gray-900 text-xs">{note.title}</h4>
+                                  <span className="text-xs text-gray-400">{formattedDate}</span>
+                                </div>
+                                <p className="text-xs text-gray-700 mt-1 leading-snug">
+                                  {note.message}
+                                </p>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : (
+                        <div className="p-4 text-center text-gray-500">No notifications</div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

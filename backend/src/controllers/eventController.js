@@ -73,6 +73,13 @@ const joinEvent = async (req, res) => {
     const userId = req.user.id;
     const { event_id } = req.body;
 
+    const complete = await isProfileComplete(userId);
+    if (!complete) {
+      return res.status(400).json({
+        error: "Your profile is incomplete. Please complete it before joining events."
+      });
+    }
+
     if (!event_id) {
       return res.status(400).json({ error: "Missing event_id" });
     }

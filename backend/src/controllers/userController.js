@@ -166,4 +166,32 @@ async function updateAdminProfile(req, res){
     }
 }
 
-module.exports = { getUserProfile, updateProfile, updateAdminProfile };
+async function isProfileComplete(userId){
+    const { data: profile, error} = await supabaseNoAuth
+        .from("user_profile")
+        .select(`
+            full_,name, address_1, city, zipcode, state_id,
+            skills:user_skills(skill_id),
+            availability
+        `)
+        .eq("user_id", userId)
+        .single();
+    
+    if (error || !profile) {
+        return false;
+    }
+
+    const hasRequiredFields =
+    profile.full_name &&
+    profile.address_1 &&
+    profile.city &&
+    profile.zipcode &&
+    profile.state_id;
+
+    const hasSkills = Array.isArray(profile.skills) && profile.skills.length > 0;
+    const hasAvailability = Array.isArray(profile.availability) && profile.availability.length > 0;
+
+    return hasRequiredFields && hasSkills && hasAvailability;
+}
+
+module.exports = { getUserProfile, updateProfile, updateAdminProfile, isProfileComplete };

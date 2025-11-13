@@ -1,13 +1,41 @@
 "use client";
 import { useState, useEffect } from "react";
 import CardGrid from "../components/events/CardGrid";
-import { fetchWithAuth } from "../authHelper";
+import { fetchWithAuth, getUserIdFromToken } from "../authHelper";
 
 function EventsPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [events, setEvents] = useState([]);
   const [joinedEventIds, setJoinedEventIds] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function checkProfile() {
+      const userId = getUserIdFromToken();
+
+      const res = await fetchWithAuth(`${API_URL}/api/users/${userId}`);
+      const data = await res.json();
+
+      const incomplete =
+        !data.full_name ||
+        !data.address_1 ||
+        !data.city ||
+        !data.zipcode ||
+        !data.state ||
+        !data.skills ||
+        data.skills.length === 0 ||
+        !data.availability ||
+        data.availability.length === 0;
+
+      if (incomplete) {
+        alert("Please complete your profile before viewing events.");
+        window.location.href = "/profile";
+      }
+    }
+
+    checkProfile();
+  }, []);
+
 
   useEffect(() => {
     const role = localStorage.getItem("role");

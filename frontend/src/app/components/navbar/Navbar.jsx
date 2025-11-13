@@ -88,7 +88,7 @@ export default function Navbar() {
 
 
   return (
-    <nav className="bg-black text-white shadow-md w-full z-[200] relative font-semibold">
+    <nav className={`bg-black text-white shadow-md w-full z-[200] relative font-semibold ${bungee.className}`}>
       <div className="w-full px-[10px]">
         <div className="flex items-center justify-between h-16 w-full">
           {/* Left side */}

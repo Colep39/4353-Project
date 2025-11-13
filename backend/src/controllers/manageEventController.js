@@ -125,9 +125,10 @@ const getRecommendedVolunteers = async (req, res) => {
       skillsMap.get(us.user_id).push(us.skill_id);
     }
 
-    const { data: emails, error: emailError } = await supabaseNoAuth.from("user_emails").select("user_id, email");
-    if (emailError) throw emailError;
-    const emailMap = new Map(emails.map(u => [u.user_id, u.email]));
+    const { data: emails, error: emailError } = await supabaseNoAuth.rpc("get_all_user_emails");
+      if (emailError) throw emailError;
+
+      const emailMap = new Map((emails || []).map(u => [u.user_id, u.email]));
 
     const { data: recommended, error: recommendedError } = await supabaseNoAuth
       .from("recommended_events")

@@ -2,6 +2,12 @@
 import { ErrorMessage, Formik, Field, Form } from 'formik';
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { Bungee } from "next/font/google";
+
+const bungee = Bungee({
+  subsets: ["latin"],
+  weight: "400",
+});
 
 const validateFields = (values) => {
   const errors = {};
@@ -32,7 +38,7 @@ export default function RegisterPage() {
       className="relative h-[calc(100vh-64px)] w-screen overflow-hidden bg-cover bg-center bg-no-repeat flex items-center justify-center"
       style={{ backgroundImage: "url('/images/login-bg.jpg')" }}
     >
-      <div className="backdrop-blur-xs bg-white/30 border border-white/40 rounded-2xl shadow-xl w-full max-w-4xl flex flex-col md:flex-row items-stretch overflow-hidden">
+      <div className={` ${bungee.className} backdrop-blur-xs bg-white/30 border border-white/40 rounded-2xl shadow-xl w-full max-w-4xl flex flex-col md:flex-row items-stretch overflow-hidden`}>
         <div className="flex-1 flex flex-col justify-center px-8 py-12 text-white-300">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 drop-shadow">Unlock Your Potential</h1>
           <p className="text-lg max-w-md drop-shadow">
@@ -76,13 +82,13 @@ export default function RegisterPage() {
               <p className="text-lg font-semibold text-center text-white-300 drop-shadow">Welcome back! Please log in.</p>
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-white-300">Email Address</label>
-                <Field className="border border-white/50 bg-white/70 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                <Field className="font-sans border border-white/50 bg-white/70 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                   id="email" name="email" placeholder="Email Address" />
                 <ErrorMessage name="email" component="div" className="text-red-300 text-sm" />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-white-300">Password</label>
-                <Field className="border border-white/50 bg-white/70 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                <Field className="font-sans border border-white/50 bg-white/70 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                   id="password" name="password" placeholder="Password" type="password" />
                 <ErrorMessage name="password" component="div" className="text-red-300 text-sm" />
               </div>

@@ -10,6 +10,8 @@ import toast from "react-hot-toast";
 export default function VolunteerProfile() {
   const [user, setUser] = useState(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [isProfileIncomplete, setIsProfileIncomplete] = useState(false);
+
 
   // Reference data
   const [states, setStates] = useState([]);
@@ -97,6 +99,18 @@ export default function VolunteerProfile() {
       : [];
 
     setUser(data);
+    const profileIncomplete =
+      !data.full_name ||
+      !data.address_1 ||
+      !data.city ||
+      !data.zipcode ||
+      !data.state ||
+      !data.state.state_code ||
+      !Array.isArray(data.skills) || data.skills.length === 0 ||
+      !Array.isArray(data.availability) || data.availability.length === 0;
+
+    setIsProfileIncomplete(profileIncomplete);
+
     setForm({
       name: data.full_name || "",
       address1: data.address_1 || "",
@@ -306,6 +320,13 @@ export default function VolunteerProfile() {
                     <p className="text-gray-500">Volunteer</p>
                   </div>
                 </div>
+
+                {isProfileIncomplete && (
+                  <div className="bg-red-100 text-red-800 px-4 py-3 rounded-lg mb-4 font-semibold shadow">
+                    ⚠️ Your profile is incomplete.  
+                    You must complete all required fields before signing up for events.
+                  </div>
+                )}
 
                 {/* Contact & Preferences */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">

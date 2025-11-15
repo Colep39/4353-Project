@@ -5,12 +5,19 @@ import { usePathname } from "next/navigation";
 import { Bell, Menu, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { fetchWithAuth, getUserIdFromToken } from '../../authHelper';
-import { Bungee } from "next/font/google";
+import { Bungee, Outfit } from "next/font/google";
 
 const bungee = Bungee({
   subsets: ["latin"],
   weight: "400",
 });
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"], // choose what you want
+  variable: "--font-outfit",
+});
+
 
 
 const logout = () => {
@@ -99,7 +106,7 @@ export default function Navbar() {
 
 
   return (
-    <nav className={`bg-black text-white shadow-md w-full z-[200] relative font-semibold ${bungee.className}`}>
+    <nav className={`bg-black text-white shadow-md w-full z-[200] relative font-semibold ${outfit.className}`}>
       <div className="w-full px-[10px]">
         <div className="flex items-center justify-between h-16 w-full">
           {/* Left side */}
@@ -114,7 +121,7 @@ export default function Navbar() {
                   className="object-contain w-full h-full"
                 />
               </div>
-              <span className={`${bungee.className} text-lg sm:text-xl md:text-2xl font-bold whitespace-nowrap text-white tracking-wide`}>
+              <span className={`text-lg sm:text-xl md:text-2xl font-bold whitespace-nowrap text-white tracking-wide`}>
                 Cougar Connect
               </span>
             </Link>

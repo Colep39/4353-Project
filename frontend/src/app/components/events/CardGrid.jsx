@@ -1,12 +1,14 @@
 import { useState, useMemo } from 'react';
 import { format } from "date-fns";
 import Loading from '../loading/Loading';
-import { Bungee } from "next/font/google";
+import { Outfit } from "next/font/google";
 
-const bungee = Bungee({
+const outfit = Outfit({
   subsets: ["latin"],
-  weight: "400",
+  weight: ["300", "400", "500", "600", "700"], // choose what you want
+  variable: "--font-outfit",
 });
+
 
 const urgencyIntToString = { 4: "Critical", 3: "High", 2: "Medium", 1: "Low" };
 
@@ -66,7 +68,7 @@ function CardGrid({events = [], isLoading = false, title, showButton = true, but
 const showHeader = !isLoading && normalizedEvents.length > 0
 
   return (
-    <div className={`h-full flex flex-col px-8 ${bungee.className}`}>
+    <div className={`h-full flex flex-col px-8 ${outfit.className}`}>
       {showHeader && (
         <div className="shrink-0 py-4 pr-2 ml-2 mr-4">
           <div className="flex items-center justify-between text-black">

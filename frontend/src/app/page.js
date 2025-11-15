@@ -1,13 +1,15 @@
 "use client";
 import Image from 'next/image';
 import Link from 'next/link';
-import { Bungee } from "next/font/google";
+import { Bungee, Outfit } from "next/font/google";
 import { useState, useEffect } from 'react';
 
-const bungee = Bungee({
+const outfit = Outfit({
   subsets: ["latin"],
-  weight: "400",
+  weight: ["300", "400", "500", "600", "700"], // choose what you want
+  variable: "--font-outfit",
 });
+
 
 const reviews = [
   {
@@ -43,7 +45,7 @@ export default function Home() {
 
   return (
     <>
-      <div className={`bg-white ${bungee.className}`}>
+      <div className={`bg-white ${outfit.className}`}>
       {/* Hero Section */}
       <div
         className="relative w-full"
@@ -88,7 +90,7 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <main className={`${bungee.className} grid items-center justify-items-center p-8 pb-0 gap-16 sm:p-20 bg-white`}>
+      <main className={`${outfit.className} grid items-center justify-items-center p-8 pb-0 gap-16 sm:p-20 bg-white`}>
 
         {/* What We Do Section */}
         <section className="w-full bg-white py-20 rounded-2xl shadow-xl">

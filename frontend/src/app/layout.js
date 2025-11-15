@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, Poppins, Bungee } from "next/font/google";
+import { Geist, Geist_Mono, Poppins, Bungee, Outfit } from "next/font/google";
 import "./globals.css";
 import Navbar from './components/navbar/Navbar';
 import AuthProvider from './components/authProvider/authProvider';
@@ -24,6 +24,13 @@ const bungee = Bungee({
   subsets: ["latin"],
 });
 
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"], // choose what you want
+  variable: "--font-outfit",
+});
+
+
 export const metadata = {
   title: "Cougar Connect",
   description: "COSC 4353 Volunteering Project",
@@ -34,7 +41,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${bungee.variable} antialiased bg-red-200 min-h-screen font-bungee`}
+        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} antialiased bg-red-200 min-h-screen font-bungee`}
       >
         <AuthProvider><Navbar /></AuthProvider>
         {children}

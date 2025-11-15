@@ -1,17 +1,9 @@
-/**
- * Volunteer Events route tests (mocked Supabase + global isProfileComplete)
- */
 require("dotenv").config({ path: ".env.test" });
 const jwt = require("jsonwebtoken");
 
-/* ------------------ GLOBAL MOCK: isProfileComplete ------------------ */
-global.isProfileComplete = jest.fn().mockResolvedValue(true);
-
-/* ------------------ MOCK: Supabase client ------------------ */
 const mockFrom = jest.fn();
 const mockInsert = jest.fn();
 const mockDelete = jest.fn();
-const mockSelect = jest.fn();
 const mockEq = jest.fn();
 const mockMaybeSingle = jest.fn();
 const mockGte = jest.fn();
@@ -25,8 +17,8 @@ beforeEach(() => {
 
   mockFrom.mockImplementation((table) => {
     switch (table) {
-      case "events":
-        return {
+      case "events": {
+        const obj = {
           select: jest.fn().mockReturnThis(),
           gte: jest.fn().mockResolvedValue({
             data: [
@@ -46,19 +38,52 @@ beforeEach(() => {
             ],
             error: null,
           }),
+          eq: jest.fn().mockReturnThis(),
+          order: jest.fn().mockReturnThis(),
+          limit: jest.fn().mockReturnThis(),
+          single: jest.fn().mockReturnThis(),
         };
 
-      case "volunteer_history":
-        return {
+        return obj;
+      }
+
+      case "volunteer_history": {
+        const vh = {
           select: jest.fn().mockReturnThis(),
-          eq: mockEq.mockResolvedValue({ data: [], error: null }),
-          insert: mockInsert.mockResolvedValue({
-            data: { volunteer_history_id: 123 },
+
+          eq: jest.fn(() => ({
+            data: [],
             error: null,
-          }),
-          delete: mockDelete.mockResolvedValue({ error: null }),
-          maybeSingle: mockMaybeSingle.mockResolvedValue({ data: null, error: null }),
+            eq: jest.fn().mockReturnThis(),
+            maybeSingle: mockMaybeSingle,
+          })),
+
+          maybeSingle: mockMaybeSingle,
+
+          insert: jest.fn(() => ({
+            select: jest.fn(() => ({
+              single: jest.fn(() =>
+                Promise.resolve({
+                  data: { volunteer_history_id: 999, user_id: 1, event_id: 1 },
+                  error: null,
+                })
+              ),
+            })),
+          })),
+
+          delete: jest.fn(() => ({
+            eq: jest.fn(() => ({
+              eq: jest.fn(() =>
+                Promise.resolve({
+                  error: null,
+                })
+              ),
+            })),
+          })),
         };
+
+        return vh;
+      }
 
       case "recommended_events":
         return {
@@ -79,16 +104,13 @@ beforeEach(() => {
   });
 });
 
-/* ------------------ IMPORT APP ------------------ */
 const request = require("supertest");
 const app = require("../src/app");
 
-/* ------------------ AUTH TOKEN ------------------ */
 const token = jwt.sign({ id: 1, role: "volunteer" }, process.env.JWT_SECRET, {
   expiresIn: "1h",
 });
 
-/* ------------------ TESTS ------------------ */
 describe("Volunteer Events routes", () => {
   it("should return 401 with no authorization token", async () => {
     const res = await request(app).get("/api/events");
@@ -131,9 +153,8 @@ describe("Volunteer Events routes", () => {
     expect(res.body).toHaveProperty("error");
   });
 
-  /* ✅ NEW TEST: Successful join */
   it("POST /api/events/join with valid event_id should return 201", async () => {
-    mockMaybeSingle.mockResolvedValueOnce({ data: null, error: null }); // not already joined
+    mockMaybeSingle.mockResolvedValueOnce({ data: null, error: null });
     mockInsert.mockResolvedValueOnce({
       data: { volunteer_history_id: 999 },
       error: null,
@@ -149,7 +170,6 @@ describe("Volunteer Events routes", () => {
     expect(res.body.data).toHaveProperty("volunteer_history_id", 999);
   });
 
-  /* ✅ NEW TEST: Successful leave */
   it("DELETE /api/events/leave with valid event_id should return 200", async () => {
     mockDelete.mockResolvedValueOnce({ error: null });
 

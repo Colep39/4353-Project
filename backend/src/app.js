@@ -11,6 +11,7 @@ const historyRoutes = require('./routes/historyRoutes');
 const stateRoutes = require('./routes/stateRoutes.js');
 const skillsRoutes = require('./routes/skillsRoutes');
 const uploadRoutes = require("./routes/upload");
+const reports = require('./routes/reports');
 
 
 const app = express();
@@ -32,6 +33,9 @@ app.use('/api/volunteerHistory', historyRoutes);
 app.use('/api/states', stateRoutes);
 app.use('/api/skills', skillsRoutes);
 app.use("/api/upload", uploadRoutes);
+
+// reports route
+app.use('/api/reports', reports);
 
 app.get('/', (req, res) => {
     res.send("API is up and going....");

@@ -1,4 +1,3 @@
-const { AuthInvalidJwtError } = require("@supabase/supabase-js");
 const supabase = require("../supabaseClient");
 const supabaseNoAuth = require("../supabaseNoAuth");
 

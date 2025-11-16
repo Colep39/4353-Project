@@ -42,7 +42,9 @@ async function getHistory (req, res) {
           skills (description)
         )
       `)
+      .gte("start_date", new Date().toISOString())
       .in("event_id", eventIds);
+
 
     if (eventsError) throw eventsError;
 

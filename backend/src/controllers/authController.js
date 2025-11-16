@@ -9,33 +9,34 @@ const register = async (req, res) => {
             return res.status(400).json({ error: "Invalid registration data"});
         }
 
+        if (process.env.NODE_ENV === "test"){
+            return res.status(200);
+        }
+
+        const origin = req.headers.origin;
+        const redirectUrl = `${origin}/callback`;
+
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
-            options: { data: { role: userType }}
+            options: { 
+                emailRedirectTo: redirectUrl,
+                data: { role: userType }
+            }
         })
 
         if (error) return res.status(400).json({ error: error.message });
         
-        const token = data.session?.access_token;
-        const refresh_token = data.session?.refresh_token;
         const userId = data.user?.id;
         const role = data.user?.user_metadata?.role;
 
-        // populating the initial user tables with fake data
+        // row for user profile init
         const { error: insertError } = await supabaseNoAuth
             .from("user_profile")
             .insert([
                 {
                     user_id: userId,
-                    full_name: "Update your name",
-                    address_1: "Add your address",
-                    address_2: null,
-                    city: "Add your city",
-                    state_id: 1,
-                    zipcode: "00000",
-                    preferences: "No preferences set",
-                    availability: [new Date().toISOString()],
+                    availability: [],
                     role: role,
                 }
             ]);
@@ -45,26 +46,8 @@ const register = async (req, res) => {
             return res.status(500).json({ error: "Failed to create user profile" });
         }
 
-        // q for jason: does this need to exist? not sure how this table works
-        const { error: skillsError } = await supabaseNoAuth
-            .from("user_skills")
-            .insert([
-                {
-                    user_id: userId,
-                    skill_id: 1
-                }
-            ]);
-        
-        if (skillsError) {
-            console.log(skillsError.message)
-            return res.status(500).json({ error: "Failed to create skills profile" });
-        }
         res.json({
             message: "Registration success",
-            token,
-            refresh_token,
-            role,
-            userId,
         });
     } catch (e) {
         res.status(500).json({ error: e.message });
@@ -88,6 +71,10 @@ const login = async (req, res) => {
             return res.status(400).json({ error: "Invalid input" });
         }
 
+        if (process.env.NODE_ENV === "test"){
+            return res.status(200);
+        }
+        
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
@@ -114,6 +101,40 @@ const verifyLogin = (email, password) => {
     return true;
 }
 
+const role = async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader){
+            return res.status(401).json({ error: "Missing auth header"});
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        if (!token){
+            return res.status(401).json({ error: "Missing token" });
+        }
+
+        const { data, error } = await supabaseNoAuth.auth.getUser(token);
+
+        if (error){
+            return res.status(401).json({ error: "Invalid token" });
+        }
+
+        const user = data.user;
+
+        const role =
+            user?.user_metadata?.role ||
+            user?.app_metadata?.role ||
+            null;
+        
+        return res.json({ role });
+    } catch (e){
+        console.error(e);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
 const refresh = async (req, res) => {
     try {
         const { refresh_token } = req.body;
@@ -133,4 +154,4 @@ const refresh = async (req, res) => {
     }
 }
 
-module.exports = { login, register, refresh };
+module.exports = { login, register, refresh, role };

@@ -6,6 +6,7 @@ import { Bell, Menu, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { fetchWithAuth, getUserIdFromToken } from '../../authHelper';
 import { Bungee, Outfit } from "next/font/google";
+import { useUserStore } from '@/store/useUserStore';
 
 const bungee = Bungee({
   subsets: ["latin"],
@@ -37,7 +38,7 @@ export default function Navbar() {
   const [isLogged, setIsLogged] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const notifRef = useRef(null);
-  const [user, setUser] = useState(null);
+  const { user, setUser } = useUserStore(); // global updates so navbar instantly updates
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const fetchProfile = async () => {
@@ -53,6 +54,16 @@ export default function Navbar() {
     setUser(data);
   }
 
+  const fetchNotifications = async () => {
+    const userId = getUserIdFromToken();
+    if (!userId) return; // not authenticated
+
+    fetchWithAuth(`${API_URL}/api/notifications/${userId}`)
+      .then((res) => res.json())
+      .then((data) => setNotifications(data))
+      .catch((err) => console.error("Error fetching notifications:", err));
+  }
+
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
     const token = localStorage.getItem("token");
@@ -65,13 +76,10 @@ export default function Navbar() {
   }, [API_URL]);
 
   useEffect(() => {
-    const userId = getUserIdFromToken();
-    if (!userId) return; // not authenticated
-
-    fetchWithAuth(`${API_URL}/api/notifications/${userId}`)
-      .then((res) => res.json())
-      .then((data) => setNotifications(data))
-      .catch((err) => console.error("Error fetching notifications:", err));
+    const id = setInterval(() => {
+      fetchNotifications();
+    }, 10000); // every 10 seconds
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -83,6 +91,21 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    const handler = () => fetchProfile();
+    window.addEventListener("profile-updated", handler);
+    return () => window.removeEventListener("profile-updated", handler);
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      fetchNotifications();
+    }, 10000); // every 10 seconds
+    return () => clearInterval(id);
+  }, []);
+
+
 
   const links = [
     { name: "Home", href: "/" },

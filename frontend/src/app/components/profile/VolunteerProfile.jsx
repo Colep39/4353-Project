@@ -6,11 +6,13 @@ import Loading from "../loading/Loading";
 import { createPortal } from "react-dom";
 import { fetchWithAuth, getUserIdFromToken } from "../../authHelper";
 import toast from "react-hot-toast";
+import { useUserStore } from "@/store/useUserStore";
 
 export default function VolunteerProfile() {
-  const [user, setUser] = useState(null);
+  const [localuser, setLocalUser] = useState(null);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [isProfileIncomplete, setIsProfileIncomplete] = useState(false);
+  const { user, setUser } = useUserStore();
 
 
   // Reference data
@@ -98,7 +100,8 @@ export default function VolunteerProfile() {
       ? [data.availability]
       : [];
 
-    setUser(data);
+    setLocalUser(data); // local state for profile
+    setUser(data); // global state for navbar
     const profileIncomplete =
       !data.full_name ||
       !data.address_1 ||
@@ -242,7 +245,7 @@ export default function VolunteerProfile() {
       state: form.state, 
       zipcode: form.zip,
       preferences: form.preferences || null,
-      profilePhoto: form.profilePhoto || null,
+      profile_photo: form.profile_photo || null,
       skills: selectedSkills, 
       availability: selectedDates,
     };
@@ -293,7 +296,7 @@ export default function VolunteerProfile() {
           {/* Profile content card */}
           <div className="relative z-10 bg-white/85 backdrop-blur-md p-6 rounded-2xl shadow-2xl max-w-3xl w-full my-10 animate-fadeIn self-start">
             {/* Conditional loading inside the card */}
-            {!user ? (
+            {!localuser ? (
               <div className="flex justify-center items-center py-20">
                 <Loading />
               </div>
@@ -302,7 +305,7 @@ export default function VolunteerProfile() {
                 {/* Header */}
                 <div className="flex items-center gap-5 border-b pb-5 mb-5">
                   <Image
-                    src={form.profile_photo || "/images/avatars/cole.jpg"}
+                    src={user?.profile_photo || "/images/avatars/cole.jpg"}
                     alt={form.name || "Unnamed User"}
                     width={96}
                     height={96}

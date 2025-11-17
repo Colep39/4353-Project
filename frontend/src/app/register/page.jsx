@@ -73,11 +73,9 @@ export default function RegisterPage() {
                   return;
                 }
 
-                localStorage.setItem("token", data.token);
                 localStorage.setItem("role", data.role);
-                localStorage.setItem("refresh_token", data.refresh_token);
 
-                window.location.href = "/profile";
+                window.location.href = "/emailverify";
               } catch (e) {
                 alert("Server error");
               } finally {

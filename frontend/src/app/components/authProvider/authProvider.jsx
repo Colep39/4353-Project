@@ -10,7 +10,7 @@ export default function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    const publicRoutes = ["/login", "/register", "/aboutUs", "/"]
+    const publicRoutes = ["/login", "/register", "/aboutUs", "/", "/emailverify", "/callback"]
     if (publicRoutes.includes(window.location.pathname)) return;
 
     // if missing or expired, log out immediately

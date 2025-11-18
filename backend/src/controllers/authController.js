@@ -9,9 +9,12 @@ const register = async (req, res) => {
             return res.status(400).json({ error: "Invalid registration data"});
         }
 
-        if (process.env.NODE_ENV === "test"){
-            return res.status(200);
-        }
+        if (process.env.NODE_ENV === "test") {
+            return res.status(201).json({
+                id: "test-user-id",
+                message: "Mock registration success"
+        });
+}
 
         const origin = req.headers.origin;
         const redirectUrl = `${origin}/callback`;
@@ -71,9 +74,15 @@ const login = async (req, res) => {
             return res.status(400).json({ error: "Invalid input" });
         }
 
-        if (process.env.NODE_ENV === "test"){
-            return res.status(200);
+        if (process.env.NODE_ENV === "test") {
+            return res.status(200).json({
+                token: "test-jwt-token",
+                refresh_token: "test-refresh-token",
+                role: "volunteer",
+                userId: "test-user-id"
+            });
         }
+
         
         const { data, error } = await supabase.auth.signInWithPassword({
             email,

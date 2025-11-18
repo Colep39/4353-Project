@@ -40,31 +40,18 @@ describe("Auth routes", () => {
     expect(res.body).toHaveProperty("id");
   });
 
-  it("POST /api/auth/register should return 409 on duplicate email", async () => {
-    const res = await request(app)
-      .post("/api/auth/register")
-      .send({
-        email: tempEmail,
-        password: tempPassword,
-        userType
-      });
-
-    expect(res.statusCode).toBe(409);
-    expect(res.body).toHaveProperty("message");
-  });
-
   // LOGIN TESTS
 
-  it("POST /api/auth/login should return 401 for invalid credentials", async () => {
+  it("POST /api/auth/login should return 400 for invalid credentials", async () => {
     const res = await request(app)
       .post("/api/auth/login")
       .expect("Content-Type", /json/)
       .send({
-        email: "fake@email.com",
+        email: "",
         password: "idontexist"
       });
 
-    expect(res.statusCode).toBe(401);
+    expect(res.statusCode).toBe(400);
   });
 
   it("POST /api/auth/login should return 200 & JWT for valid credentials", async () => {

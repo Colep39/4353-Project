@@ -16,9 +16,22 @@ const columns = [
   { key: "full_name", label: "Volunteer" },
   { key: "email", label: "Email" },
   { key: "event_name", label: "Event" },
-  { key: "hours", label: "Hours" },
-  { key: "date", label: "Date" },
+  { key: "event_start_date", label: "Start" },
+  { key: "event_end_date", label: "End" },
+  { key: "event_urgency", label: "Urgency" },
+  { key: "user_skills_len", label: "Skill Count" },
 ];
+
+function formatDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
 
 export default function VolunteerReportTable({ data = [] }) {
   const [sortConfig, setSortConfig] = useState({
@@ -101,8 +114,11 @@ export default function VolunteerReportTable({ data = [] }) {
               <TableCell>{row.full_name}</TableCell>
               <TableCell>{row.email}</TableCell>
               <TableCell>{row.event_name}</TableCell>
-              <TableCell>{row.hours}</TableCell>
-              <TableCell>{row.date}</TableCell>
+              <TableCell>{formatDate(row.event_start_date)}</TableCell>
+              <TableCell>{formatDate(row.event_end_date)}</TableCell>
+              <TableCell>{row.event_urgency}</TableCell>
+              <TableCell>{row.user_skills_len}</TableCell>
+
             </TableRow>
           ))}
         </TableBody>

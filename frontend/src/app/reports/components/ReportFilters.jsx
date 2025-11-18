@@ -24,7 +24,8 @@ export default function ReportFilters({ onChange }) {
     endDate: "",
     search: "",
     skill: "",
-    minHours: "",
+    minSkills: "",
+    urgency: "", 
   });
 
   const [dateRange, setDateRange] = useState({
@@ -125,15 +126,28 @@ export default function ReportFilters({ onChange }) {
           </Select>
         </div>
 
-        {/* Min hours */}
+        {/* Event Urgency */}
         <div>
-          <Label>Minimum Hours</Label>
-          <Input
-            type="number"
-            placeholder="e.g. 2"
-            onChange={(e) => updateField("minHours", e.target.value)}
-          />
+          <Label>Event Urgency</Label>
+          <Select onValueChange={(val) => updateField("urgency", val)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select urgency" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">Low</SelectItem>
+              <SelectItem value="2">Medium</SelectItem>
+              <SelectItem value="3">High</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+
+        <Label>Minimum Skills</Label>
+        <Input
+          type="number"
+          placeholder="e.g. 2"
+          onChange={(e) => updateField("minSkills", e.target.value)}
+        />
+
       </CardContent>
     </Card>
   );

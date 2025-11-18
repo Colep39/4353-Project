@@ -12,8 +12,11 @@ import {
 import { Download, FileSpreadsheet, FileText } from "lucide-react";
 
 export default function ExportButtons({ reportType, filters }) {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL; // ✅ Use your env style
   const query = new URLSearchParams(filters).toString();
-  const basePath = `/api/reports/export/${reportType}`;
+
+  // Export endpoints now point to backend, not Next.js
+  const basePath = `${API_URL}/api/reports/export/${reportType}`;
 
   return (
     <div className="flex justify-end pt-4">
@@ -28,6 +31,8 @@ export default function ExportButtons({ reportType, filters }) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Download as</DropdownMenuLabel>
           <DropdownMenuSeparator />
+
+          {/* CSV Export */}
           <DropdownMenuItem asChild>
             <a
               href={`${basePath}/csv?${query}`}
@@ -37,6 +42,8 @@ export default function ExportButtons({ reportType, filters }) {
               CSV
             </a>
           </DropdownMenuItem>
+
+          {/* PDF Export */}
           <DropdownMenuItem asChild>
             <a
               href={`${basePath}/pdf?${query}`}

@@ -14,10 +14,23 @@ import { ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 
 const columns = [
   { key: "event_name", label: "Event" },
-  { key: "date", label: "Date" },
+  { key: "event_start_date", label: "Start" },
+  { key: "event_end_date", label: "End" },
+  { key: "event_urgency", label: "Urgency" },
   { key: "volunteer_name", label: "Volunteer" },
-  { key: "hours", label: "Hours" },
+  { key: "volunteer_skills_len", label: "Volunteer Skill Count" },
 ];
+
+function formatDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
 
 export default function EventReportTable({ data = [] }) {
   const [sortConfig, setSortConfig] = useState({
@@ -96,12 +109,15 @@ export default function EventReportTable({ data = [] }) {
           {pageData.map((row, index) => (
             <TableRow key={index} className="hover:bg-gray-50">
               <TableCell>{row.event_name}</TableCell>
-              <TableCell>{row.date}</TableCell>
+              <TableCell>{formatDate(row.event_start_date)}</TableCell>
+              <TableCell>{formatDate(row.event_end_date)}</TableCell>
+              <TableCell>{row.event_urgency}</TableCell>
               <TableCell>{row.volunteer_name}</TableCell>
-              <TableCell>{row.hours}</TableCell>
+              <TableCell>{row.volunteer_skills_len}</TableCell>
             </TableRow>
           ))}
         </TableBody>
+
       </Table>
 
       {/* Pagination footer */}

@@ -21,6 +21,16 @@ const columns = [
   { key: "volunteer_skills_len", label: "Volunteer Skill Count" },
 ];
 
+function formatDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+
 
 export default function EventReportTable({ data = [] }) {
   const [sortConfig, setSortConfig] = useState({
@@ -99,8 +109,8 @@ export default function EventReportTable({ data = [] }) {
           {pageData.map((row, index) => (
             <TableRow key={index} className="hover:bg-gray-50">
               <TableCell>{row.event_name}</TableCell>
-              <TableCell>{row.event_start_date}</TableCell>
-              <TableCell>{row.event_end_date}</TableCell>
+              <TableCell>{formatDate(row.event_start_date)}</TableCell>
+              <TableCell>{formatDate(row.event_end_date)}</TableCell>
               <TableCell>{row.event_urgency}</TableCell>
               <TableCell>{row.volunteer_name}</TableCell>
               <TableCell>{row.volunteer_skills_len}</TableCell>

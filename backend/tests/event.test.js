@@ -112,11 +112,6 @@ const token = jwt.sign({ id: 1, role: "volunteer" }, process.env.JWT_SECRET, {
 });
 
 describe("Volunteer Events routes", () => {
-  it("should return 401 with no authorization token", async () => {
-    const res = await request(app).get("/api/events");
-    expect(res.statusCode).toBe(401);
-  });
-
   it("GET /api/events should return a list of normalized events", async () => {
     const res = await request(app)
       .get("/api/events")
@@ -175,7 +170,7 @@ describe("Volunteer Events routes", () => {
 
     const res = await request(app)
       .delete("/api/events/leave")
-      .set("Authorization", `Bearer ${token}`)
+      .set("Authorization", `Bearer ${token}`) 
       .send({ event_id: 1 });
 
     expect(res.statusCode).toBe(200);

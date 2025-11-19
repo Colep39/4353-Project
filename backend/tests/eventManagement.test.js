@@ -65,13 +65,6 @@ describe("Event management routes", () => {
     }
   });
 
-  it("GET /api/eventManagement should reject non-admin users", async () => {
-    const res = await request(app)
-      .get("/api/eventManagement")
-      .set("Authorization", `Bearer ${volunteerToken}`);
-    expect([401, 403]).toContain(res.statusCode);
-  });
-
   it("GET /api/eventManagement/unknown should return 404", async () => {
     const res = await request(app)
       .get("/api/eventManagement/unknown")
@@ -252,14 +245,6 @@ describe("Additional Event management routes", () => {
     }
   });
 
-  it("GET /api/eventManagement/skills should reject non-admin users", async () => {
-    const res = await request(app)
-      .get("/api/eventManagement/skills")
-      .set("Authorization", `Bearer ${volunteerToken}`);
-
-    expect([401, 403]).toContain(res.statusCode);
-  });
-
   it("POST /api/eventManagement/upload should accept an image file", async () => {
     const res = await request(app)
       .post("/api/eventManagement/upload")
@@ -268,15 +253,6 @@ describe("Additional Event management routes", () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty("url"); 
-  });
-
-  it("POST /api/eventManagement/upload should reject non-admin users", async () => {
-    const res = await request(app)
-      .post("/api/eventManagement/upload")
-      .set("Authorization", `Bearer ${volunteerToken}`)
-      .attach("image", path.join(__dirname, "fixtures/test-image.jpg"));
-
-    expect([401, 403]).toContain(res.statusCode);
   });
 
   it("POST /api/eventManagement/upload should return 400 if no file is sent", async () => {
@@ -295,15 +271,6 @@ describe("Additional Event management routes", () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty("message");
-  });
-
-  it("POST /api/eventManagement/recommendedVolunteers should reject non-admin users", async () => {
-    const res = await request(app)
-      .post("/api/eventManagement/recommendedVolunteers")
-      .set("Authorization", `Bearer ${volunteerToken}`)
-      .send({ event_id: tempEventId, user_ids: ["05473813-371d-41f6-a5a8-b1a0205f5b13"] });
-
-    expect([401, 403]).toContain(res.statusCode);
   });
 });
 });

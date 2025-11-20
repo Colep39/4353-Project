@@ -112,7 +112,7 @@ const showHeader = !isLoading && normalizedEvents.length > 0
             {event.isRecommended && (
               <div className="absolute top-3 right-3 bg-blue-200 text-gray-800 text-s font-semibold px-3 py-1 rounded-full shadow-md">Recommended Event</div>
             )}
-              <div className="w-[10%] m-2">
+              <div className="w-[10%] h-[180px] m-2">
                 <img src={event.image} alt={event.title} className="object-cover h-full w-full rounded"/>
               </div>
               <div className="w-[90%] p-4 flex flex-col justify-between">

@@ -1,5 +1,5 @@
 const supabaseNoAuth = require('../supabaseNoAuth');
-require('dotenv').config()
+// require('dotenv').config()
 
 async function getSkills(req, res) {
   try {

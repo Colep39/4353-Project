@@ -41,4 +41,8 @@ app.get('/', (req, res) => {
     res.send("API is up and going....");
 });
 
+app.use((req, res) => {
+  res.status(404).json({ message: "Not found" });
+});
+
 module.exports = app;

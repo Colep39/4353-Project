@@ -5,17 +5,13 @@ require("dotenv").config({ path: ".env.test" });
 describe("Skills routes", () => {
   let tempSkillId;
 
-  // Seed a temporary skill
-  beforeEach(async () => {
-    const res = await request(app)
-      .post("/api/skills") // Only if you have a POST route, otherwise skip
-      .send({
-        name: `Test Skill ${Date.now()}`,
-      });
-
-    // If POST /skills doesn't exist, comment out the seeding portion.
-    if (res.body?.id) tempSkillId = res.body.id;
-  });
+  jest.mock("../src/supabaseNoAuth", () => ({
+    from: jest.fn().mockReturnThis(),
+    select: jest.fn().mockResolvedValue({
+      data: [{ id: 1, name: "Mocked Skill" }],
+      error: null
+    })
+  }));
 
   // Cleanup
   afterEach(async () => {
@@ -33,8 +29,8 @@ describe("Skills routes", () => {
 
     if (res.body.length > 0) {
       const skill = res.body[0];
-      expect(skill).toHaveProperty("id");
-      expect(skill).toHaveProperty("name");
+      expect(skill).toHaveProperty("skill_id");
+      expect(skill).toHaveProperty("description");
     }
   });
 

@@ -73,15 +73,8 @@ export default function Home() {
           </p>
 
           <div className="flex space-x-4 mt-4">
-            {isLogged ? null :
-            <Link href="/register">
-              <button className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition transform hover:scale-105 cursor-pointer">
-                Join Now
-              </button>
-            </Link>
-    }
             <Link href="/aboutUs">
-              <button className="px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-100 transition transform hover:scale-105 cursor-pointer">
+              <button className="px-6 py-3 bg-red-500 text-black rounded-lg hover:bg-red-600 transition transform hover:scale-105 cursor-pointer">
                 Learn More
               </button>
             </Link>

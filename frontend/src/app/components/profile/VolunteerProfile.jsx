@@ -14,7 +14,6 @@ export default function VolunteerProfile() {
   const [isProfileIncomplete, setIsProfileIncomplete] = useState(false);
   const { user, setUser } = useUserStore();
 
-
   // Reference data
   const [states, setStates] = useState([]);
   const [skills, setSkills] = useState([]);
@@ -284,26 +283,35 @@ export default function VolunteerProfile() {
     </p>
   );
 
+  if (!localuser) {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-white">
+        <Loading />
+      </div>
+    );
+  }
+
   return (
     <>
-      <div
-      className="min-h-[calc(100vh-4rem)] flex justify-center bg-cover bg-center bg-no-repeat p-6 relative"
-      style={{ backgroundImage: "url('/Cherry Blossoms.jpg')" }}
-      >
-          {/* Background overlay */}
-          <div className="absolute inset-0 bg-black/40" />
+      {/* PAGE BACKGROUND */}
+        <div
+          className="min-h-[calc(100vh-4rem)] flex justify-center bg-cover bg-center bg-no-repeat p-6 relative"
+          style={{ backgroundImage: "url('/Cherry Blossoms.jpg')" }}
+        >
+          <div className="absolute inset-0 bg-black/40 animate-fadeIn" />
 
-          {/* Profile content card */}
-          <div className="relative z-10 bg-white/85 backdrop-blur-md p-6 rounded-2xl shadow-2xl max-w-3xl w-full my-10 animate-fadeIn self-start">
-            {/* Conditional loading inside the card */}
+          {/* PROFILE CARD */}
+          <div className="relative z-10 bg-white/85 backdrop-blur-md p-6 rounded-2xl shadow-2xl max-w-3xl w-full my-10 animate-fadeInUp self-start">
+
+            {/* LOADING SPINNER *INSIDE* PROFILE CARD */}
             {!localuser ? (
               <div className="flex justify-center items-center py-20">
                 <Loading />
               </div>
             ) : (
               <>
-                {/* Header */}
-                <div className="flex items-center gap-5 border-b pb-5 mb-5">
+                {/* HEADER */}
+                <div className="flex items-center gap-5 border-b pb-5 mb-5 animate-fadeInUp">
                   <Image
                     src={user?.profile_photo || "/images/avatars/cole.jpg"}
                     alt={form.name || "Unnamed User"}
@@ -324,6 +332,7 @@ export default function VolunteerProfile() {
                   </div>
                 </div>
 
+                {/* PROFILE INCOMPLETE WARNING */}
                 {isProfileIncomplete && (
                   <div className="bg-red-100 text-red-800 px-4 py-3 rounded-lg mb-4 font-semibold shadow">
                     ⚠️ Your profile is incomplete.  
@@ -331,8 +340,8 @@ export default function VolunteerProfile() {
                   </div>
                 )}
 
-                {/* Contact & Preferences */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {/* CONTACT & PREFERENCES */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 animate-fadeInUp">
                   <div>
                     <h2 className="text-lg font-semibold text-red-600 mb-2">
                       Contact Information
@@ -369,13 +378,13 @@ export default function VolunteerProfile() {
                   </div>
                 </div>
 
-                {/* Skills & Availability */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* SKILLS */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeInUp">
                   <div>
                     <h2 className="text-lg font-semibold text-red-600 mb-2">
                       Skills
                     </h2>
-                    {selectedSkills && selectedSkills.length > 0 ? (
+                    {selectedSkills.length > 0 ? (
                       <div className="relative max-h-48 overflow-y-auto bg-white/60 rounded-lg p-3 border border-gray-200">
                         <ul className="list-disc list-inside text-gray-700 space-y-1">
                           {selectedSkills.map((skill, idx) => (
@@ -387,30 +396,9 @@ export default function VolunteerProfile() {
                       <MissingField text="No skills specified." />
                     )}
                   </div>
-                  {/* 
-                  <div>
-                    <h2 className="text-lg font-semibold text-red-600 mb-2">
-                      Availability
-                    </h2>
-                    {selectedDates && selectedDates.length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {selectedDates.map((d) => (
-                          <span
-                            key={d}
-                            className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm"
-                          >
-                            {new Date(d).toLocaleDateString()}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <MissingField text="No availability set." />
-                    )}
-                  </div>
-                  */}
                 </div>
 
-                {/* Edit button */}
+                {/* EDIT BUTTON */}
                 <div className="mt-8 flex justify-end">
                   <button
                     onClick={openModal}
@@ -426,14 +414,12 @@ export default function VolunteerProfile() {
           {profileModalOpen &&
             createPortal(
               <div
-                className="
-                  fixed top-[4rem] left-0 right-0 bottom-0 z-[150]
-                  flex items-center justify-center
-                  bg-white/10 backdrop-blur-lg backdrop-saturate-150
-                  transition-all duration-200
-                "
+                className="fixed top-[4rem] left-0 right-0 bottom-0 z-[150]
+                          flex items-center justify-center
+                          bg-white/10 backdrop-blur-lg backdrop-saturate-150
+                          transition-all duration-200 animate-fadeIn"
               >
-                <div className="bg-white rounded-2xl shadow-2xl p-6 w-[90%] max-w-3xl max-h-[90vh] overflow-y-auto relative">
+                <div className="bg-white rounded-2xl shadow-2xl p-6 w-[90%] max-w-3xl animate-scaleIn max-h-[90vh] overflow-y-auto relative">
                   <h2 className="text-2xl font-semibold mb-4 text-gray-800">
                     Edit Profile
                   </h2>

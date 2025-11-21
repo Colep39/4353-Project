@@ -17,7 +17,7 @@ export default function ProfilePage(){
     useEffect(() => {
         const storedRole = localStorage.getItem("role");
         setRole(storedRole);
-    })
+    }, []);
 
     return(
         <>

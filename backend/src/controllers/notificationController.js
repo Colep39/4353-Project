@@ -14,7 +14,7 @@ async function getNotifications(req, res) {
             return res.status(401).json({ error: "Invalid or expired token" });
         }
 
-        const userId = Number(req.params.id);
+       const userId = data.user.id; 
 
         const { data: notifications, error: notificationsError } = await supabaseNoAuth
             .from("notifications")

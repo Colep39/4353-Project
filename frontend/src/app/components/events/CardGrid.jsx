@@ -9,6 +9,7 @@ const outfit = Outfit({
   variable: "--font-outfit",
 });
 
+const transitionClasses = "transition-all duration-500 ease-out";
 
 const urgencyIntToString = { 4: "Critical", 3: "High", 2: "Medium", 1: "Low" };
 
@@ -105,23 +106,33 @@ const showHeader = !isLoading && normalizedEvents.length > 0
             </div>
           </div>
         ) : (
-          filteredAndSortedEvents.map((event) => (
-            <div key={event.id} className={`relative min-h-[20vh] mt-2 ml-2 flex bg-white rounded-lg shadow-md overflow-hidden ${tooltip ? "hover:outline hover:outline-black cursor-pointer" : ""}`}
-                {...(tooltipText ? { title: tooltipText } : {})} {...(tooltip ? { onClick: () => onEventClick(event) } : {})}>
-            
-            {event.isRecommended && (
-              <div className="absolute top-3 right-3 bg-blue-200 text-gray-800 text-s font-semibold px-3 py-1 rounded-full shadow-md">Recommended Event</div>
-            )}
+          filteredAndSortedEvents.map((event, index) => (
+            <div
+              key={event.id}
+              className={`relative min-h-[20vh] mt-2 ml-2 flex bg-white rounded-xl shadow-sm overflow-hidden
+                          ${tooltip ? "hover:outline hover:outline-black cursor-pointer" : ""}
+                          transform hover:scale-[1.01] hover:shadow-lg transition-all duration-300 ease-out
+                          opacity-0 translate-y-3 animate-fadeSlideIn`}
+              style={{ animationDelay: `${index * 80}ms` }}
+              title={tooltip ? "Click to edit event" : ""}
+              onClick={tooltip ? () => onEventClick(event) : undefined}
+            >
+              {event.isRecommended && (
+                <div className="absolute top-3 right-3 bg-blue-200 text-gray-800 text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                  Recommended Event
+                </div>
+              )}
+
               <div className="w-[10%] h-[180px] m-2">
-                <img src={event.image} alt={event.title} className="object-cover h-full w-full rounded"/>
+                <img src={event.image} alt={event.title} className="object-cover h-full w-full rounded" />
               </div>
+
               <div className="w-[90%] p-4 flex flex-col justify-between">
                 <h2 className="text-xl font-semibold">{event.title}</h2>
+
                 <div className="text-sm text-gray-500 mb-2 flex flex-wrap gap-x-4 gap-y-1">
                   {event.location && (
-                    <span>
-                      <strong>Location:</strong> {event.location}
-                    </span>
+                    <span><strong>Location:</strong> {event.location}</span>
                   )}
                   {event.date.start && (
                     <span>
@@ -131,38 +142,40 @@ const showHeader = !isLoading && normalizedEvents.length > 0
                         : format(event.date.start, "MMM dd, yyyy")}
                     </span>
                   )}
-                  <span>
-                    <strong>Urgency:</strong> {urgencyIntToString[event.urgency] || "Low"}
-                  </span>
+                  <span><strong>Urgency:</strong> {urgencyIntToString[event.urgency] || "Low"}</span>
                 </div>
-                {event.skills && event.skills.length > 0 && (
+
+                {event.skills?.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-2">
                     {event.skills.map((skill, idx) => {
                       const skillLabel = typeof skill === "string" ? skill : skill.description || "";
                       return (
-                        <span
-                          key={idx}
-                          className="bg-red-100 text-gray-900 text-xs px-2 py-1 rounded-full"
-                        >
+                        <span key={idx} className="bg-red-100 text-gray-900 text-xs px-2 py-1 rounded-full">
                           {skillLabel}
                         </span>
                       );
                     })}
                   </div>
                 )}
+
                 <p className="text-gray-700">{event.description}</p>
+
                 {showButton ? (
                   <div className="mt-2">
-                    <button className="bg-red-100 border border-black rounded px-4 py-1 text-sm font-medium hover:bg-red-300 cursor-pointer"
+                    <button
+                      className="bg-red-100 border border-black rounded px-4 py-1 text-sm font-medium hover:bg-red-300 cursor-pointer transition-all duration-200"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (onToggleJoin) {
-                          onToggleJoin(event.id);
-                        } else if (onMatchVolunteers) {
-                          onMatchVolunteers(event);
-                        }
-                      }}>
-                      {onToggleJoin ? joinedEventIds.includes(event.id) ? "Leave Event" : "Join Event" : buttonLabel}
+                        onToggleJoin
+                          ? onToggleJoin(event.id)
+                          : onMatchVolunteers?.(event);
+                      }}
+                    >
+                      {onToggleJoin
+                        ? joinedEventIds.includes(event.id)
+                          ? "Leave Event"
+                          : "Join Event"
+                        : buttonLabel}
                     </button>
                   </div>
                 ) : (
@@ -173,7 +186,8 @@ const showHeader = !isLoading && normalizedEvents.length > 0
               </div>
             </div>
           ))
-        )}
+
+          )}
       </div>
     </div>
   );

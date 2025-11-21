@@ -15,20 +15,16 @@ const bungee = Bungee({
 
 const outfit = Outfit({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"], // choose what you want
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-outfit",
 });
-
-
 
 const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("role");
   localStorage.removeItem("refresh_token");
-  
   window.location.href = "/login";
 };
-
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -181,8 +177,8 @@ export default function Navbar() {
                   href={link.href}
                   className={`relative px-3 py-1 rounded-lg transition-all duration-300 
                     ${pathname === link.href 
-                      ? "bg-red-500/40 text-red-100  scale-105" 
-                      : "hover:bg-red-400/30 hover:text-red-100 "}`
+                      ? "bg-red-500 text-red-100  scale-105" 
+                      : "hover:bg-red-400 hover:text-red-100 "}`
                   }
                 >
                   {link.name}

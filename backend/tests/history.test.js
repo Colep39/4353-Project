@@ -82,7 +82,7 @@ describe("Volunteer History routes", () => {
     expect(res.statusCode).toBe(404);
   });
 
-  it("Should return 500 when Supabase returns error on volunteer history", async () => {
+  it("Should return 500 when supabase returns error on volunteer history", async () => {
     supabase.from.mockReturnValueOnce({
       select: jest.fn().mockReturnThis(),
       eq: jest.fn().mockResolvedValueOnce({

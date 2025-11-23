@@ -1,124 +1,180 @@
+const request = require("supertest");
+const app = require("../src/app");
 const supabase = require("../src/supabaseNoAuth");
-const jwt = require("jsonwebtoken");
 
 jest.mock("../src/supabaseNoAuth", () => {
   return {
     auth: {
-      getUser: jest.fn().mockResolvedValue({
-        data: { user: { id: 2 } },
-        error: null
-      })
+      getUser: jest.fn()
     },
-
-    from: jest.fn((table) => {
-      if (table === "volunteer_history") {
-        return {
-          select: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockResolvedValue({
-            data: [{ event_id: 123 }],
-            error: null
-          })
-        };
-      }
-
-      if (table === "events") {
-        return {
-          select: jest.fn().mockReturnThis(),
-          lt: jest.fn().mockReturnThis(),
-          in: jest.fn().mockResolvedValue({
-            data: [
-              {
-                event_id: 123,
-                event_name: "Mock Event",
-                event_description: "Mock Desc",
-                event_urgency: 1,
-                location: "Houston",
-                event_image: "/img/mock.jpg",
-                start_date: new Date(2024, 1, 1).toISOString(),
-                end_date: new Date(2024, 1, 2).toISOString(),
-                event_skills: [
-                  { skills: { skill_id: 1, description: "Mock Skill" } }
-                ]
-              }
-            ],
-            error: null
-          })
-        };
-      }
-
-      return {};
-    })
+    from: jest.fn()
   };
 });
 
+const token = "mock-token";
 
-const request = require("supertest");
-const app = require("../src/app");
-require("dotenv").config({ path: ".env.test" });
+describe("GET /api/volunteerHistory", () => {
+  beforeEach(() => jest.clearAllMocks());
 
-const token = "mock-token"; 
-
-describe("Volunteer History routes", () => {
-  let tempEventId;
-
-  afterEach(async () => {
-    if (tempEventId) {
-      await request(app)
-        .delete(`/api/eventManagement/${tempEventId}`)
-        .set("Authorization", `Bearer ${token}`);
-    }
-  });
-
-  it("should return 401 when missing token", async () => {
+  it("returns 401 when no token provided", async () => {
     const res = await request(app).get("/api/volunteerHistory");
-    expect(res.statusCode).toBe(401);
+    expect(res.status).toBe(401);
   });
 
-  it("GET /api/volunteerHistory/:badId returns 404", async () => {
+  it("returns 401 when getUser returns error", async () => {
+    supabase.auth.getUser.mockResolvedValueOnce({
+      data: null,
+      error: { message: "Bad token" }
+    });
+
     const res = await request(app)
-      .get("/api/volunteerHistory/9999")
+      .get("/api/volunteerHistory")
       .set("Authorization", `Bearer ${token}`);
 
-    expect(res.statusCode).toBe(404);
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe("Bad token");
   });
 
-  it("Should return 500 when supabase returns error on volunteer history", async () => {
+  it("returns 401 when getUser returns null user", async () => {
+    supabase.auth.getUser.mockResolvedValueOnce({
+      data: { user: null },
+      error: null
+    });
+
+    const res = await request(app)
+      .get("/api/volunteerHistory")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 500 when volunteer_history query errors", async () => {
+    supabase.auth.getUser.mockResolvedValueOnce({
+      data: { user: { id: 1 } },
+      error: null
+    });
+
     supabase.from.mockReturnValueOnce({
       select: jest.fn().mockReturnThis(),
       eq: jest.fn().mockResolvedValueOnce({
         data: null,
-        error: { message: "DB error" }
+        error: { message: "DB FAILED" }
       })
-    })
+    });
 
     const res = await request(app)
       .get("/api/volunteerHistory")
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.status).toBe(500);
-    expect(res.body.error).toBe("DB error");
+    expect(res.body.error).toBe("DB FAILED");
   });
 
-  it("GET /api/volunteerHistory returns array of volunteer history", async () => {
+  it("returns empty array when volunteer_history is empty", async () => {
+    supabase.auth.getUser.mockResolvedValueOnce({
+      data: { user: { id: 1 } },
+      error: null
+    });
+
+    supabase.from.mockReturnValueOnce({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockResolvedValueOnce({
+        data: [],
+        error: null
+      })
+    });
+
     const res = await request(app)
       .get("/api/volunteerHistory")
       .set("Authorization", `Bearer ${token}`);
 
-    expect(res.headers["content-type"]).toMatch(/json/);
-    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([]);
+  });
 
-    if (res.body.length > 0) {
-      expect(
-        res.body.every(
-          (x) =>
-            x.hasOwnProperty("id") &&
-            x.hasOwnProperty("title") &&
-            x.hasOwnProperty("date") &&
-            x.hasOwnProperty("urgency") &&
-            x.hasOwnProperty("description") &&
-            x.hasOwnProperty("image")
-        )
-      ).toBe(true);
-    }
+  it("returns 500 when events table errors", async () => {
+    supabase.auth.getUser.mockResolvedValueOnce({
+      data: { user: { id: 1 } },
+      error: null
+    });
+
+    supabase.from.mockReturnValueOnce({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockResolvedValueOnce({
+        data: [{ event_id: 10 }],
+        error: null
+      })
+    });
+
+    supabase.from.mockReturnValueOnce({
+      select: jest.fn().mockReturnThis(),
+      lt: jest.fn().mockReturnThis(),
+      in: jest.fn().mockResolvedValueOnce({
+        data: null,
+        error: { message: "EVENTS FAIL" }
+      })
+    });
+
+    const res = await request(app)
+      .get("/api/volunteerHistory")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(500);
+    expect(res.body.error).toBe("EVENTS FAIL");
+  });
+
+  it("returns normalized event structure", async () => {
+    supabase.auth.getUser.mockResolvedValueOnce({
+      data: { user: { id: 1 } },
+      error: null
+    });
+
+    supabase.from.mockReturnValueOnce({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockResolvedValueOnce({
+        data: [{ event_id: 123 }],
+        error: null
+      })
+    });
+
+    supabase.from.mockReturnValueOnce({
+      select: jest.fn().mockReturnThis(),
+      lt: jest.fn().mockReturnThis(),
+      in: jest.fn().mockResolvedValueOnce({
+        data: [
+          {
+            event_id: 123,
+            event_name: "Mock Event",
+            event_description: "Desc",
+            event_urgency: 2,
+            location: "Houston",
+            event_image: "/img/a.jpg",
+            start_date: "2024-02-01T00:00:00.000Z",
+            end_date: "2024-02-02T00:00:00.000Z",
+            event_skills: [
+              { skills: { skill_id: 2, description: "Zeta" } },
+              { skills: { skill_id: 1, description: "Alpha" } }
+            ]
+          }
+        ],
+        error: null
+      })
+    });
+
+    const res = await request(app)
+      .get("/api/volunteerHistory")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.length).toBe(1);
+
+    const item = res.body[0];
+    expect(item.id).toBe(123);
+    expect(item.title).toBe("Mock Event");
+
+    expect(item.skills.map(s => s.description)).toEqual(["Alpha", "Zeta"]);
+
+    expect(typeof item.date.start).toBe("string");
+    expect(typeof item.date.end).toBe("string");
   });
 });

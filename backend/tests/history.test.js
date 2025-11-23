@@ -1,3 +1,4 @@
+const supabase = require("../src/supabaseNoAuth");
 const jwt = require("jsonwebtoken");
 
 jest.mock("../src/supabaseNoAuth", () => {
@@ -79,6 +80,23 @@ describe("Volunteer History routes", () => {
       .set("Authorization", `Bearer ${token}`);
 
     expect(res.statusCode).toBe(404);
+  });
+
+  it("Should return 500 when Supabase returns error on volunteer history", async () => {
+    supabase.from.mockReturnValueOnce({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockResolvedValueOnce({
+        data: null,
+        error: { message: "DB error" }
+      })
+    })
+
+    const res = await request(app)
+      .get("/api/volunteerHistory")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(500);
+    expect(res.body.error).toBe("DB error");
   });
 
   it("GET /api/volunteerHistory returns array of volunteer history", async () => {

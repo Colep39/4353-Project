@@ -1,41 +1,57 @@
-const request = require("supertest");
-const app = require("../src/app");
-require("dotenv").config({ path: ".env.test" });
+jest.mock("../src/supabaseNoAuth");
 
-describe("Skills routes", () => {
-  let tempSkillId;
+const supabaseNoAuth = require("../src/supabaseNoAuth");
+const { getSkills } = require("../src/controllers/skillsController");
 
-  jest.mock("../src/supabaseNoAuth", () => ({
-    from: jest.fn().mockReturnThis(),
-    select: jest.fn().mockResolvedValue({
-      data: [{ id: 1, name: "Mocked Skill" }],
-      error: null
-    })
-  }));
+describe("getSkills Controller", () => {
+  let req, res;
 
-  // Cleanup
-  afterEach(async () => {
-    if (tempSkillId) {
-      await request(app).delete(`/api/skills/${tempSkillId}`);
-    }
+  beforeEach(() => {
+    req = {};
+    res = {
+      status: jest.fn(() => res),
+      json: jest.fn()
+    };
+
+    supabaseNoAuth.from.mockReset();
   });
 
-  it("GET /api/skills should return a JSON array of skills", async () => {
-    const res = await request(app).get("/api/skills");
+  it("returns 200 and skill list on success", async () => {
+    supabaseNoAuth.from.mockReturnValue({
+      select: jest.fn().mockResolvedValue({
+        data: [{ id: 1, name: "Mock Skill" }],
+        error: null
+      })
+    });
 
-    expect(res.statusCode).toBe(200);
-    expect(res.headers["content-type"]).toMatch(/json/);
-    expect(Array.isArray(res.body)).toBe(true);
+    await getSkills(req, res);
 
-    if (res.body.length > 0) {
-      const skill = res.body[0];
-      expect(skill).toHaveProperty("skill_id");
-      expect(skill).toHaveProperty("description");
-    }
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith([{ id: 1, name: "Mock Skill" }]);
   });
 
-  it("GET /api/skills/unknown should return 404 for invalid route", async () => {
-    const res = await request(app).get("/api/skills/unknown");
-    expect(res.statusCode).toBe(404);
+  it("returns 500 when supabase returns error", async () => {
+    supabaseNoAuth.from.mockReturnValue({
+      select: jest.fn().mockResolvedValue({
+        data: null,
+        error: new Error("DB failed")
+      })
+    });
+
+    await getSkills(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ message: "Failed to load skills" });
+  });
+
+  it("returns 500 when an exception occurs", async () => {
+    supabaseNoAuth.from.mockImplementation(() => {
+      throw new Error("Unexpected");
+    });
+
+    await getSkills(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ message: "Failed to load skills" });
   });
 });

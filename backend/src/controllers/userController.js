@@ -170,7 +170,7 @@ async function isProfileComplete(userId){
     const { data: profile, error} = await supabaseNoAuth
         .from("user_profile")
         .select(`
-            full_,name, address_1, city, zipcode, state_id,
+            full_name, address_1, city, zipcode, state_id,
             skills:user_skills(skill_id),
             availability
         `)
@@ -181,12 +181,14 @@ async function isProfileComplete(userId){
         return false;
     }
 
-    const hasRequiredFields =
-    profile.full_name &&
-    profile.address_1 &&
-    profile.city &&
-    profile.zipcode &&
-    profile.state_id;
+    const hasRequiredFields = !!(
+        profile.full_name &&
+        profile.address_1 &&
+        profile.city &&
+        profile.zipcode &&
+        profile.state_id
+    );
+
 
     const hasSkills = Array.isArray(profile.skills) && profile.skills.length > 0;
     const hasAvailability = Array.isArray(profile.availability) && profile.availability.length > 0;

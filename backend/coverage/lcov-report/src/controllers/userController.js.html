@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">73.91% </span>
+                <span class="strong">84.05% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>51/69</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">56.66% </span>
-                <span class="quiet">Branches</span>
-                <span class='fraction'>34/60</span>
+                <span class='fraction'>58/69</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">83.33% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>5/6</span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>50/60</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75.75% </span>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>6/6</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">86.36% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>50/66</span>
+                <span class='fraction'>57/66</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -259,7 +259,9 @@
 <a name='L194'></a><a href='#L194'>194</a>
 <a name='L195'></a><a href='#L195'>195</a>
 <a name='L196'></a><a href='#L196'>196</a>
-<a name='L197'></a><a href='#L197'>197</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">7x</span>
+<a name='L197'></a><a href='#L197'>197</a>
+<a name='L198'></a><a href='#L198'>198</a>
+<a name='L199'></a><a href='#L199'>199</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -428,7 +430,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -438,21 +440,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span></td><td class="text"><pre class="prettyprint lang-js">const supabaseNoAuth = require('../supabaseNoAuth');
@@ -623,32 +627,34 @@ async function updateAdminProfile(req, res){
     }
 }
 &nbsp;
-async function <span class="fstat-no" title="function not covered" >isProfileComplete(</span>userId){
-    const { data: profile, error} = <span class="cstat-no" title="statement not covered" >await supabaseNoAuth</span>
+async function isProfileComplete(userId){
+    const { data: profile, error} = await supabaseNoAuth
         .from("user_profile")
         .select(`
-            full_,name, address_1, city, zipcode, state_id,
+            full_name, address_1, city, zipcode, state_id,
             skills:user_skills(skill_id),
             availability
         `)
         .eq("user_id", userId)
         .single();
     
-<span class="cstat-no" title="statement not covered" >    if (error || !profile) {</span>
-<span class="cstat-no" title="statement not covered" >        return false;</span>
+    if (error || !profile) {
+        return false;
     }
 &nbsp;
-    const hasRequiredFields =
-<span class="cstat-no" title="statement not covered" >    profile.full_name &amp;&amp;</span>
-    profile.address_1 &amp;&amp;
-    profile.city &amp;&amp;
-    profile.zipcode &amp;&amp;
-    profile.state_id;
+    const hasRequiredFields = !!(
+        profile.full_name &amp;&amp;
+        profile.address_1 &amp;&amp;
+        profile.city &amp;&amp;
+        profile.zipcode &amp;&amp;
+        profile.state_id
+    );
 &nbsp;
-    const hasSkills = <span class="cstat-no" title="statement not covered" >Array.isArray(profile.skills) &amp;&amp; profile.skills.length &gt; 0;</span>
-    const hasAvailability = <span class="cstat-no" title="statement not covered" >Array.isArray(profile.availability) &amp;&amp; profile.availability.length &gt; 0;</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return hasRequiredFields &amp;&amp; hasSkills &amp;&amp; hasAvailability;</span>
+    const hasSkills = Array.isArray(profile.skills) &amp;&amp; profile.skills.length &gt; 0;
+    const hasAvailability = Array.isArray(profile.availability) &amp;&amp; profile.availability.length &gt; 0;
+&nbsp;
+    return hasRequiredFields &amp;&amp; hasSkills &amp;&amp; hasAvailability;
 }
 &nbsp;
 module.exports = { getUserProfile, updateProfile, updateAdminProfile, isProfileComplete };</pre></td></tr></table></pre>
@@ -658,7 +664,7 @@ module.exports = { getUserProfile, updateProfile, updateAdminProfile, isProfileC
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-23T00:52:00.072Z
+                at 2025-11-23T19:24:19.935Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

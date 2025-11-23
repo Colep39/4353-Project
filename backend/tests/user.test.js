@@ -1,4 +1,5 @@
 require("dotenv").config({ path: ".env.test" });
+process.env.NODE_ENV = "test";
 
 const supabase = require("../src/supabaseNoAuth");
 jest.mock("../src/supabaseNoAuth");
@@ -24,16 +25,19 @@ describe("User routes", () => {
     eq: jest.fn().mockReturnThis(),
     single: jest.fn(),
     or: jest.fn().mockReturnThis(),
-    in: jest.fn().mockReturnThis()
+    in: jest.fn().mockReturnThis(),
   };
 
   beforeEach(() => {
     callIndex = 0;
+
     supabase.from.mockImplementation(() => mockTable);
+
     supabase.auth.getUser.mockResolvedValue({
       data: { user: { id: 1 } },
-      error: null
+      error: null,
     });
+
     mockTable.select.mockClear();
     mockTable.update.mockClear();
     mockTable.delete.mockClear();
@@ -47,11 +51,13 @@ describe("User routes", () => {
   it("GET /api/users/:id returns profile", async () => {
     mockTable.single.mockResolvedValueOnce({
       data: { full_name: "Cole Harden", city: "Houston" },
-      error: null
+      error: null,
     });
+
     const res = await request(app)
       .get("/api/users/1")
       .set("Authorization", `Bearer ${adminToken}`);
+
     expect(res.statusCode).toBe(200);
     expect(res.body.full_name).toBe("Cole Harden");
   });
@@ -59,30 +65,36 @@ describe("User routes", () => {
   it("GET /api/users/:id returns 401 when invalid token", async () => {
     supabase.auth.getUser.mockResolvedValueOnce({
       data: null,
-      error: new Error("bad token")
+      error: new Error("bad token"),
     });
+
     const res = await request(app)
       .get("/api/users/1")
       .set("Authorization", "Bearer BADTOKEN");
+
     expect(res.statusCode).toBe(401);
   });
 
   it("GET /api/users/:id returns 404 when profile missing", async () => {
     mockTable.single.mockResolvedValueOnce({ data: null, error: null });
+
     const res = await request(app)
       .get("/api/users/123")
       .set("Authorization", `Bearer ${adminToken}`);
+
     expect(res.statusCode).toBe(404);
   });
 
   it("GET /api/users/:id returns 500 on profileError", async () => {
     mockTable.single.mockResolvedValueOnce({
       data: null,
-      error: new Error("profileError")
+      error: new Error("profileError"),
     });
+
     const res = await request(app)
       .get("/api/users/1")
       .set("Authorization", `Bearer ${adminToken}`);
+
     expect(res.statusCode).toBe(500);
   });
 
@@ -93,6 +105,7 @@ describe("User routes", () => {
 
   it("PUT /api/users/:id/update updates profile", async () => {
     mockTable.single.mockResolvedValueOnce({ data: { state_id: 99 } });
+
     const res = await request(app)
       .put("/api/users/1/update")
       .set("Authorization", `Bearer ${adminToken}`)
@@ -100,8 +113,9 @@ describe("User routes", () => {
         full_name: "Cole Hawke",
         city: "Houston",
         state: "TX",
-        skills: []
+        skills: [],
       });
+
     expect(res.statusCode).toBe(200);
   });
 
@@ -116,26 +130,26 @@ describe("User routes", () => {
         return {
           select: jest.fn().mockReturnThis(),
           or: jest.fn().mockReturnThis(),
-          single: jest.fn().mockResolvedValue(stateRow)
+          single: jest.fn().mockResolvedValue(stateRow),
         };
       }
       if (callIndex === 1) {
         callIndex++;
         return {
           update: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis()
+          eq: jest.fn().mockReturnThis(),
         };
       }
       if (callIndex === 2) {
         callIndex++;
         return {
           delete: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis()
+          eq: jest.fn().mockReturnThis(),
         };
       }
       return {
         select: jest.fn().mockReturnThis(),
-        in: jest.fn().mockResolvedValue(emptySkills)
+        in: jest.fn().mockResolvedValue(emptySkills),
       };
     });
 
@@ -146,7 +160,7 @@ describe("User routes", () => {
         full_name: "Tester",
         city: "Nowhere",
         state: "TX",
-        skills: "SkillA, SkillB"
+        skills: "SkillA, SkillB",
       });
 
     expect(res.statusCode).toBe(200);
@@ -163,27 +177,27 @@ describe("User routes", () => {
         return {
           select: jest.fn().mockReturnThis(),
           or: jest.fn().mockReturnThis(),
-          single: jest.fn().mockResolvedValue(stateRow)
+          single: jest.fn().mockResolvedValue(stateRow),
         };
       }
       if (callIndex === 1) {
         callIndex++;
         return {
           update: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis()
+          eq: jest.fn().mockReturnThis(),
         };
       }
       if (callIndex === 2) {
         callIndex++;
         return {
           delete: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis()
+          eq: jest.fn().mockReturnThis(),
         };
       }
       return {
         select: jest.fn().mockReturnThis(),
         in: jest.fn().mockResolvedValue(skillRows),
-        insert: jest.fn().mockResolvedValue({})
+        insert: jest.fn().mockResolvedValue({}),
       };
     });
 
@@ -194,7 +208,7 @@ describe("User routes", () => {
         full_name: "X",
         city: "Y",
         state: "TX",
-        skills: ["A"]
+        skills: ["A"],
       });
 
     expect(res.statusCode).toBe(200);
@@ -203,19 +217,23 @@ describe("User routes", () => {
   it("PUT /api/users/:id/update returns 401 invalid token", async () => {
     supabase.auth.getUser.mockResolvedValueOnce({
       data: null,
-      error: new Error("bad")
+      error: new Error("bad"),
     });
+
     const res = await request(app)
       .put("/api/users/1/update")
       .set("Authorization", "Bearer BAD");
+
     expect(res.statusCode).toBe(401);
   });
 
   it("PUT /api/users/:id/update returns 500 when update fails", async () => {
     mockTable.single.mockResolvedValueOnce({ data: { state_id: 1 } });
+
     mockTable.update.mockImplementationOnce(() => {
       throw new Error("Update failed!");
     });
+
     const res = await request(app)
       .put("/api/users/1/update")
       .set("Authorization", `Bearer ${adminToken}`)
@@ -223,20 +241,141 @@ describe("User routes", () => {
         full_name: "Bad Update",
         city: "Houston",
         state: "TX",
-        skills: []
+        skills: [],
       });
+
     expect(res.statusCode).toBe(500);
   });
 
   it("PUT /api/users/:id/admin/update fails when invalid token", async () => {
     supabase.auth.getUser.mockResolvedValueOnce({
       data: null,
-      error: new Error("expired")
+      error: new Error("expired"),
     });
+
     const res = await request(app)
       .put("/api/users/1/admin/update")
       .set("Authorization", "Bearer BAD")
       .send({ full_name: "Admin" });
+
     expect(res.statusCode).toBe(401);
+  });
+});
+
+describe("User routes - isProfileComplete()", () => {
+  const mockTable = {
+    select: jest.fn().mockReturnThis(),
+    eq: jest.fn().mockReturnThis(),
+    single: jest.fn(),
+  };
+
+  beforeEach(() => {
+    supabase.from.mockImplementation(() => mockTable);
+
+    supabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 1 } },
+      error: null,
+    });
+
+    mockTable.select.mockClear();
+    mockTable.eq.mockClear();
+    mockTable.single.mockClear();
+  });
+
+  it("returns false on supabase error", async () => {
+    mockTable.single.mockResolvedValueOnce({
+      data: null,
+      error: new Error("db err"),
+    });
+
+    const res = await request(app)
+      .get("/api/users/1/isProfileComplete")
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(JSON.parse(res.text)).toBe(false);
+  });
+
+  it("returns false when incomplete fields", async () => {
+    mockTable.single.mockResolvedValueOnce({
+      data: {
+        full_name: null,
+        address_1: "A",
+        city: "C",
+        zipcode: "Z",
+        state_id: 1,
+        skills: [{ skill_id: 1 }],
+        availability: ["M"],
+      },
+      error: null,
+    });
+
+    const res = await request(app)
+      .get("/api/users/1/isProfileComplete")
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(JSON.parse(res.text)).toBe(false);
+  });
+
+  it("returns false when no skills", async () => {
+    mockTable.single.mockResolvedValueOnce({
+      data: {
+        full_name: "X",
+        address_1: "A",
+        city: "C",
+        zipcode: "Z",
+        state_id: 1,
+        skills: [],
+        availability: ["M"],
+      },
+      error: null,
+    });
+
+    const res = await request(app)
+      .get("/api/users/1/isProfileComplete")
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(JSON.parse(res.text)).toBe(false);
+  });
+
+  it("returns false when no availability", async () => {
+    mockTable.single.mockResolvedValueOnce({
+      data: {
+        full_name: "X",
+        address_1: "A",
+        city: "C",
+        zipcode: "Z",
+        state_id: 1,
+        skills: [{ skill_id: 1 }],
+        availability: [],
+      },
+      error: null,
+    });
+
+    const res = await request(app)
+      .get("/api/users/1/isProfileComplete")
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(JSON.parse(res.text)).toBe(false);
+  });
+
+  it("returns true when profile complete", async () => {
+    mockTable.single.mockResolvedValueOnce({
+      data: {
+        full_name: "X",
+        address_1: "A",
+        city: "C",
+        zipcode: "Z",
+        state_id: 1,
+        skills: [{ skill_id: 1 }],
+        availability: ["Mon"],
+      },
+      error: null,
+    });
+
+    const res = await request(app)
+      .get("/api/users/1/isProfileComplete")
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(JSON.parse(res.text)).toBe(true);
   });
 });

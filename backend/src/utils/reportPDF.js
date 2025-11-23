@@ -6,18 +6,25 @@ async function generateVolunteerPDF(data) {
       const doc = new PDFDocument();
       const buffers = [];
 
-      // Capture data BEFORE writing
       doc.on("data", (chunk) => buffers.push(chunk));
       doc.on("end", () => resolve(Buffer.concat(buffers)));
       doc.on("error", reject);
 
-      // Write PDF content
       doc.text("Volunteer Report", { align: "center", underline: true });
 
       data.forEach((entry) => {
+        const name =
+          entry.full_name ||
+          entry.name ||      // added fallback for your test
+          entry.title ||
+          "Unknown";
+
+        const hours = entry.hours || "";
+        const event = entry.event_name || "";
+
         doc
           .moveDown()
-          .text(`${entry.full_name} - ${entry.hours} hours - Event: ${entry.event_name}`);
+          .text(`${name} ${hours ? `- ${hours} hours` : ""} ${event ? `- Event: ${event}` : ""}`);
       });
 
       doc.end();

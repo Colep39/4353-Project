@@ -16,13 +16,10 @@ const register = async (req, res) => {
         });
 }
 
-        const redirectUrl = `https://cougar-connect.vercel.app/callback`;
-
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: { 
-                emailRedirectTo: redirectUrl,
                 data: { role: userType }
             }
         })

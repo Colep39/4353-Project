@@ -1,5 +1,6 @@
 const supabase = require("../supabaseClient");
 const supabaseNoAuth = require("../supabaseNoAuth");
+require("dotenv").config();
 
 const register = async (req, res) => {
     try {
@@ -13,13 +14,17 @@ const register = async (req, res) => {
             return res.status(201).json({
                 id: "test-user-id",
                 message: "Mock registration success"
-        });
-}
+            });
+        }
+
+        const base = process.env.EMAIL_REDIRECT_BASE || req.headers.origin;
+        const redirectUrl = `${base}/callback`;
 
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: { 
+                emailRedirectTo: redirectUrl,
                 data: { role: userType }
             }
         })

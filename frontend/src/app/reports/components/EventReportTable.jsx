@@ -41,7 +41,15 @@ export default function EventReportTable({ data = [] }) {
   const rowsPerPage = 10;
 
   const sortedData = useMemo(() => {
-    const copy = [...data];
+    const filtered = data.filter((row) => {
+      const name = row.volunteer_name;
+      if (!name) return false;
+
+      const cleaned = String(name).trim().toLowerCase();
+      return cleaned !== "" && cleaned !== "null" && cleaned !== "undefined";
+    });
+
+    const copy = [...filtered];
     const { key, direction } = sortConfig;
 
     copy.sort((a, b) => {
@@ -59,6 +67,7 @@ export default function EventReportTable({ data = [] }) {
 
     return copy;
   }, [data, sortConfig]);
+
 
   const totalPages = Math.max(1, Math.ceil(sortedData.length / rowsPerPage));
   const startIdx = (page - 1) * rowsPerPage;

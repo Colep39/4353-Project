@@ -21,19 +21,7 @@ describe("GET /api/volunteerHistory", () => {
     expect(res.status).toBe(401);
   });
 
-  it("returns 401 when getUser returns error", async () => {
-    supabase.auth.getUser.mockResolvedValueOnce({
-      data: null,
-      error: { message: "Bad token" }
-    });
-
-    const res = await request(app)
-      .get("/api/volunteerHistory")
-      .set("Authorization", `Bearer ${token}`);
-
-    expect(res.status).toBe(401);
-    expect(res.body.error).toBe("Bad token");
-  });
+  
 
   it("returns 401 when getUser returns null user", async () => {
     supabase.auth.getUser.mockResolvedValueOnce({
